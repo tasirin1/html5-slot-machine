@@ -29,9 +29,9 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             initApp();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             android.util.Log.e("MainActivity", "Init error", e);
-            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Error: " + (e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -66,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
             serverUrlText.setText(server.getServerUrl());
         } catch (Exception e) {
             android.util.Log.e("MainActivity", "Server start error", e);
-            serverUrlText.setText("Server error: " + e.getMessage());
+            if (serverUrlText != null)
+                serverUrlText.setText("Server error: " + e.getMessage());
         }
 
         setupDifficulty();
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshAccountList() {
+        if (accountListLayout == null) return;
         accountListLayout.removeViews(1, Math.max(0, accountListLayout.getChildCount() - 1));
         String json = accountManager.getAllAccounts();
         try {
@@ -280,26 +282,39 @@ public class MainActivity extends AppCompatActivity {
 
     // ===== DISPLAY =====
 
-    private void updateDisplay() {
-        currentJackpotText.setText(gameConfig.getFormattedJackpot());
-        jackpotInput.setText(String.valueOf(gameConfig.getJackpot()));
-        startingMoneyInput.setText(String.valueOf(gameConfig.getStartingMoney()));
-        betAmountInput.setText(String.valueOf(gameConfig.getBetAmount()));
-
-        statusText.setText(
-            "Difficulty: " + gameConfig.getDifficulty().label
-            + " | Win: " + String.format("%.1f%%", gameConfig.getWinRate() * 100)
-            + " | Pay: " + String.format("%.0fx", gameConfig.getPayoutMultiplier())
-            + "\nServer: " + server.getServerUrl());
-
-        int wrp = Math.round((gameConfig.getWinRate() * 100 - 0.5f) / 0.5f);
-        winRateSeekBar.setProgress(Math.max(0, Math.min(149, wrp)));
-        winRateValue.setText(String.format("%.1f%%", gameConfig.getWinRate() * 100));
-
-        int pp = Math.round(gameConfig.getPayoutMultiplier() - 1);
-        payoutSeekBar.setProgress(Math.max(0, Math.min(49, pp)));
-        payoutValue.setText(String.format("%.0fx", gameConfig.getPayoutMultiplier()));
-    }
+        private void updateDisplay() {
+        try {
+            if (gameConfig == null) return;
+            if (currentJackpotText != null)
+                currentJackpotText.setText(gameConfig.getFormattedJackpot());
+            if (jackpotInput != null)
+                jackpotInput.setText(String.valueOf(gameConfig.getJackpot()));
+            if (startingMoneyInput != null)
+                startingMoneyInput.setText(String.valueOf(gameConfig.getStartingMoney()));
+            if (betAmountInput != null)
+                betAmountInput.setText(String.valueOf(gameConfig.getBetAmount()));
+            if (statusText != null)
+                statusText.setText(
+                    "Difficulty: " + gameConfig.getDifficulty().label
+                    + " | Win: " + String.format("%.1f%%", gameConfig.getWinRate() * 100)
+                    + " | Pay: " + String.format("%.0fx", gameConfig.getPayoutMultiplier())
+                    + (server != null ? "\nServer: " + server.getServerUrl() : ""));
+            if (winRateSeekBar != null) {
+                int wrp = Math.round((gameConfig.getWinRate() * 100 - 0.5f) / 0.5f);
+                winRateSeekBar.setProgress(Math.max(0, Math.min(149, wrp)));
+            }
+            if (winRateValue != null)
+                winRateValue.setText(String.format("%.1f%%", gameConfig.getWinRate() * 100));
+            if (payoutSeekBar != null) {
+                int pp = Math.round(gameConfig.getPayoutMultiplier() - 1);
+                payoutSeekBar.setProgress(Math.max(0, Math.min(49, pp)));
+            }
+            if (payoutValue != null)
+                payoutValue.setText(String.format("%.0fx", gameConfig.getPayoutMultiplier()));
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "updateDisplay error", e);
+        }
+    }}
 
     private String formatMoney(long v) {
         return String.format("%,d", v).replace(",", ".");
@@ -308,7 +323,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        refreshAccountList();
+        if (accountListLayout != null) {
+            refreshAccountList();
+        }
     }
 
     @Override
