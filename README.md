@@ -1,36 +1,90 @@
-# HTML5 Slot Machine
+# 🎰 Slot Machine Server
 
-![Build and Deploy Status](https://github.com/johakr/html5-slot-machine/actions/workflows/deploy.yml/badge.svg) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+A complete slot machine game system with:
 
-This is a modern proof of concept casino slot machine game, built using only vanilla HTML, CSS and JavaScript.
-No Flash or Frameworks required. Allowing for an amazing low bundle size and blazing fast performance.
-
-Built using the _Web Animations API_.
-
-**[Live Demo](https://johakr.github.io/html5-slot-machine/)**
+- **Web-based slot machine** playable from any browser
+- **Android APK** with embedded HTTP server and admin panel
+- **Local network hosting** — play on multiple devices via WiFi
+- **Admin dashboard** to control difficulty, jackpot, and money settings
 
 ## Features
 
-- Fully responsive for great UX on mobile, web & fullscreen mode.
-- Autoplay functionality, which keeps running even if the game window is in background.
+### 🎮 Game (Browser)
 
-## Installation, Build & Deployment
+- 5-reel slot machine with Star Wars themed symbols
+- Smooth animations using Web Animations API
+- Fully responsive for mobile, tablet, and desktop
+- Money system: bet coins, win payouts
+- Autoplay mode
+- Landscape optimized
 
-1. Clone repository
-2. Run `npm install`
-   - _Development_: run `npm start` and go to `http://localhost:8080`
-   - _Production_: run `npm run build` and serve from `/dist`
+### 📱 Admin Panel (Android APK)
 
-## Configuration
+- Start/stop local HTTP server on port 8080
+- **Difficulty Level**: Very Easy → Impossible (6 presets)
+- **Win Rate**: 0.5% — 75%
+- **Payout Multiplier**: 1× — 50×
+- **Jackpot**: Set any amount
+- **Starting Money & Bet Amount**: Configure player economy
+- Works on Android 6+ and Android TV
 
-For configuration options see `config` object in [index.js](https://github.com/johakr/html5-slot-machine/blob/master/src/js/index.js)
+## Installation
 
-| Property      | Description                                                                                                                            | Default   |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| `inverted`    | Controls visual spinning direction of reels. If false, reels will spin from bottom to top. If true, reels will spin from top to bottom | false     |
-| `onSpinStart` | Callback function invoked when spin starts with symbols pattern array `(symbols) => void`.                                             | undefined |
-| `onSpinEnd`   | Callback function invoked when spin ends with symbols pattern array `(symbols) => void`.                                               | undefined |
+### Web App
+
+```bash
+npm install
+npm run build    # production build → /dist
+npm start        # development server → http://localhost:8080
+```
+
+### Android APK
+
+Download from [GitHub Actions](https://github.com/tasirin1/html5-slot-machine/actions):
+
+1. Open the **Build Android APK** workflow
+2. Click the latest successful run (✅)
+3. Scroll to **Artifacts** → download **slot-machine-apk**
+4. Extract ZIP and install `app-debug.apk` on Android
+
+## How to Play
+
+1. Install the APK on an Android device and open it
+2. The admin dashboard shows the **server URL** (e.g., `http://192.168.1.5:8080`)
+3. Adjust **Difficulty**, **Jackpot**, and **Money** settings
+4. Open a browser on any device on the same WiFi network
+5. Navigate to the server URL
+6. Start spinning! (The game follows the rules set from the admin panel)
+
+## Architecture
+
+```
+┌─────────────────┐     WiFi      ┌──────────────────┐
+│  Android APK    │──────────────▶│  Player Browser  │
+│  (Admin Panel)  │  HTTP :8080   │  (Slot Machine)  │
+│                 │               │                  │
+│  ┌───────────┐  │  GET /api/    │  ┌────────────┐  │
+│  │  GameConfig│◀├───────────────┤  │  Slot.js   │  │
+│  │  (SharedPref)│  config       │  │  (Web)     │  │
+│  └───────────┘  │               │  └────────────┘  │
+│       │         │               │                  │
+│  ┌───────────┐  │  POST /api/   │                  │
+│  │ SlotServer │◀├───────────────┤                  │
+│  │ (NanoHTTPd)│  │ config       │                  │
+│  └───────────┘  │               │                  │
+└─────────────────┘               └──────────────────┘
+```
+
+## API Endpoints
+
+| Method | Endpoint       | Description                |
+| ------ | -------------- | -------------------------- |
+| GET    | `/api/config`  | Get all game configuration |
+| POST   | `/api/config`  | Update game configuration  |
+| GET    | `/api/jackpot` | Get current jackpot        |
+| POST   | `/api/jackpot` | Set jackpot value          |
+| GET    | `/api/status`  | Server status info         |
 
 ## Credits
 
-Icons are created by [KPD Media](https://dribbble.com/shots/3517520-Star-Wars) and can be used for private and commercial purposes with no attribution required ([check license here](https://iconstore.co/icons/10-star-wars-icons/)).
+Icons by [KPD Media](https://dribbble.com/shots/3517520-Star-Wars) — free for private and commercial use.
