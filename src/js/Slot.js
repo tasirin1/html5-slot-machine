@@ -34,6 +34,8 @@ export default class Slot {
     this.spinButton.addEventListener("click", () => this.spin());
 
     this.autoPlayCheckbox = document.getElementById("autoplay");
+    this.spinCount = 0;
+    this.gameConfig = null;
 
     if (config.inverted) {
       this.container.classList.add("inverted");
@@ -41,27 +43,51 @@ export default class Slot {
 
     this.config = config;
 
-    // Fetch initial jackpot from server
-    this.updateJackpotFromServer();
+    // Fetch config and jackpot from server
+    this.loadConfig();
   }
 
-  async updateJackpotFromServer() {
-    const data = await JackpotAPI.fetchJackpot();
-    if (this.jackpotDisplay) {
+  async loadConfig() {
+    this.gameConfig = await JackpotAPI.fetchConfig();
+    this.updateJackpotDisplay();
+  }
+
+  updateJackpotDisplay() {
+    if (this.jackpotDisplay && this.gameConfig) {
       this.jackpotDisplay.textContent =
-        data.formatted || JackpotAPI.formatNumber(data.jackpot);
+        this.gameConfig.formattedJackpot ||
+        JackpotAPI.formatNumber(this.gameConfig.jackpot || 5555555);
     }
   }
 
   spin() {
+    this.spinCount++;
+
+    // Determine if this spin should be a win based on server config
+    const willWin = this.shouldWin();
+
+    if (willWin) {
+      // Player wins: generate matching symbols
+      const winSymbol = Symbol.random();
+      this.nextSymbols = [
+        [Symbol.random(), Symbol.random(), Symbol.random()],
+        [winSymbol, winSymbol, winSymbol],
+        [Symbol.random(), Symbol.random(), Symbol.random()],
+        [winSymbol, winSymbol, winSymbol],
+        [Symbol.random(), Symbol.random(), Symbol.random()],
+      ];
+    } else {
+      // Player loses: generate all random symbols
+      this.nextSymbols = [
+        [Symbol.random(), Symbol.random(), Symbol.random()],
+        [Symbol.random(), Symbol.random(), Symbol.random()],
+        [Symbol.random(), Symbol.random(), Symbol.random()],
+        [Symbol.random(), Symbol.random(), Symbol.random()],
+        [Symbol.random(), Symbol.random(), Symbol.random()],
+      ];
+    }
+
     this.currentSymbols = this.nextSymbols;
-    this.nextSymbols = [
-      [Symbol.random(), Symbol.random(), Symbol.random()],
-      [Symbol.random(), Symbol.random(), Symbol.random()],
-      [Symbol.random(), Symbol.random(), Symbol.random()],
-      [Symbol.random(), Symbol.random(), Symbol.random()],
-      [Symbol.random(), Symbol.random(), Symbol.random()],
-    ];
 
     this.onSpinStart(this.nextSymbols);
 
@@ -73,17 +99,36 @@ export default class Slot {
     ).then(() => this.onSpinEnd(this.nextSymbols));
   }
 
+  shouldWin() {
+    if (!this.gameConfig) return false;
+
+    const winRate = this.gameConfig.winRate || 0.15;
+    const minSpins = this.gameConfig.minSpinsBeforeWin || 10;
+
+    // Guaranteed win after minimum spins
+    if (this.spinCount >= minSpins && this.spinCount % minSpins === 0) {
+      return true;
+    }
+
+    // Random chance based on win rate
+    return Math.random() < winRate;
+  }
+
   onSpinStart(symbols) {
     this.spinButton.disabled = true;
     this.config.onSpinStart?.(symbols);
   }
 
-  onSpinEnd(symbols) {
+  async onSpinEnd(symbols) {
     this.spinButton.disabled = false;
     this.config.onSpinEnd?.(symbols);
 
     // Refresh jackpot from server after each spin
-    this.updateJackpotFromServer();
+    const data = await JackpotAPI.fetchJackpot();
+    if (this.jackpotDisplay) {
+      this.jackpotDisplay.textContent =
+        data.formatted || JackpotAPI.formatNumber(data.jackpot);
+    }
 
     if (this.autoPlayCheckbox.checked) {
       return window.setTimeout(() => this.spin(), 200);

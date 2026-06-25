@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Slot Machine</string>
-    <string name="jackpot_title">Jackpot Settings</string>
-    <string name="current_jackpot">Current Jackpot</string>
-    <string name="set_jackpot">Set Jackpot</string>
+    <string name="app_name">Slot Machine Admin</string>
     <string name="server_status">Server Status</string>
     <string name="server_running">Server is running on</string>
-    <string name="btn_open_admin">⚙️ Jackpot Settings</string>
-    <string name="btn_save">Save</string>
-    <string name="label_jackpot_value">Jackpot Value</string>
-    <string name="toast_updated">Jackpot updated!</string>
-    <string name="scan_qr">Scan QR code to play on another device</string>
 </resources>

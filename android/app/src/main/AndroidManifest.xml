@@ -25,12 +25,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".AdminActivity"
-            android:exported="false"
-            android:label="Jackpot Settings"
-            android:parentActivityName=".MainActivity" />
-
     </application>
 
 </manifest>

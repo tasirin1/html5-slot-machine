@@ -3,8 +3,6 @@ package com.slotmachine;
 import android.content.Context;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,17 +19,15 @@ public class SlotServer extends NanoHTTPD {
 
     private static final String TAG = "SlotServer";
     private static final int PORT = 8080;
-    private static final String API_JACKPOT = "/api/jackpot";
-    private static final String API_STATUS = "/api/status";
 
     private final Context context;
-    private final JackpotManager jackpotManager;
+    private final GameConfig gameConfig;
     private String localIp;
 
     public SlotServer(Context context) {
         super(PORT);
         this.context = context;
-        this.jackpotManager = JackpotManager.getInstance(context);
+        this.gameConfig = GameConfig.getInstance(context);
         this.localIp = getLocalIpAddress();
     }
 
@@ -42,22 +38,77 @@ public class SlotServer extends NanoHTTPD {
 
         Log.d(TAG, method + " " + uri);
 
-        // API routes
-        if (uri.equals(API_JACKPOT)) {
-            return handleJackpotApi(method, session);
+        switch (uri) {
+            case "/api/config":
+                return handleConfigApi(method, session);
+            case "/api/jackpot":
+                return handleJackpotApi(method, session);
+            case "/api/status":
+                return handleStatusApi();
+            default:
+                return serveStaticFile(uri);
         }
-        if (uri.equals(API_STATUS)) {
-            return handleStatusApi();
+    }
+
+    private Response handleConfigApi(Method method, IHTTPSession session) {
+        if (Method.GET.equals(method)) {
+            return newFixedLengthResponse(Response.Status.OK, "application/json",
+                gameConfig.toJson());
         }
 
-        // Serve static files
-        return serveStaticFile(uri);
+        if (Method.POST.equals(method)) {
+            try {
+                Map<String, String> files = new HashMap<>();
+                session.parseBody(files);
+                String body = session.getQueryParameterString();
+                if (body == null || body.isEmpty()) {
+                    body = files.get("postData");
+                }
+
+                if (body != null && !body.isEmpty()) {
+                    // Parse difficulty
+                    if (body.contains("\"difficultyId\"")) {
+                        String valStr = body.replaceAll(".*\"difficultyId\"\\s*:\\s*(\\d+).*", "$1");
+                        if (!valStr.equals(body)) {
+                            int diffId = Integer.parseInt(valStr);
+                            gameConfig.setDifficulty(GameConfig.Difficulty.fromId(diffId));
+                        }
+                    }
+                    // Parse custom values
+                    if (body.contains("\"custom\"")) {
+                        float winRate = getJsonFloat(body, "winRate", 0.15f);
+                        float payoutMult = getJsonFloat(body, "payoutMultiplier", 3.0f);
+                        int minSpins = (int) getJsonFloat(body, "minSpinsBeforeWin", 10);
+                        float jackpotHitRate = getJsonFloat(body, "jackpotHitRate", 0.005f);
+                        gameConfig.setCustomConfig(winRate, payoutMult, minSpins, jackpotHitRate);
+                    }
+                    // Parse jackpot
+                    if (body.contains("\"jackpot\"")) {
+                        String valStr = body.replaceAll(".*\"jackpot\"\\s*:\\s*(\\d+).*", "$1");
+                        if (!valStr.equals(body)) {
+                            gameConfig.setJackpot(Long.parseLong(valStr));
+                        }
+                    }
+
+                    return newFixedLengthResponse(Response.Status.OK, "application/json",
+                        "{\"success\": true, \"config\": " + gameConfig.toJson() + "}");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error parsing config POST", e);
+            }
+
+            return newFixedLengthResponse(Response.Status.BAD_REQUEST, "application/json",
+                "{\"error\": \"Invalid request\"}");
+        }
+
+        return newFixedLengthResponse(Response.Status.METHOD_NOT_ALLOWED, "application/json",
+            "{\"error\": \"Method not allowed\"}");
     }
 
     private Response handleJackpotApi(Method method, IHTTPSession session) {
         if (Method.GET.equals(method)) {
-            String json = "{\"jackpot\": " + jackpotManager.getJackpot()
-                + ", \"formatted\": \"" + jackpotManager.getFormattedJackpot() + "\"}";
+            String json = "{\"jackpot\": " + gameConfig.getJackpot()
+                + ", \"formatted\": \"" + gameConfig.getFormattedJackpot() + "\"}";
             return newFixedLengthResponse(Response.Status.OK, "application/json", json);
         }
 
@@ -65,35 +116,22 @@ public class SlotServer extends NanoHTTPD {
             try {
                 Map<String, String> files = new HashMap<>();
                 session.parseBody(files);
-
-                int contentLength = Integer.parseInt(
-                    session.getHeaders().getOrDefault("content-length", "0"));
-
-                if (contentLength > 0) {
-                    String body = session.getQueryParameterString();
-                    if (body == null || body.isEmpty()) {
-                        // Try to read from parsed body
-                        body = files.get("postData");
-                    }
-                    if (body != null && !body.isEmpty()) {
-                        // Parse JSON manually
-                        if (body.contains("\"value\"")) {
-                            String valStr = body.replaceAll(".*\"value\"\\s*:\\s*(\\d+).*", "$1");
-                            try {
-                                long value = Long.parseLong(valStr);
-                                jackpotManager.setJackpot(value);
-                                String json = "{\"success\": true, \"jackpot\": " + value + "}";
-                                return newFixedLengthResponse(Response.Status.OK, "application/json", json);
-                            } catch (NumberFormatException e) {
-                                // ignore
-                            }
-                        }
+                String body = session.getQueryParameterString();
+                if (body == null || body.isEmpty()) {
+                    body = files.get("postData");
+                }
+                if (body != null && body.contains("\"value\"")) {
+                    String valStr = body.replaceAll(".*\"value\"\\s*:\\s*(\\d+).*", "$1");
+                    if (!valStr.equals(body)) {
+                        long value = Long.parseLong(valStr);
+                        gameConfig.setJackpot(value);
+                        return newFixedLengthResponse(Response.Status.OK, "application/json",
+                            "{\"success\": true, \"jackpot\": " + value + "}");
                     }
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error parsing jackpot POST", e);
             }
-
             return newFixedLengthResponse(Response.Status.BAD_REQUEST, "application/json",
                 "{\"error\": \"Invalid request\"}");
         }
@@ -107,7 +145,9 @@ public class SlotServer extends NanoHTTPD {
             + "\"status\": \"running\","
             + "\"ip\": \"" + localIp + "\","
             + "\"port\": " + PORT + ","
-            + "\"jackpot\": " + jackpotManager.getJackpot()
+            + "\"players\": 0,"
+            + "\"totalSpins\": 0,"
+            + "\"config\": " + gameConfig.toJson()
             + "}";
         return newFixedLengthResponse(Response.Status.OK, "application/json", json);
     }
@@ -117,18 +157,15 @@ public class SlotServer extends NanoHTTPD {
             uri = "/index.html";
         }
 
-        // Remove leading slash
         String assetPath = "www" + uri;
 
         try {
             InputStream inputStream = context.getAssets().open(assetPath);
-            String mimeType = getMimeType(uri);
-
-            // Read the input stream into bytes
             byte[] bytes = readInputStream(inputStream);
             inputStream.close();
-
-            return newChunkedResponse(Response.Status.OK, mimeType, new java.io.ByteArrayInputStream(bytes));
+            String mimeType = getMimeType(uri);
+            return newChunkedResponse(Response.Status.OK, mimeType,
+                new ByteArrayInputStream(bytes));
         } catch (IOException e) {
             Log.d(TAG, "File not found: " + assetPath);
             return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain",
@@ -154,9 +191,18 @@ public class SlotServer extends NanoHTTPD {
         if (uri.endsWith(".png")) return "image/png";
         if (uri.endsWith(".jpg") || uri.endsWith(".jpeg")) return "image/jpeg";
         if (uri.endsWith(".json")) return "application/json";
-        if (uri.endsWith(".woff2")) return "font/woff2";
-        if (uri.endsWith(".woff")) return "font/woff";
         return "text/plain";
+    }
+
+    private float getJsonFloat(String json, String key, float defaultVal) {
+        try {
+            String pattern = ".*\"" + key + "\"\\s*:\\s*([0-9.eE+-]+).*";
+            String val = json.replaceAll(pattern, "$1");
+            if (!val.equals(json)) {
+                return Float.parseFloat(val);
+            }
+        } catch (Exception ignored) {}
+        return defaultVal;
     }
 
     private String getLocalIpAddress() {
@@ -177,17 +223,9 @@ public class SlotServer extends NanoHTTPD {
         return "127.0.0.1";
     }
 
-    public String getLocalIp() {
-        return localIp;
-    }
-
-    public int getPort() {
-        return PORT;
-    }
-
-    public String getServerUrl() {
-        return "http://" + localIp + ":" + PORT;
-    }
+    public String getLocalIp() { return localIp; }
+    public int getPort() { return PORT; }
+    public String getServerUrl() { return "http://" + localIp + ":" + PORT; }
 
     public void startServer() {
         try {

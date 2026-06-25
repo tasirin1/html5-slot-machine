@@ -1,4 +1,4 @@
-/*! For license information please see bundle.28eef536336d2248d619.js.LICENSE.txt */
+/*! For license information please see bundle.392fa3ce09a6e258fb70.js.LICENSE.txt */
 (() => {
   var t = {
       138: (t, r, e) => {
@@ -399,7 +399,7 @@
           var i = r && r.prototype instanceof b ? r : b,
             a = Object.create(i.prototype),
             c = new N(n || []);
-          return o(a, "_invoke", { value: O(t, e, c) }), a;
+          return o(a, "_invoke", { value: C(t, e, c) }), a;
         }
         function p(t, r, e) {
           try {
@@ -422,17 +422,17 @@
           return this;
         });
         var E = Object.getPrototypeOf,
-          _ = E && E(E(F([])));
+          _ = E && E(E(G([])));
         _ && _ !== e && n.call(_, a) && (S = _);
         var L = (x.prototype = b.prototype = Object.create(S));
-        function j(t) {
+        function k(t) {
           ["next", "throw", "return"].forEach(function (r) {
             s(t, r, function (t) {
               return this._invoke(r, t);
             });
           });
         }
-        function k(t, r) {
+        function j(t, r) {
           function e(o, i, a, c) {
             var u = p(t[o], t, i);
             if ("throw" !== u.type) {
@@ -470,7 +470,7 @@
             },
           });
         }
-        function O(r, e, n) {
+        function C(r, e, n) {
           var o = y;
           return function (i, a) {
             if (o === v) throw Error("Generator is already running");
@@ -481,7 +481,7 @@
             for (n.method = i, n.arg = a; ; ) {
               var c = n.delegate;
               if (c) {
-                var u = P(c, n);
+                var u = O(c, n);
                 if (u) {
                   if (u === g) continue;
                   return u;
@@ -503,7 +503,7 @@
             }
           };
         }
-        function P(r, e) {
+        function O(r, e) {
           var n = e.method,
             o = r.iterator[n];
           if (o === t)
@@ -513,7 +513,7 @@
                 r.iterator.return &&
                 ((e.method = "return"),
                 (e.arg = t),
-                P(r, e),
+                O(r, e),
                 "throw" === e.method)) ||
                 ("return" !== n &&
                   ((e.method = "throw"),
@@ -541,7 +541,7 @@
               (e.delegate = null),
               g);
         }
-        function C(t) {
+        function P(t) {
           var r = { tryLoc: t[0] };
           1 in t && (r.catchLoc = t[1]),
             2 in t && ((r.finallyLoc = t[2]), (r.afterLoc = t[3])),
@@ -553,10 +553,10 @@
         }
         function N(t) {
           (this.tryEntries = [{ tryLoc: "root" }]),
-            t.forEach(C, this),
+            t.forEach(P, this),
             this.reset(!0);
         }
-        function F(r) {
+        function G(r) {
           if (r || "" === r) {
             var e = r[a];
             if (e) return e.call(r);
@@ -597,21 +597,21 @@
           (r.awrap = function (t) {
             return { __await: t };
           }),
-          j(k.prototype),
-          s(k.prototype, c, function () {
+          k(j.prototype),
+          s(j.prototype, c, function () {
             return this;
           }),
-          (r.AsyncIterator = k),
+          (r.AsyncIterator = j),
           (r.async = function (t, e, n, o, i) {
             void 0 === i && (i = Promise);
-            var a = new k(h(t, e, n, o), i);
+            var a = new j(h(t, e, n, o), i);
             return r.isGeneratorFunction(e)
               ? a
               : a.next().then(function (t) {
                   return t.done ? t.value : a.next();
                 });
           }),
-          j(L),
+          k(L),
           s(L, u, "Generator"),
           s(L, a, function () {
             return this;
@@ -634,7 +634,7 @@
               }
             );
           }),
-          (r.values = F),
+          (r.values = G),
           (N.prototype = {
             constructor: N,
             reset: function (r) {
@@ -755,7 +755,7 @@
             },
             delegateYield: function (r, e, n) {
               return (
-                (this.delegate = { iterator: F(r), resultName: e, nextLoc: n }),
+                (this.delegate = { iterator: G(r), resultName: e, nextLoc: n }),
                 "next" === this.method && (this.arg = t),
                 g
               );
@@ -773,66 +773,114 @@
         }
         c.done ? r(u) : Promise.resolve(u).then(n, o);
       }
-      var p = window.location.origin;
-      const y = function () {
-          return ((t = f().mark(function t() {
-            var r, e;
-            return f().wrap(
-              function (t) {
-                for (;;)
-                  switch ((t.prev = t.next)) {
-                    case 0:
-                      return (
-                        (t.prev = 0),
-                        (t.next = 3),
-                        fetch("".concat(p, "/api/jackpot"))
-                      );
-                    case 3:
-                      return (r = t.sent), (t.next = 6), r.json();
-                    case 6:
-                      return (e = t.sent), t.abrupt("return", e);
-                    case 10:
-                      return (
-                        (t.prev = 10),
-                        (t.t0 = t.catch(0)),
-                        console.error("Failed to fetch jackpot:", t.t0),
-                        t.abrupt("return", {
-                          jackpot: 5555555,
-                          formatted: "5.555.555",
-                        })
-                      );
-                    case 14:
-                    case "end":
-                      return t.stop();
-                  }
-              },
-              t,
-              null,
-              [[0, 10]],
-            );
-          })),
-          function () {
-            var r = this,
-              e = arguments;
-            return new Promise(function (n, o) {
-              var i = t.apply(r, e);
-              function a(t) {
-                h(i, n, o, a, c, "next", t);
-              }
-              function c(t) {
-                h(i, n, o, a, c, "throw", t);
-              }
-              a(void 0);
-            });
-          })();
-          var t;
+      function p(t) {
+        return function () {
+          var r = this,
+            e = arguments;
+          return new Promise(function (n, o) {
+            var i = t.apply(r, e);
+            function a(t) {
+              h(i, n, o, a, c, "next", t);
+            }
+            function c(t) {
+              h(i, n, o, a, c, "throw", t);
+            }
+            a(void 0);
+          });
+        };
+      }
+      var y = window.location.origin;
+      const d = function () {
+          return p(
+            f().mark(function t() {
+              var r, e;
+              return f().wrap(
+                function (t) {
+                  for (;;)
+                    switch ((t.prev = t.next)) {
+                      case 0:
+                        return (
+                          (t.prev = 0),
+                          (t.next = 3),
+                          fetch("".concat(y, "/api/jackpot"))
+                        );
+                      case 3:
+                        return (r = t.sent), (t.next = 6), r.json();
+                      case 6:
+                        return (e = t.sent), t.abrupt("return", e);
+                      case 10:
+                        return (
+                          (t.prev = 10),
+                          (t.t0 = t.catch(0)),
+                          console.error("Failed to fetch jackpot:", t.t0),
+                          t.abrupt("return", {
+                            jackpot: 5555555,
+                            formatted: "5.555.555",
+                          })
+                        );
+                      case 14:
+                      case "end":
+                        return t.stop();
+                    }
+                },
+                t,
+                null,
+                [[0, 10]],
+              );
+            }),
+          )();
         },
-        d = function (t) {
+        v = function () {
+          return p(
+            f().mark(function t() {
+              var r, e;
+              return f().wrap(
+                function (t) {
+                  for (;;)
+                    switch ((t.prev = t.next)) {
+                      case 0:
+                        return (
+                          (t.prev = 0),
+                          (t.next = 3),
+                          fetch("".concat(y, "/api/config"))
+                        );
+                      case 3:
+                        return (r = t.sent), (t.next = 6), r.json();
+                      case 6:
+                        return (e = t.sent), t.abrupt("return", e);
+                      case 10:
+                        return (
+                          (t.prev = 10),
+                          (t.t0 = t.catch(0)),
+                          console.error("Failed to fetch config:", t.t0),
+                          t.abrupt("return", {
+                            difficulty: "Medium",
+                            winRate: 0.15,
+                            payoutMultiplier: 3,
+                            minSpinsBeforeWin: 10,
+                            jackpotHitRate: 0.005,
+                            jackpot: 5555555,
+                            formattedJackpot: "5.555.555",
+                          })
+                        );
+                      case 14:
+                      case "end":
+                        return t.stop();
+                    }
+                },
+                t,
+                null,
+                [[0, 10]],
+              );
+            }),
+          )();
+        },
+        m = function (t) {
           return t.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         };
-      function v(t) {
+      function g(t) {
         return (
-          (v =
+          (g =
             "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               ? function (t) {
                   return typeof t;
@@ -845,11 +893,11 @@
                     ? "symbol"
                     : typeof t;
                 }),
-          v(t)
+          g(t)
         );
       }
-      function m() {
-        m = function () {
+      function b() {
+        b = function () {
           return r;
         };
         var t,
@@ -884,10 +932,10 @@
           };
         }
         function l(t, r, e, n) {
-          var i = r && r.prototype instanceof b ? r : b,
+          var i = r && r.prototype instanceof m ? r : m,
             a = Object.create(i.prototype),
             c = new N(n || []);
-          return o(a, "_invoke", { value: O(t, e, c) }), a;
+          return o(a, "_invoke", { value: C(t, e, c) }), a;
         }
         function f(t, r, e) {
           try {
@@ -901,8 +949,8 @@
           p = "suspendedYield",
           y = "executing",
           d = "completed",
-          g = {};
-        function b() {}
+          v = {};
+        function m() {}
         function w() {}
         function x() {}
         var S = {};
@@ -910,23 +958,23 @@
           return this;
         });
         var E = Object.getPrototypeOf,
-          _ = E && E(E(F([])));
+          _ = E && E(E(G([])));
         _ && _ !== e && n.call(_, a) && (S = _);
-        var L = (x.prototype = b.prototype = Object.create(S));
-        function j(t) {
+        var L = (x.prototype = m.prototype = Object.create(S));
+        function k(t) {
           ["next", "throw", "return"].forEach(function (r) {
             s(t, r, function (t) {
               return this._invoke(r, t);
             });
           });
         }
-        function k(t, r) {
+        function j(t, r) {
           function e(o, i, a, c) {
             var u = f(t[o], t, i);
             if ("throw" !== u.type) {
               var s = u.arg,
                 l = s.value;
-              return l && "object" == v(l) && n.call(l, "__await")
+              return l && "object" == g(l) && n.call(l, "__await")
                 ? r.resolve(l.__await).then(
                     function (t) {
                       e("next", t, a, c);
@@ -958,7 +1006,7 @@
             },
           });
         }
-        function O(r, e, n) {
+        function C(r, e, n) {
           var o = h;
           return function (i, a) {
             if (o === y) throw Error("Generator is already running");
@@ -969,9 +1017,9 @@
             for (n.method = i, n.arg = a; ; ) {
               var c = n.delegate;
               if (c) {
-                var u = P(c, n);
+                var u = O(c, n);
                 if (u) {
-                  if (u === g) continue;
+                  if (u === v) continue;
                   return u;
                 }
               }
@@ -983,7 +1031,7 @@
               o = y;
               var s = f(r, e, n);
               if ("normal" === s.type) {
-                if (((o = n.done ? d : p), s.arg === g)) continue;
+                if (((o = n.done ? d : p), s.arg === v)) continue;
                 return { value: s.arg, done: n.done };
               }
               "throw" === s.type &&
@@ -991,7 +1039,7 @@
             }
           };
         }
-        function P(r, e) {
+        function O(r, e) {
           var n = e.method,
             o = r.iterator[n];
           if (o === t)
@@ -1001,19 +1049,19 @@
                 r.iterator.return &&
                 ((e.method = "return"),
                 (e.arg = t),
-                P(r, e),
+                O(r, e),
                 "throw" === e.method)) ||
                 ("return" !== n &&
                   ((e.method = "throw"),
                   (e.arg = new TypeError(
                     "The iterator does not provide a '" + n + "' method",
                   )))),
-              g
+              v
             );
           var i = f(o, r.iterator, e.arg);
           if ("throw" === i.type)
             return (
-              (e.method = "throw"), (e.arg = i.arg), (e.delegate = null), g
+              (e.method = "throw"), (e.arg = i.arg), (e.delegate = null), v
             );
           var a = i.arg;
           return a
@@ -1022,14 +1070,14 @@
                 (e.next = r.nextLoc),
                 "return" !== e.method && ((e.method = "next"), (e.arg = t)),
                 (e.delegate = null),
-                g)
+                v)
               : a
             : ((e.method = "throw"),
               (e.arg = new TypeError("iterator result is not an object")),
               (e.delegate = null),
-              g);
+              v);
         }
-        function C(t) {
+        function P(t) {
           var r = { tryLoc: t[0] };
           1 in t && (r.catchLoc = t[1]),
             2 in t && ((r.finallyLoc = t[2]), (r.afterLoc = t[3])),
@@ -1041,10 +1089,10 @@
         }
         function N(t) {
           (this.tryEntries = [{ tryLoc: "root" }]),
-            t.forEach(C, this),
+            t.forEach(P, this),
             this.reset(!0);
         }
-        function F(r) {
+        function G(r) {
           if (r || "" === r) {
             var e = r[a];
             if (e) return e.call(r);
@@ -1059,7 +1107,7 @@
               return (i.next = i);
             }
           }
-          throw new TypeError(v(r) + " is not iterable");
+          throw new TypeError(g(r) + " is not iterable");
         }
         return (
           (w.prototype = x),
@@ -1085,21 +1133,21 @@
           (r.awrap = function (t) {
             return { __await: t };
           }),
-          j(k.prototype),
-          s(k.prototype, c, function () {
+          k(j.prototype),
+          s(j.prototype, c, function () {
             return this;
           }),
-          (r.AsyncIterator = k),
+          (r.AsyncIterator = j),
           (r.async = function (t, e, n, o, i) {
             void 0 === i && (i = Promise);
-            var a = new k(l(t, e, n, o), i);
+            var a = new j(l(t, e, n, o), i);
             return r.isGeneratorFunction(e)
               ? a
               : a.next().then(function (t) {
                   return t.done ? t.value : a.next();
                 });
           }),
-          j(L),
+          k(L),
           s(L, u, "Generator"),
           s(L, a, function () {
             return this;
@@ -1122,7 +1170,7 @@
               }
             );
           }),
-          (r.values = F),
+          (r.values = G),
           (N.prototype = {
             constructor: N,
             reset: function (r) {
@@ -1203,7 +1251,7 @@
                 (a.type = t),
                 (a.arg = r),
                 i
-                  ? ((this.method = "next"), (this.next = i.finallyLoc), g)
+                  ? ((this.method = "next"), (this.next = i.finallyLoc), v)
                   : this.complete(a)
               );
             },
@@ -1217,14 +1265,14 @@
                       (this.method = "return"),
                       (this.next = "end"))
                     : "normal" === t.type && r && (this.next = r),
-                g
+                v
               );
             },
             finish: function (t) {
               for (var r = this.tryEntries.length - 1; r >= 0; --r) {
                 var e = this.tryEntries[r];
                 if (e.finallyLoc === t)
-                  return this.complete(e.completion, e.afterLoc), T(e), g;
+                  return this.complete(e.completion, e.afterLoc), T(e), v;
               }
             },
             catch: function (t) {
@@ -1243,16 +1291,16 @@
             },
             delegateYield: function (r, e, n) {
               return (
-                (this.delegate = { iterator: F(r), resultName: e, nextLoc: n }),
+                (this.delegate = { iterator: G(r), resultName: e, nextLoc: n }),
                 "next" === this.method && (this.arg = t),
-                g
+                v
               );
             },
           }),
           r
         );
       }
-      function g(t, r, e, n, o, i, a) {
+      function w(t, r, e, n, o, i, a) {
         try {
           var c = t[i](a),
             u = c.value;
@@ -1261,29 +1309,45 @@
         }
         c.done ? r(u) : Promise.resolve(u).then(n, o);
       }
-      function b(t, r) {
+      function x(t) {
+        return function () {
+          var r = this,
+            e = arguments;
+          return new Promise(function (n, o) {
+            var i = t.apply(r, e);
+            function a(t) {
+              w(i, n, o, a, c, "next", t);
+            }
+            function c(t) {
+              w(i, n, o, a, c, "throw", t);
+            }
+            a(void 0);
+          });
+        };
+      }
+      function S(t, r) {
         for (var e = 0; e < r.length; e++) {
           var n = r[e];
           (n.enumerable = n.enumerable || !1),
             (n.configurable = !0),
             "value" in n && (n.writable = !0),
-            Object.defineProperty(t, w(n.key), n);
+            Object.defineProperty(t, E(n.key), n);
         }
       }
-      function w(t) {
+      function E(t) {
         var r = (function (t) {
-          if ("object" != v(t) || !t) return t;
+          if ("object" != g(t) || !t) return t;
           var r = t[Symbol.toPrimitive];
           if (void 0 !== r) {
             var e = r.call(t, "string");
-            if ("object" != v(e)) return e;
+            if ("object" != g(e)) return e;
             throw new TypeError("@@toPrimitive must return a primitive value.");
           }
           return String(t);
         })(t);
-        return "symbol" == v(r) ? r : r + "";
+        return "symbol" == g(r) ? r : r + "";
       }
-      var x = (function () {
+      var _ = (function () {
           return (
             (t = function t(r) {
               var e = this,
@@ -1322,67 +1386,74 @@
                   return e.spin();
                 }),
                 (this.autoPlayCheckbox = document.getElementById("autoplay")),
+                (this.spinCount = 0),
+                (this.gameConfig = null),
                 n.inverted && this.container.classList.add("inverted"),
                 (this.config = n),
-                this.updateJackpotFromServer();
+                this.loadConfig();
             }),
             (r = [
               {
-                key: "updateJackpotFromServer",
+                key: "loadConfig",
                 value:
-                  ((e = m().mark(function t() {
-                    var r;
-                    return m().wrap(
-                      function (t) {
-                        for (;;)
-                          switch ((t.prev = t.next)) {
-                            case 0:
-                              return (t.next = 2), y();
-                            case 2:
-                              (r = t.sent),
-                                this.jackpotDisplay &&
-                                  (this.jackpotDisplay.textContent =
-                                    r.formatted || d(r.jackpot));
-                            case 4:
-                            case "end":
-                              return t.stop();
-                          }
-                      },
-                      t,
-                      this,
-                    );
-                  })),
-                  (n = function () {
-                    var t = this,
-                      r = arguments;
-                    return new Promise(function (n, o) {
-                      var i = e.apply(t, r);
-                      function a(t) {
-                        g(i, n, o, a, c, "next", t);
-                      }
-                      function c(t) {
-                        g(i, n, o, a, c, "throw", t);
-                      }
-                      a(void 0);
-                    });
-                  }),
+                  ((n = x(
+                    b().mark(function t() {
+                      return b().wrap(
+                        function (t) {
+                          for (;;)
+                            switch ((t.prev = t.next)) {
+                              case 0:
+                                return (t.next = 2), v();
+                              case 2:
+                                (this.gameConfig = t.sent),
+                                  this.updateJackpotDisplay();
+                              case 4:
+                              case "end":
+                                return t.stop();
+                            }
+                        },
+                        t,
+                        this,
+                      );
+                    }),
+                  )),
                   function () {
                     return n.apply(this, arguments);
                   }),
               },
               {
+                key: "updateJackpotDisplay",
+                value: function () {
+                  this.jackpotDisplay &&
+                    this.gameConfig &&
+                    (this.jackpotDisplay.textContent =
+                      this.gameConfig.formattedJackpot ||
+                      m(this.gameConfig.jackpot || 5555555));
+                },
+              },
+              {
                 key: "spin",
                 value: function () {
                   var t = this;
+                  if ((this.spinCount++, this.shouldWin())) {
+                    var r = i.random();
+                    this.nextSymbols = [
+                      [i.random(), i.random(), i.random()],
+                      [r, r, r],
+                      [i.random(), i.random(), i.random()],
+                      [r, r, r],
+                      [i.random(), i.random(), i.random()],
+                    ];
+                  } else
+                    this.nextSymbols = [
+                      [i.random(), i.random(), i.random()],
+                      [i.random(), i.random(), i.random()],
+                      [i.random(), i.random(), i.random()],
+                      [i.random(), i.random(), i.random()],
+                      [i.random(), i.random(), i.random()],
+                    ];
                   return (
                     (this.currentSymbols = this.nextSymbols),
-                    (this.nextSymbols = [
-                      [i.random(), i.random(), i.random()],
-                      [i.random(), i.random(), i.random()],
-                      [i.random(), i.random(), i.random()],
-                      [i.random(), i.random(), i.random()],
-                      [i.random(), i.random(), i.random()],
-                    ]),
                     this.onSpinStart(this.nextSymbols),
                     Promise.all(
                       this.reels.map(function (r) {
@@ -1391,6 +1462,18 @@
                     ).then(function () {
                       return t.onSpinEnd(t.nextSymbols);
                     })
+                  );
+                },
+              },
+              {
+                key: "shouldWin",
+                value: function () {
+                  if (!this.gameConfig) return !1;
+                  var t = this.gameConfig.winRate || 0.15,
+                    r = this.gameConfig.minSpinsBeforeWin || 10;
+                  return (
+                    (this.spinCount >= r && this.spinCount % r == 0) ||
+                    Math.random() < t
                   );
                 },
               },
@@ -1406,31 +1489,65 @@
               },
               {
                 key: "onSpinEnd",
-                value: function (t) {
-                  var r,
-                    e,
-                    n = this;
-                  if (
-                    ((this.spinButton.disabled = !1),
-                    null === (r = (e = this.config).onSpinEnd) ||
-                      void 0 === r ||
-                      r.call(e, t),
-                    this.updateJackpotFromServer(),
-                    this.autoPlayCheckbox.checked)
-                  )
-                    return window.setTimeout(function () {
-                      return n.spin();
-                    }, 200);
-                },
+                value:
+                  ((e = x(
+                    b().mark(function t(r) {
+                      var e,
+                        n,
+                        o,
+                        i = this;
+                      return b().wrap(
+                        function (t) {
+                          for (;;)
+                            switch ((t.prev = t.next)) {
+                              case 0:
+                                return (
+                                  (this.spinButton.disabled = !1),
+                                  null === (e = (n = this.config).onSpinEnd) ||
+                                    void 0 === e ||
+                                    e.call(n, r),
+                                  (t.next = 4),
+                                  d()
+                                );
+                              case 4:
+                                if (
+                                  ((o = t.sent),
+                                  this.jackpotDisplay &&
+                                    (this.jackpotDisplay.textContent =
+                                      o.formatted || m(o.jackpot)),
+                                  !this.autoPlayCheckbox.checked)
+                                ) {
+                                  t.next = 8;
+                                  break;
+                                }
+                                return t.abrupt(
+                                  "return",
+                                  window.setTimeout(function () {
+                                    return i.spin();
+                                  }, 200),
+                                );
+                              case 8:
+                              case "end":
+                                return t.stop();
+                            }
+                        },
+                        t,
+                        this,
+                      );
+                    }),
+                  )),
+                  function (t) {
+                    return e.apply(this, arguments);
+                  }),
               },
             ]),
-            r && b(t.prototype, r),
+            r && S(t.prototype, r),
             Object.defineProperty(t, "prototype", { writable: !1 }),
             t
           );
           var t, r, e, n;
         })(),
-        S = {
+        L = {
           inverted: !1,
           onSpinStart: function (t) {
             console.log("onSpinStart", t);
@@ -1439,6 +1556,6 @@
             console.log("onSpinEnd", t);
           },
         };
-      new x(document.getElementById("slot"), S);
+      new _(document.getElementById("slot"), L);
     })();
 })();
