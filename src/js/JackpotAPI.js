@@ -2,10 +2,15 @@ const BASE = window.location.origin;
 
 async function apiPost(path, data) {
   try {
+    // Encode data as form-urlencoded for NanoHTTPd compatibility
+    const params = new URLSearchParams();
+    for (const [key, val] of Object.entries(data)) {
+      params.append(key, val);
+    }
     const r = await fetch(BASE + path, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
     });
     return await r.json();
   } catch (e) {

@@ -1,4 +1,4 @@
-/*! For license information please see bundle.9ead9815cf9dffb03188.js.LICENSE.txt */
+/*! For license information please see bundle.e2f91eb27831b5dd6498.js.LICENSE.txt */
 (() => {
   "use strict";
   (() => {
@@ -176,8 +176,8 @@
           },
         i = "function" == typeof Symbol ? Symbol : {},
         u = i.iterator || "@@iterator",
-        s = i.asyncIterator || "@@asyncIterator",
-        l = i.toStringTag || "@@toStringTag";
+        l = i.asyncIterator || "@@asyncIterator",
+        s = i.toStringTag || "@@toStringTag";
       function f(t, e, r) {
         return (
           Object.defineProperty(t, e, {
@@ -223,9 +223,9 @@
         return this;
       });
       var E = Object.getPrototypeOf,
-        k = E && E(E(C([])));
-      k && k !== r && n.call(k, u) && (L = k);
-      var S = (x.prototype = b.prototype = Object.create(L));
+        S = E && E(E(A([])));
+      S && S !== r && n.call(S, u) && (L = S);
+      var k = (x.prototype = b.prototype = Object.create(L));
       function j(t) {
         ["next", "throw", "return"].forEach(function (e) {
           f(t, e, function (t) {
@@ -235,10 +235,10 @@
       }
       function O(t, e) {
         function r(o, i, c, u) {
-          var s = p(t[o], t, i);
-          if ("throw" !== s.type) {
-            var l = s.arg,
-              f = l.value;
+          var l = p(t[o], t, i);
+          if ("throw" !== l.type) {
+            var s = l.arg,
+              f = s.value;
             return f && "object" == a(f) && n.call(f, "__await")
               ? e.resolve(f.__await).then(
                   function (t) {
@@ -250,14 +250,14 @@
                 )
               : e.resolve(f).then(
                   function (t) {
-                    (l.value = t), c(l);
+                    (s.value = t), c(s);
                   },
                   function (t) {
                     return r("throw", t, c, u);
                   },
                 );
           }
-          u(s.arg);
+          u(l.arg);
         }
         var i;
         o(this, "_invoke", {
@@ -294,13 +294,13 @@
               n.dispatchException(n.arg);
             } else "return" === n.method && n.abrupt("return", n.arg);
             o = d;
-            var s = p(e, r, n);
-            if ("normal" === s.type) {
-              if (((o = n.done ? g : v), s.arg === m)) continue;
-              return { value: s.arg, done: n.done };
+            var l = p(e, r, n);
+            if ("normal" === l.type) {
+              if (((o = n.done ? g : v), l.arg === m)) continue;
+              return { value: l.arg, done: n.done };
             }
-            "throw" === s.type &&
-              ((o = g), (n.method = "throw"), (n.arg = s.arg));
+            "throw" === l.type &&
+              ((o = g), (n.method = "throw"), (n.arg = l.arg));
           }
         };
       }
@@ -355,7 +355,7 @@
           t.forEach(T, this),
           this.reset(!0);
       }
-      function C(e) {
+      function A(e) {
         if (e || "" === e) {
           var r = e[u];
           if (r) return r.call(e);
@@ -374,9 +374,9 @@
       }
       return (
         (w.prototype = x),
-        o(S, "constructor", { value: x, configurable: !0 }),
+        o(k, "constructor", { value: x, configurable: !0 }),
         o(x, "constructor", { value: w, configurable: !0 }),
-        (w.displayName = f(x, l, "GeneratorFunction")),
+        (w.displayName = f(x, s, "GeneratorFunction")),
         (e.isGeneratorFunction = function (t) {
           var e = "function" == typeof t && t.constructor;
           return (
@@ -388,8 +388,8 @@
           return (
             Object.setPrototypeOf
               ? Object.setPrototypeOf(t, x)
-              : ((t.__proto__ = x), f(t, l, "GeneratorFunction")),
-            (t.prototype = Object.create(S)),
+              : ((t.__proto__ = x), f(t, s, "GeneratorFunction")),
+            (t.prototype = Object.create(k)),
             t
           );
         }),
@@ -397,7 +397,7 @@
           return { __await: t };
         }),
         j(O.prototype),
-        f(O.prototype, s, function () {
+        f(O.prototype, l, function () {
           return this;
         }),
         (e.AsyncIterator = O),
@@ -410,12 +410,12 @@
                 return t.done ? t.value : a.next();
               });
         }),
-        j(S),
-        f(S, l, "Generator"),
-        f(S, u, function () {
+        j(k),
+        f(k, s, "Generator"),
+        f(k, u, function () {
           return this;
         }),
-        f(S, "toString", function () {
+        f(k, "toString", function () {
           return "[object Generator]";
         }),
         (e.keys = function (t) {
@@ -433,7 +433,7 @@
             }
           );
         }),
-        (e.values = C),
+        (e.values = A),
         (G.prototype = {
           constructor: G,
           reset: function (e) {
@@ -478,14 +478,14 @@
               if ("root" === a.tryLoc) return o("end");
               if (a.tryLoc <= this.prev) {
                 var u = n.call(a, "catchLoc"),
-                  s = n.call(a, "finallyLoc");
-                if (u && s) {
+                  l = n.call(a, "finallyLoc");
+                if (u && l) {
                   if (this.prev < a.catchLoc) return o(a.catchLoc, !0);
                   if (this.prev < a.finallyLoc) return o(a.finallyLoc);
                 } else if (u) {
                   if (this.prev < a.catchLoc) return o(a.catchLoc, !0);
                 } else {
-                  if (!s) throw Error("try statement without catch or finally");
+                  if (!l) throw Error("try statement without catch or finally");
                   if (this.prev < a.finallyLoc) return o(a.finallyLoc);
                 }
               }
@@ -553,7 +553,7 @@
           },
           delegateYield: function (e, r, n) {
             return (
-              (this.delegate = { iterator: C(e), resultName: r, nextLoc: n }),
+              (this.delegate = { iterator: A(e), resultName: r, nextLoc: n }),
               "next" === this.method && (this.arg = t),
               m
             );
@@ -570,7 +570,7 @@
           Array.isArray(t) ||
           (r = (function (t, e) {
             if (t) {
-              if ("string" == typeof t) return s(t, e);
+              if ("string" == typeof t) return l(t, e);
               var r = {}.toString.call(t).slice(8, -1);
               return (
                 "Object" === r && t.constructor && (r = t.constructor.name),
@@ -578,7 +578,7 @@
                   ? Array.from(t)
                   : "Arguments" === r ||
                       /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)
-                    ? s(t, e)
+                    ? l(t, e)
                     : void 0
               );
             }
@@ -626,12 +626,12 @@
         },
       };
     }
-    function s(t, e) {
+    function l(t, e) {
       (null == e || e > t.length) && (e = t.length);
       for (var r = 0, n = Array(e); r < e; r++) n[r] = t[r];
       return n;
     }
-    function l(t, e, r, n, o, i, a) {
+    function s(t, e, r, n, o, i, a) {
       try {
         var c = t[i](a),
           u = c.value;
@@ -716,21 +716,21 @@
                                     clearInterval(a), o.setSymbols(e), void t()
                                   );
                                 var c,
-                                  s = u(o.items);
+                                  l = u(o.items);
                                 try {
-                                  for (s.s(); !(c = s.n()).done; ) {
-                                    var l = c.value,
+                                  for (l.s(); !(c = l.n()).done; ) {
+                                    var s = c.value,
                                       f = i.random(),
                                       h = i.getData(f);
-                                    (l.textContent = h.icon),
-                                      (l.style.cssText = "background:"
+                                    (s.textContent = h.icon),
+                                      (s.style.cssText = "background:"
                                         .concat(h.bg, ";color:")
                                         .concat(h.color, ";"));
                                   }
                                 } catch (t) {
-                                  s.e(t);
+                                  l.e(t);
                                 } finally {
-                                  s.f();
+                                  l.f();
                                 }
                               }, 60);
                             }),
@@ -748,10 +748,10 @@
                 return new Promise(function (n, o) {
                   var i = r.apply(t, e);
                   function a(t) {
-                    l(i, n, o, a, c, "next", t);
+                    s(i, n, o, a, c, "next", t);
                   }
                   function c(t) {
-                    l(i, n, o, a, c, "throw", t);
+                    s(i, n, o, a, c, "throw", t);
                   }
                   a(void 0);
                 });
@@ -785,8 +785,82 @@
         y(t)
       );
     }
-    function v() {
-      v = function () {
+    function v(t, e) {
+      return (
+        (function (t) {
+          if (Array.isArray(t)) return t;
+        })(t) ||
+        (function (t, e) {
+          var r =
+            null == t
+              ? null
+              : ("undefined" != typeof Symbol && t[Symbol.iterator]) ||
+                t["@@iterator"];
+          if (null != r) {
+            var n,
+              o,
+              i,
+              a,
+              c = [],
+              u = !0,
+              l = !1;
+            try {
+              if (((i = (r = r.call(t)).next), 0 === e)) {
+                if (Object(r) !== r) return;
+                u = !1;
+              } else
+                for (
+                  ;
+                  !(u = (n = i.call(r)).done) &&
+                  (c.push(n.value), c.length !== e);
+                  u = !0
+                );
+            } catch (t) {
+              (l = !0), (o = t);
+            } finally {
+              try {
+                if (
+                  !u &&
+                  null != r.return &&
+                  ((a = r.return()), Object(a) !== a)
+                )
+                  return;
+              } finally {
+                if (l) throw o;
+              }
+            }
+            return c;
+          }
+        })(t, e) ||
+        (function (t, e) {
+          if (t) {
+            if ("string" == typeof t) return d(t, e);
+            var r = {}.toString.call(t).slice(8, -1);
+            return (
+              "Object" === r && t.constructor && (r = t.constructor.name),
+              "Map" === r || "Set" === r
+                ? Array.from(t)
+                : "Arguments" === r ||
+                    /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)
+                  ? d(t, e)
+                  : void 0
+            );
+          }
+        })(t, e) ||
+        (function () {
+          throw new TypeError(
+            "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+          );
+        })()
+      );
+    }
+    function d(t, e) {
+      (null == e || e > t.length) && (e = t.length);
+      for (var r = 0, n = Array(e); r < e; r++) n[r] = t[r];
+      return n;
+    }
+    function g() {
+      g = function () {
         return e;
       };
       var t,
@@ -802,7 +876,7 @@
         a = i.iterator || "@@iterator",
         c = i.asyncIterator || "@@asyncIterator",
         u = i.toStringTag || "@@toStringTag";
-      function s(t, e, r) {
+      function l(t, e, r) {
         return (
           Object.defineProperty(t, e, {
             value: r,
@@ -814,13 +888,13 @@
         );
       }
       try {
-        s({}, "");
+        l({}, "");
       } catch (t) {
-        s = function (t, e, r) {
+        l = function (t, e, r) {
           return (t[e] = r);
         };
       }
-      function l(t, e, r, n) {
+      function s(t, e, r, n) {
         var i = e && e.prototype instanceof b ? e : b,
           a = Object.create(i.prototype),
           c = new G(n || []);
@@ -833,26 +907,26 @@
           return { type: "throw", arg: t };
         }
       }
-      e.wrap = l;
+      e.wrap = s;
       var h = "suspendedStart",
         p = "suspendedYield",
-        d = "executing",
-        g = "completed",
+        v = "executing",
+        d = "completed",
         m = {};
       function b() {}
       function w() {}
       function x() {}
       var L = {};
-      s(L, a, function () {
+      l(L, a, function () {
         return this;
       });
       var E = Object.getPrototypeOf,
-        k = E && E(E(C([])));
-      k && k !== r && n.call(k, a) && (L = k);
-      var S = (x.prototype = b.prototype = Object.create(L));
+        S = E && E(E(A([])));
+      S && S !== r && n.call(S, a) && (L = S);
+      var k = (x.prototype = b.prototype = Object.create(L));
       function j(t) {
         ["next", "throw", "return"].forEach(function (e) {
-          s(t, e, function (t) {
+          l(t, e, function (t) {
             return this._invoke(e, t);
           });
         });
@@ -861,10 +935,10 @@
         function r(o, i, a, c) {
           var u = f(t[o], t, i);
           if ("throw" !== u.type) {
-            var s = u.arg,
-              l = s.value;
-            return l && "object" == y(l) && n.call(l, "__await")
-              ? e.resolve(l.__await).then(
+            var l = u.arg,
+              s = l.value;
+            return s && "object" == y(s) && n.call(s, "__await")
+              ? e.resolve(s.__await).then(
                   function (t) {
                     r("next", t, a, c);
                   },
@@ -872,9 +946,9 @@
                     r("throw", t, a, c);
                   },
                 )
-              : e.resolve(l).then(
+              : e.resolve(s).then(
                   function (t) {
-                    (s.value = t), a(s);
+                    (l.value = t), a(l);
                   },
                   function (t) {
                     return r("throw", t, a, c);
@@ -898,8 +972,8 @@
       function P(e, r, n) {
         var o = h;
         return function (i, a) {
-          if (o === d) throw Error("Generator is already running");
-          if (o === g) {
+          if (o === v) throw Error("Generator is already running");
+          if (o === d) {
             if ("throw" === i) throw a;
             return { value: t, done: !0 };
           }
@@ -914,17 +988,17 @@
             }
             if ("next" === n.method) n.sent = n._sent = n.arg;
             else if ("throw" === n.method) {
-              if (o === h) throw ((o = g), n.arg);
+              if (o === h) throw ((o = d), n.arg);
               n.dispatchException(n.arg);
             } else "return" === n.method && n.abrupt("return", n.arg);
-            o = d;
-            var s = f(e, r, n);
-            if ("normal" === s.type) {
-              if (((o = n.done ? g : p), s.arg === m)) continue;
-              return { value: s.arg, done: n.done };
+            o = v;
+            var l = f(e, r, n);
+            if ("normal" === l.type) {
+              if (((o = n.done ? d : p), l.arg === m)) continue;
+              return { value: l.arg, done: n.done };
             }
-            "throw" === s.type &&
-              ((o = g), (n.method = "throw"), (n.arg = s.arg));
+            "throw" === l.type &&
+              ((o = d), (n.method = "throw"), (n.arg = l.arg));
           }
         };
       }
@@ -979,7 +1053,7 @@
           t.forEach(T, this),
           this.reset(!0);
       }
-      function C(e) {
+      function A(e) {
         if (e || "" === e) {
           var r = e[a];
           if (r) return r.call(e);
@@ -998,9 +1072,9 @@
       }
       return (
         (w.prototype = x),
-        o(S, "constructor", { value: x, configurable: !0 }),
+        o(k, "constructor", { value: x, configurable: !0 }),
         o(x, "constructor", { value: w, configurable: !0 }),
-        (w.displayName = s(x, u, "GeneratorFunction")),
+        (w.displayName = l(x, u, "GeneratorFunction")),
         (e.isGeneratorFunction = function (t) {
           var e = "function" == typeof t && t.constructor;
           return (
@@ -1012,8 +1086,8 @@
           return (
             Object.setPrototypeOf
               ? Object.setPrototypeOf(t, x)
-              : ((t.__proto__ = x), s(t, u, "GeneratorFunction")),
-            (t.prototype = Object.create(S)),
+              : ((t.__proto__ = x), l(t, u, "GeneratorFunction")),
+            (t.prototype = Object.create(k)),
             t
           );
         }),
@@ -1021,25 +1095,25 @@
           return { __await: t };
         }),
         j(O.prototype),
-        s(O.prototype, c, function () {
+        l(O.prototype, c, function () {
           return this;
         }),
         (e.AsyncIterator = O),
         (e.async = function (t, r, n, o, i) {
           void 0 === i && (i = Promise);
-          var a = new O(l(t, r, n, o), i);
+          var a = new O(s(t, r, n, o), i);
           return e.isGeneratorFunction(r)
             ? a
             : a.next().then(function (t) {
                 return t.done ? t.value : a.next();
               });
         }),
-        j(S),
-        s(S, u, "Generator"),
-        s(S, a, function () {
+        j(k),
+        l(k, u, "Generator"),
+        l(k, a, function () {
           return this;
         }),
-        s(S, "toString", function () {
+        l(k, "toString", function () {
           return "[object Generator]";
         }),
         (e.keys = function (t) {
@@ -1057,7 +1131,7 @@
             }
           );
         }),
-        (e.values = C),
+        (e.values = A),
         (G.prototype = {
           constructor: G,
           reset: function (e) {
@@ -1102,14 +1176,14 @@
               if ("root" === a.tryLoc) return o("end");
               if (a.tryLoc <= this.prev) {
                 var u = n.call(a, "catchLoc"),
-                  s = n.call(a, "finallyLoc");
-                if (u && s) {
+                  l = n.call(a, "finallyLoc");
+                if (u && l) {
                   if (this.prev < a.catchLoc) return o(a.catchLoc, !0);
                   if (this.prev < a.finallyLoc) return o(a.finallyLoc);
                 } else if (u) {
                   if (this.prev < a.catchLoc) return o(a.catchLoc, !0);
                 } else {
-                  if (!s) throw Error("try statement without catch or finally");
+                  if (!l) throw Error("try statement without catch or finally");
                   if (this.prev < a.finallyLoc) return o(a.finallyLoc);
                 }
               }
@@ -1177,7 +1251,7 @@
           },
           delegateYield: function (e, r, n) {
             return (
-              (this.delegate = { iterator: C(e), resultName: r, nextLoc: n }),
+              (this.delegate = { iterator: A(e), resultName: r, nextLoc: n }),
               "next" === this.method && (this.arg = t),
               m
             );
@@ -1186,7 +1260,7 @@
         e
       );
     }
-    function d(t, e, r, n, o, i, a) {
+    function m(t, e, r, n, o, i, a) {
       try {
         var c = t[i](a),
           u = c.value;
@@ -1195,82 +1269,92 @@
       }
       c.done ? e(u) : Promise.resolve(u).then(n, o);
     }
-    function g(t) {
+    function b(t) {
       return function () {
         var e = this,
           r = arguments;
         return new Promise(function (n, o) {
           var i = t.apply(e, r);
           function a(t) {
-            d(i, n, o, a, c, "next", t);
+            m(i, n, o, a, c, "next", t);
           }
           function c(t) {
-            d(i, n, o, a, c, "throw", t);
+            m(i, n, o, a, c, "throw", t);
           }
           a(void 0);
         });
       };
     }
-    var m = window.location.origin;
-    function b(t, e) {
-      return w.apply(this, arguments);
+    var w = window.location.origin;
+    function x(t, e) {
+      return L.apply(this, arguments);
     }
-    function w() {
-      return (w = g(
-        v().mark(function t(e, r) {
-          var n;
-          return v().wrap(
+    function L() {
+      return (L = b(
+        g().mark(function t(e, r) {
+          var n, o, i, a, c, u, l;
+          return g().wrap(
             function (t) {
               for (;;)
                 switch ((t.prev = t.next)) {
                   case 0:
+                    for (
+                      t.prev = 0,
+                        n = new URLSearchParams(),
+                        o = 0,
+                        i = Object.entries(r);
+                      o < i.length;
+                      o++
+                    )
+                      (a = v(i[o], 2)), (c = a[0]), (u = a[1]), n.append(c, u);
                     return (
-                      (t.prev = 0),
-                      (t.next = 3),
-                      fetch(m + e, {
+                      (t.next = 5),
+                      fetch(w + e, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(r),
+                        headers: {
+                          "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: n.toString(),
                       })
                     );
-                  case 3:
-                    return (n = t.sent), (t.next = 6), n.json();
-                  case 6:
+                  case 5:
+                    return (l = t.sent), (t.next = 8), l.json();
+                  case 8:
                     return t.abrupt("return", t.sent);
-                  case 9:
+                  case 11:
                     return (
-                      (t.prev = 9),
+                      (t.prev = 11),
                       (t.t0 = t.catch(0)),
                       t.abrupt("return", {
                         success: !1,
                         error: "Connection failed",
                       })
                     );
-                  case 12:
+                  case 14:
                   case "end":
                     return t.stop();
                 }
             },
             t,
             null,
-            [[0, 9]],
+            [[0, 11]],
           );
         }),
       )).apply(this, arguments);
     }
-    function x(t) {
-      return L.apply(this, arguments);
+    function E(t) {
+      return S.apply(this, arguments);
     }
-    function L() {
-      return (L = g(
-        v().mark(function t(e) {
+    function S() {
+      return (S = b(
+        g().mark(function t(e) {
           var r;
-          return v().wrap(
+          return g().wrap(
             function (t) {
               for (;;)
                 switch ((t.prev = t.next)) {
                   case 0:
-                    return (t.prev = 0), (t.next = 3), fetch(m + e);
+                    return (t.prev = 0), (t.next = 3), fetch(w + e);
                   case 3:
                     return (r = t.sent), (t.next = 6), r.json();
                   case 6:
@@ -1293,16 +1377,16 @@
         }),
       )).apply(this, arguments);
     }
-    const E = function (t, e) {
-        return g(
-          v().mark(function r() {
-            return v().wrap(function (r) {
+    const k = function (t, e) {
+        return b(
+          g().mark(function r() {
+            return g().wrap(function (r) {
               for (;;)
                 switch ((r.prev = r.next)) {
                   case 0:
                     return r.abrupt(
                       "return",
-                      b("/api/login", { username: t, pin: e }),
+                      x("/api/login", { username: t, pin: e }),
                     );
                   case 1:
                   case "end":
@@ -1312,16 +1396,16 @@
           }),
         )();
       },
-      k = function (t, e, r) {
-        return g(
-          v().mark(function n() {
-            return v().wrap(function (n) {
+      j = function (t, e, r) {
+        return b(
+          g().mark(function n() {
+            return g().wrap(function (n) {
               for (;;)
                 switch ((n.prev = n.next)) {
                   case 0:
                     return n.abrupt(
                       "return",
-                      b("/api/account", { username: t, pin: e, balance: r }),
+                      x("/api/account", { username: t, pin: e, balance: r }),
                     );
                   case 1:
                   case "end":
@@ -1331,14 +1415,14 @@
           }),
         )();
       },
-      S = function () {
-        return g(
-          v().mark(function t() {
-            return v().wrap(function (t) {
+      O = function () {
+        return b(
+          g().mark(function t() {
+            return g().wrap(function (t) {
               for (;;)
                 switch ((t.prev = t.next)) {
                   case 0:
-                    return t.abrupt("return", x("/api/config"));
+                    return t.abrupt("return", E("/api/config"));
                   case 1:
                   case "end":
                     return t.stop();
@@ -1347,12 +1431,12 @@
           }),
         )();
       },
-      j = function (t) {
+      P = function (t) {
         return String(t).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
       };
-    function O(t) {
+    function _(t) {
       return (
-        (O =
+        (_ =
           "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             ? function (t) {
                 return typeof t;
@@ -1365,11 +1449,11 @@
                   ? "symbol"
                   : typeof t;
               }),
-        O(t)
+        _(t)
       );
     }
-    function P() {
-      P = function () {
+    function T() {
+      T = function () {
         return e;
       };
       var t,
@@ -1385,7 +1469,7 @@
         a = i.iterator || "@@iterator",
         c = i.asyncIterator || "@@asyncIterator",
         u = i.toStringTag || "@@toStringTag";
-      function s(t, e, r) {
+      function l(t, e, r) {
         return (
           Object.defineProperty(t, e, {
             value: r,
@@ -1397,13 +1481,13 @@
         );
       }
       try {
-        s({}, "");
+        l({}, "");
       } catch (t) {
-        s = function (t, e, r) {
+        l = function (t, e, r) {
           return (t[e] = r);
         };
       }
-      function l(t, e, r, n) {
+      function s(t, e, r, n) {
         var i = e && e.prototype instanceof g ? e : g,
           a = Object.create(i.prototype),
           c = new G(n || []);
@@ -1416,7 +1500,7 @@
           return { type: "throw", arg: t };
         }
       }
-      e.wrap = l;
+      e.wrap = s;
       var h = "suspendedStart",
         p = "suspendedYield",
         y = "executing",
@@ -1426,28 +1510,28 @@
       function m() {}
       function b() {}
       var w = {};
-      s(w, a, function () {
+      l(w, a, function () {
         return this;
       });
       var x = Object.getPrototypeOf,
-        L = x && x(x(C([])));
+        L = x && x(x(A([])));
       L && L !== r && n.call(L, a) && (w = L);
       var E = (b.prototype = g.prototype = Object.create(w));
-      function k(t) {
+      function S(t) {
         ["next", "throw", "return"].forEach(function (e) {
-          s(t, e, function (t) {
+          l(t, e, function (t) {
             return this._invoke(e, t);
           });
         });
       }
-      function S(t, e) {
+      function k(t, e) {
         function r(o, i, a, c) {
           var u = f(t[o], t, i);
           if ("throw" !== u.type) {
-            var s = u.arg,
-              l = s.value;
-            return l && "object" == O(l) && n.call(l, "__await")
-              ? e.resolve(l.__await).then(
+            var l = u.arg,
+              s = l.value;
+            return s && "object" == _(s) && n.call(s, "__await")
+              ? e.resolve(s.__await).then(
                   function (t) {
                     r("next", t, a, c);
                   },
@@ -1455,9 +1539,9 @@
                     r("throw", t, a, c);
                   },
                 )
-              : e.resolve(l).then(
+              : e.resolve(s).then(
                   function (t) {
-                    (s.value = t), a(s);
+                    (l.value = t), a(l);
                   },
                   function (t) {
                     return r("throw", t, a, c);
@@ -1489,7 +1573,7 @@
           for (n.method = i, n.arg = a; ; ) {
             var c = n.delegate;
             if (c) {
-              var u = _(c, n);
+              var u = O(c, n);
               if (u) {
                 if (u === d) continue;
                 return u;
@@ -1501,17 +1585,17 @@
               n.dispatchException(n.arg);
             } else "return" === n.method && n.abrupt("return", n.arg);
             o = y;
-            var s = f(e, r, n);
-            if ("normal" === s.type) {
-              if (((o = n.done ? v : p), s.arg === d)) continue;
-              return { value: s.arg, done: n.done };
+            var l = f(e, r, n);
+            if ("normal" === l.type) {
+              if (((o = n.done ? v : p), l.arg === d)) continue;
+              return { value: l.arg, done: n.done };
             }
-            "throw" === s.type &&
-              ((o = v), (n.method = "throw"), (n.arg = s.arg));
+            "throw" === l.type &&
+              ((o = v), (n.method = "throw"), (n.arg = l.arg));
           }
         };
       }
-      function _(e, r) {
+      function O(e, r) {
         var n = r.method,
           o = e.iterator[n];
         if (o === t)
@@ -1521,7 +1605,7 @@
               e.iterator.return &&
               ((r.method = "return"),
               (r.arg = t),
-              _(e, r),
+              O(e, r),
               "throw" === r.method)) ||
               ("return" !== n &&
                 ((r.method = "throw"),
@@ -1547,7 +1631,7 @@
             (r.delegate = null),
             d);
       }
-      function T(t) {
+      function P(t) {
         var e = { tryLoc: t[0] };
         1 in t && (e.catchLoc = t[1]),
           2 in t && ((e.finallyLoc = t[2]), (e.afterLoc = t[3])),
@@ -1559,10 +1643,10 @@
       }
       function G(t) {
         (this.tryEntries = [{ tryLoc: "root" }]),
-          t.forEach(T, this),
+          t.forEach(P, this),
           this.reset(!0);
       }
-      function C(e) {
+      function A(e) {
         if (e || "" === e) {
           var r = e[a];
           if (r) return r.call(e);
@@ -1577,13 +1661,13 @@
             return (i.next = i);
           }
         }
-        throw new TypeError(O(e) + " is not iterable");
+        throw new TypeError(_(e) + " is not iterable");
       }
       return (
         (m.prototype = b),
         o(E, "constructor", { value: b, configurable: !0 }),
         o(b, "constructor", { value: m, configurable: !0 }),
-        (m.displayName = s(b, u, "GeneratorFunction")),
+        (m.displayName = l(b, u, "GeneratorFunction")),
         (e.isGeneratorFunction = function (t) {
           var e = "function" == typeof t && t.constructor;
           return (
@@ -1595,7 +1679,7 @@
           return (
             Object.setPrototypeOf
               ? Object.setPrototypeOf(t, b)
-              : ((t.__proto__ = b), s(t, u, "GeneratorFunction")),
+              : ((t.__proto__ = b), l(t, u, "GeneratorFunction")),
             (t.prototype = Object.create(E)),
             t
           );
@@ -1603,26 +1687,26 @@
         (e.awrap = function (t) {
           return { __await: t };
         }),
-        k(S.prototype),
-        s(S.prototype, c, function () {
+        S(k.prototype),
+        l(k.prototype, c, function () {
           return this;
         }),
-        (e.AsyncIterator = S),
+        (e.AsyncIterator = k),
         (e.async = function (t, r, n, o, i) {
           void 0 === i && (i = Promise);
-          var a = new S(l(t, r, n, o), i);
+          var a = new k(s(t, r, n, o), i);
           return e.isGeneratorFunction(r)
             ? a
             : a.next().then(function (t) {
                 return t.done ? t.value : a.next();
               });
         }),
-        k(E),
-        s(E, u, "Generator"),
-        s(E, a, function () {
+        S(E),
+        l(E, u, "Generator"),
+        l(E, a, function () {
           return this;
         }),
-        s(E, "toString", function () {
+        l(E, "toString", function () {
           return "[object Generator]";
         }),
         (e.keys = function (t) {
@@ -1640,7 +1724,7 @@
             }
           );
         }),
-        (e.values = C),
+        (e.values = A),
         (G.prototype = {
           constructor: G,
           reset: function (e) {
@@ -1685,14 +1769,14 @@
               if ("root" === a.tryLoc) return o("end");
               if (a.tryLoc <= this.prev) {
                 var u = n.call(a, "catchLoc"),
-                  s = n.call(a, "finallyLoc");
-                if (u && s) {
+                  l = n.call(a, "finallyLoc");
+                if (u && l) {
                   if (this.prev < a.catchLoc) return o(a.catchLoc, !0);
                   if (this.prev < a.finallyLoc) return o(a.finallyLoc);
                 } else if (u) {
                   if (this.prev < a.catchLoc) return o(a.catchLoc, !0);
                 } else {
-                  if (!s) throw Error("try statement without catch or finally");
+                  if (!l) throw Error("try statement without catch or finally");
                   if (this.prev < a.finallyLoc) return o(a.finallyLoc);
                 }
               }
@@ -1760,7 +1844,7 @@
           },
           delegateYield: function (e, r, n) {
             return (
-              (this.delegate = { iterator: C(e), resultName: r, nextLoc: n }),
+              (this.delegate = { iterator: A(e), resultName: r, nextLoc: n }),
               "next" === this.method && (this.arg = t),
               d
             );
@@ -1769,7 +1853,7 @@
         e
       );
     }
-    function _(t, e, r, n, o, i, a) {
+    function N(t, e, r, n, o, i, a) {
       try {
         var c = t[i](a),
           u = c.value;
@@ -1778,43 +1862,43 @@
       }
       c.done ? e(u) : Promise.resolve(u).then(n, o);
     }
-    function T(t) {
+    function G(t) {
       return function () {
         var e = this,
           r = arguments;
         return new Promise(function (n, o) {
           var i = t.apply(e, r);
           function a(t) {
-            _(i, n, o, a, c, "next", t);
+            N(i, n, o, a, c, "next", t);
           }
           function c(t) {
-            _(i, n, o, a, c, "throw", t);
+            N(i, n, o, a, c, "throw", t);
           }
           a(void 0);
         });
       };
     }
-    function N(t, e) {
+    function A(t, e) {
       for (var r = 0; r < e.length; r++) {
         var n = e[r];
         (n.enumerable = n.enumerable || !1),
           (n.configurable = !0),
           "value" in n && (n.writable = !0),
-          Object.defineProperty(t, G(n.key), n);
+          Object.defineProperty(t, C(n.key), n);
       }
     }
-    function G(t) {
+    function C(t) {
       var e = (function (t) {
-        if ("object" != O(t) || !t) return t;
+        if ("object" != _(t) || !t) return t;
         var e = t[Symbol.toPrimitive];
         if (void 0 !== e) {
           var r = e.call(t, "string");
-          if ("object" != O(r)) return r;
+          if ("object" != _(r)) return r;
           throw new TypeError("@@toPrimitive must return a primitive value.");
         }
         return String(t);
       })(t);
-      return "symbol" == O(e) ? e : e + "";
+      return "symbol" == _(e) ? e : e + "";
     }
     new ((function () {
       return (
@@ -1895,10 +1979,10 @@
           {
             key: "doLogin",
             value:
-              ((o = T(
-                P().mark(function t() {
+              ((o = G(
+                T().mark(function t() {
                   var e, r, n;
-                  return P().wrap(
+                  return T().wrap(
                     function (t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -1921,7 +2005,7 @@
                               (this.el.loginBtn.disabled = !0),
                               (this.el.loginBtn.textContent = "Connecting..."),
                               (t.next = 9),
-                              E(e, r)
+                              k(e, r)
                             );
                           case 9:
                             if ((n = t.sent) && n.success) {
@@ -1983,9 +2067,9 @@
             key: "updateUI",
             value: function () {
               this.el.playerMoney &&
-                (this.el.playerMoney.textContent = j(this.money)),
+                (this.el.playerMoney.textContent = P(this.money)),
                 this.el.betDisplay &&
-                  (this.el.betDisplay.textContent = j(this.bet));
+                  (this.el.betDisplay.textContent = P(this.bet));
             },
           },
           {
@@ -1999,15 +2083,15 @@
           {
             key: "refreshConfig",
             value:
-              ((n = T(
-                P().mark(function t() {
+              ((n = G(
+                T().mark(function t() {
                   var e;
-                  return P().wrap(
+                  return T().wrap(
                     function (t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
                           case 0:
-                            return (t.prev = 0), (t.next = 3), S();
+                            return (t.prev = 0), (t.next = 3), O();
                           case 3:
                             (e = t.sent) && e.winRate && (this.config = e),
                               (t.next = 9);
@@ -2032,8 +2116,8 @@
           {
             key: "spin",
             value:
-              ((r = T(
-                P().mark(function t() {
+              ((r = G(
+                T().mark(function t() {
                   var e,
                     r,
                     n,
@@ -2041,10 +2125,10 @@
                     a,
                     c,
                     u,
-                    s,
                     l,
+                    s,
                     f = this;
-                  return P().wrap(
+                  return T().wrap(
                     function (t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -2074,7 +2158,7 @@
                               (this.money -= this.bet),
                               this.updateUI(),
                               this.showMsg("Memutar...", "#888"),
-                              k(this.user, this.pin, this.money),
+                              j(this.user, this.pin, this.money),
                               (t.next = 14),
                               this.refreshConfig()
                             );
@@ -2102,26 +2186,26 @@
                                     [i.random(), i.random(), i.random()],
                                     [i.random(), i.random(), i.random()],
                                   ]),
-                              (s = [0, 150, 300]),
-                              (l = this.reels.map(function (t, e) {
+                              (l = [0, 150, 300]),
+                              (s = this.reels.map(function (t, e) {
                                 return new Promise(function (r) {
                                   setTimeout(function () {
                                     t.spin(o[e]).then(r);
-                                  }, s[e]);
+                                  }, l[e]);
                                 });
                               })),
                               (t.next = 23),
-                              Promise.all(l)
+                              Promise.all(s)
                             );
                           case 23:
                             this.updateUI(),
                               n
                                 ? this.showMsg(
-                                    "🎉 MENANG " + j(a) + "!",
+                                    "🎉 MENANG " + P(a) + "!",
                                     "#FFD700",
                                   )
                                 : this.showMsg("", "#888"),
-                              k(this.user, this.pin, this.money),
+                              j(this.user, this.pin, this.money),
                               (this.spinning = !1),
                               (this.el.spinBtn.disabled =
                                 this.money < this.bet),
@@ -2155,7 +2239,7 @@
             },
           },
         ]),
-        e && N(t.prototype, e),
+        e && A(t.prototype, e),
         Object.defineProperty(t, "prototype", { writable: !1 }),
         t
       );

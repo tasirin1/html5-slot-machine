@@ -224,18 +224,40 @@ public class SlotServer extends NanoHTTPD {
     }
 
     private String readBody(IHTTPSession session) throws Exception {
-        // parseBody always stores raw body as "content" before checking content-type.
-        // For JSON/others it throws, but the raw body is still accessible.
+        // parseBody works for form-urlencoded and multipart
+        // For form-urlencoded, the decoded params are in session.getParms()
         Map<String, String> files = new HashMap<>();
-        String body = null;
         try {
             session.parseBody(files);
-            // Form-urlencoded or multipart was parsed successfully
-            body = files.get("postData");
         } catch (Exception e) {
-            // parseBody threw (e.g. for application/json), but raw body is in "content" key
-            body = files.get("content");
+            // parseBody may throw, try other methods
         }
+        
+        // If we have form parameters, convert to JSON-like string for our regex parsers
+        Map<String, String> parms = session.getParms();
+        if (parms != null && !parms.isEmpty()) {
+            StringBuilder json = new StringBuilder();
+            json.append("{");
+            boolean first = true;
+            for (Map.Entry<String, String> e : parms.entrySet()) {
+                if (!first) json.append(",");
+                first = false;
+                String val = e.getValue();
+                // If numeric, don't quote (so extractJsonLong/Float works)
+                boolean isNumber = val.matches("-?\\d+(\\.\\d+)?");
+                json.append("\"").append(e.getKey()).append("\":");
+                if (isNumber) {
+                    json.append(val);
+                } else {
+                    json.append("\"").append(val).append("\"");
+                }
+            }
+            json.append("}");
+            return json.toString();
+        }
+        
+        // Fallback: try to get raw body
+        String body = files.get("postData");
         if (body == null || body.isEmpty()) {
             body = session.getQueryParameterString();
         }
