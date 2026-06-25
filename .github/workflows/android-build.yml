@@ -3,8 +3,6 @@ name: Build Android APK
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -23,11 +21,13 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: "platforms;android-34 build-tools;34.0.0"
 
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "20"
           cache: "npm"
 
       - name: Build web app
@@ -35,7 +35,7 @@ jobs:
           npm ci
           npm run build
 
-      - name: Copy web assets to Android project
+      - name: Prepare Android assets
         run: |
           mkdir -p android/app/src/main/assets/www
           cp -r dist/* android/app/src/main/assets/www/
@@ -45,12 +45,23 @@ jobs:
           # Replace CDN link with local file
           sed -i 's|https://unpkg.com/bootstrap@5.2.3/dist/css/bootstrap-reboot.min.css|bootstrap-reboot.min.css|' \
             android/app/src/main/assets/www/index.html
+          # Verify assets
+          echo "Assets prepared:"
+          ls -la android/app/src/main/assets/www/
+
+      - name: Create local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+          cat android/local.properties
 
       - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
@@ -58,3 +69,12 @@ jobs:
           name: slot-machine-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+      - name: Upload build reports (if failed)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports
+          path: |
+            android/app/build/reports/
+            android/.gradle/
