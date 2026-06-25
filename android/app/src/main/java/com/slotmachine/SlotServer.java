@@ -45,6 +45,7 @@ public class SlotServer extends NanoHTTPD {
                 case "/api/jackpot":     return jsonResponse(handleJackpot(method, session));
                 case "/api/status":      return jsonResponse(handleStatus());
                 case "/api/login":       return jsonResponse(handleLogin(method, session));
+                case "/api/register":    return jsonResponse(handleRegister(method, session));
                 case "/api/account":     return jsonResponse(handleAccount(method, session));
                 case "/api/accounts":    return jsonResponse(handleAccounts(method, session));
                 default:                 return serveStaticFile(uri);
@@ -130,6 +131,29 @@ public class SlotServer extends NanoHTTPD {
         String result = accountManager.login(username, pin);
         // Add config to response
         if (result.contains("\"success\":true")) {
+            result = result.substring(0, result.length() - 1)
+                + ",\"config\":" + gameConfig.toJson() + "}";
+        }
+        return result;
+    }
+
+    // ========== REGISTER ==========
+
+    private String handleRegister(Method method, IHTTPSession session) throws Exception {
+        if (method != Method.POST) return "{"error":"Use POST"}";
+        String body = readBody(session);
+        if (body == null) return "{"error":"No body"}";
+
+        String username = extractJsonString(body, "username");
+        String pin = extractJsonString(body, "pin");
+        if (username == null || pin == null) return "{"error":"username and pin required"}";
+        if (username.length() < 3) return "{"error":"Username min 3 characters"}";
+        if (pin.length() < 3) return "{"error":"PIN min 3 characters"}";
+
+        long startingMoney = gameConfig.getStartingMoney();
+        String result = accountManager.createAccount(username, pin, startingMoney);
+        if (result.contains("\"success\":true")) {
+            // Auto-login: add config to response
             result = result.substring(0, result.length() - 1)
                 + ",\"config\":" + gameConfig.toJson() + "}";
         }
@@ -224,44 +248,79 @@ public class SlotServer extends NanoHTTPD {
     }
 
     private String readBody(IHTTPSession session) throws Exception {
-        // parseBody works for form-urlencoded and multipart
-        // For form-urlencoded, the decoded params are in session.getParms()
         Map<String, String> files = new HashMap<>();
         try {
             session.parseBody(files);
         } catch (Exception e) {
-            // parseBody may throw, try other methods
+            // parseBody may throw
         }
         
-        // If we have form parameters, convert to JSON-like string for our regex parsers
+        // Try getParms first (merge of URL + body params after parseBody)
         Map<String, String> parms = session.getParms();
         if (parms != null && !parms.isEmpty()) {
-            StringBuilder json = new StringBuilder();
-            json.append("{");
-            boolean first = true;
+            // Check if we have actual POST params (not just empty defaults)
+            boolean hasContent = false;
             for (Map.Entry<String, String> e : parms.entrySet()) {
-                if (!first) json.append(",");
-                first = false;
-                String val = e.getValue();
-                // If numeric, don't quote (so extractJsonLong/Float works)
-                boolean isNumber = val.matches("-?\\d+(\\.\\d+)?");
-                json.append("\"").append(e.getKey()).append("\":");
-                if (isNumber) {
-                    json.append(val);
-                } else {
-                    json.append("\"").append(val).append("\"");
+                if (e.getValue() != null && !e.getValue().isEmpty()) {
+                    hasContent = true;
+                    break;
                 }
             }
-            json.append("}");
-            return json.toString();
+            if (hasContent) return buildJsonFromMap(parms);
         }
         
-        // Fallback: try to get raw body
-        String body = files.get("postData");
-        if (body == null || body.isEmpty()) {
-            body = session.getQueryParameterString();
+        // Fallback: raw body from parseBody (URL-encoded string)
+        String rawBody = files.get("postData");
+        if (rawBody != null && !rawBody.isEmpty()) {
+            return buildJsonFromMap(parseUrlEncoded(rawBody));
         }
-        return (body == null || body.isEmpty()) ? null : body;
+        
+        // Fallback: query string
+        String qs = session.getQueryParameterString();
+        if (qs != null && !qs.isEmpty()) {
+            return buildJsonFromMap(parseUrlEncoded(qs));
+        }
+        
+        return null;
+    }
+    
+    private Map<String, String> parseUrlEncoded(String body) {
+        Map<String, String> result = new HashMap<>();
+        if (body == null || body.isEmpty()) return result;
+        try {
+            String[] pairs = body.split("&");
+            for (String pair : pairs) {
+                int eq = pair.indexOf('=');
+                if (eq > 0) {
+                    String key = java.net.URLDecoder.decode(pair.substring(0, eq), "UTF-8");
+                    String val = java.net.URLDecoder.decode(pair.substring(eq + 1), "UTF-8");
+                    result.put(key, val);
+                }
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "parseUrlEncoded error", e);
+        }
+        return result;
+    }
+    
+    private String buildJsonFromMap(Map<String, String> map) {
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        boolean first = true;
+        for (Map.Entry<String, String> e : map.entrySet()) {
+            if (!first) json.append(",");
+            first = false;
+            String val = e.getValue();
+            boolean isNumber = val.matches("-?\\d+(\\.\\d+)?");
+            json.append("\"").append(e.getKey()).append("\":");
+            if (isNumber) {
+                json.append(val);
+            } else {
+                json.append("\"").append(val).append("\"");
+            }
+        }
+        json.append("}");
+        return json.toString();
     }
 
     private long extractJsonLong(String json, String key) {

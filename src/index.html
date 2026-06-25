@@ -18,7 +18,7 @@
     <div id="loginScreen">
       <div class="login-box">
         <div class="login-title">🎰 SLOT 777</div>
-        <div class="login-sub">Masuk ke akun kamu</div>
+        <div id="loginSub" class="login-sub">Masuk ke akun kamu</div>
         <input
           type="text"
           id="loginUser"
@@ -28,12 +28,15 @@
         <input
           type="password"
           id="loginPin"
-          placeholder="PIN"
+          placeholder="PIN (angka)"
           inputmode="numeric"
         />
         <div id="loginError" class="login-error"></div>
         <button id="loginBtn" class="login-btn">PLAY</button>
-        <div class="login-hint">Minta akun ke admin</div>
+        <button id="registerBtn" class="register-btn">Buat Akun Baru</button>
+        <div id="loginToggle" class="login-hint">
+          Belum punya akun? Klik daftar
+        </div>
       </div>
     </div>
 

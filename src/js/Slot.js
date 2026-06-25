@@ -10,6 +10,7 @@ export default class Slot {
     this.bet = 100;
     this.config = null;
     this.spinning = false;
+    this.isRegister = false;
 
     // DOM
     this.el = {};
@@ -19,7 +20,10 @@ export default class Slot {
       "loginUser",
       "loginPin",
       "loginBtn",
+      "registerBtn",
       "loginError",
+      "loginSub",
+      "loginToggle",
       "logoutBtn",
       "playerMoney",
       "betDisplay",
@@ -35,6 +39,8 @@ export default class Slot {
 
     // Events
     this.el.loginBtn.addEventListener("click", () => this.doLogin());
+    this.el.registerBtn.addEventListener("click", () => this.doRegister());
+    this.el.loginToggle.addEventListener("click", () => this.toggleRegister());
     this.el.loginPin.addEventListener("keydown", (e) => {
       if (e.key === "Enter") this.doLogin();
     });
@@ -48,6 +54,22 @@ export default class Slot {
     this.showLogin();
   }
 
+  toggleRegister() {
+    this.isRegister = !this.isRegister;
+    if (this.isRegister) {
+      this.el.loginSub.textContent = "Buat akun baru";
+      this.el.loginBtn.textContent = "DAFTAR";
+      this.el.registerBtn.textContent = "Kembali ke Login";
+      this.el.loginToggle.textContent = "Sudah punya akun? Klik login";
+    } else {
+      this.el.loginSub.textContent = "Masuk ke akun kamu";
+      this.el.loginBtn.textContent = "PLAY";
+      this.el.registerBtn.textContent = "Buat Akun Baru";
+      this.el.loginToggle.textContent = "Belum punya akun? Klik daftar";
+    }
+    this.el.loginError.textContent = "";
+  }
+
   showLogin() {
     this.el.gameScreen.classList.remove("active");
     this.el.loginScreen.style.display = "flex";
@@ -57,6 +79,55 @@ export default class Slot {
     this.user = null;
     this.pin = null;
     this.spinning = false;
+    this.isRegister = false;
+    this.el.loginSub.textContent = "Masuk ke akun kamu";
+    this.el.loginBtn.textContent = "PLAY";
+    this.el.registerBtn.textContent = "Buat Akun Baru";
+    this.el.loginToggle.textContent = "Belum punya akun? Klik daftar";
+  }
+
+  async doRegister() {
+    const user = this.el.loginUser.value.trim();
+    const pin = this.el.loginPin.value.trim();
+    if (!user || !pin) {
+      this.el.loginError.textContent = "Isi username dan PIN";
+      return;
+    }
+    if (user.length < 3) {
+      this.el.loginError.textContent = "Username minimal 3 karakter";
+      return;
+    }
+    if (pin.length < 3) {
+      this.el.loginError.textContent = "PIN minimal 3 karakter";
+      return;
+    }
+
+    this.el.loginBtn.disabled = true;
+    this.el.loginBtn.textContent = "Mendaftar...";
+
+    const res = await JackpotAPI.register(user, pin);
+    if (!res || !res.success) {
+      this.el.loginError.textContent = (res && res.error) || "Daftar gagal";
+      this.el.loginBtn.disabled = false;
+      this.el.loginBtn.textContent = "DAFTAR";
+      return;
+    }
+
+    // Auto-login after register
+    this.user = user;
+    this.pin = pin;
+    this.config = res.config || {
+      winRate: 0.15,
+      payoutMultiplier: 3,
+      startingMoney: 1000,
+      betAmount: 100,
+    };
+    this.money = this.config.startingMoney || 1000;
+    this.bet = this.config.betAmount || 100;
+
+    this.el.loginBtn.disabled = false;
+    this.el.loginBtn.textContent = "PLAY";
+    this.startGame();
   }
 
   async doLogin() {
@@ -72,7 +143,8 @@ export default class Slot {
 
     const res = await JackpotAPI.login(user, pin);
     if (!res || !res.success) {
-      this.el.loginError.textContent = (res && res.error) || "Login gagal";
+      this.el.loginError.textContent =
+        (res && res.error) || "Login gagal. Cek username & PIN";
       this.el.loginBtn.disabled = false;
       this.el.loginBtn.textContent = "PLAY";
       return;
@@ -141,18 +213,14 @@ export default class Slot {
     this.updateUI();
     this.showMsg("Memutar...", "#888");
 
-    // Sync minus balance
     JackpotAPI.updateBalance(this.user, this.pin, this.money);
 
-    // Refresh config from server
     await this.refreshConfig();
 
-    // Determine win
     const wr = (this.config && this.config.winRate) || 0.15;
     const pm = (this.config && this.config.payoutMultiplier) || 3;
     const win = Math.random() < wr;
 
-    // Generate reel results
     let resultSymbols;
     let winnings = 0;
     if (win) {
@@ -173,7 +241,6 @@ export default class Slot {
       ];
     }
 
-    // Animate reels
     const delays = [0, 150, 300];
     const promises = this.reels.map(
       (reel, i) =>
@@ -196,7 +263,6 @@ export default class Slot {
       this.showMsg("", "#888");
     }
 
-    // Sync final balance
     JackpotAPI.updateBalance(this.user, this.pin, this.money);
 
     this.spinning = false;

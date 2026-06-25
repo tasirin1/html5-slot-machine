@@ -2,7 +2,6 @@ const BASE = window.location.origin;
 
 async function apiPost(path, data) {
   try {
-    // Encode data as form-urlencoded for NanoHTTPd compatibility
     const params = new URLSearchParams();
     for (const [key, val] of Object.entries(data)) {
       params.append(key, val);
@@ -30,6 +29,10 @@ async function apiGet(path) {
 const JackpotAPI = {
   async login(username, pin) {
     return apiPost("/api/login", { username, pin });
+  },
+
+  async register(username, pin) {
+    return apiPost("/api/register", { username, pin });
   },
 
   async updateBalance(username, pin, balance) {

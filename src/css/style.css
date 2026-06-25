@@ -269,3 +269,31 @@ body {
     gap: 10px;
   }
 }
+
+/* ===== REGISTER BUTTON ===== */
+.register-btn {
+  width: 100%;
+  height: 40px;
+  background: transparent;
+  border: 1px solid #d5ad6d;
+  border-radius: 8px;
+  color: #d5ad6d;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.register-btn:active {
+  transform: scale(0.97);
+}
+.login-hint {
+  cursor: pointer;
+  color: #888;
+  font-size: 12px;
+  margin-top: 10px;
+  text-decoration: underline;
+}
+.login-hint:hover {
+  color: #ffd700;
+}
