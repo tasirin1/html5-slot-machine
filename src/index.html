@@ -6,52 +6,66 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <title>Slot Machine</title>
+    <title>Slot 777</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/bootstrap@5.2.3/dist/css/bootstrap-reboot.min.css"
     />
   </head>
   <body>
-    <div id="slot">
-      <!-- TOP BAR: Money | Jackpot -->
-      <div id="topBar">
-        <div class="left">
-          <div class="money-display">
-            <span class="label">💰</span>
-            <span id="playerMoney" class="value">0</span>
-            <span class="label" style="margin: 0 4px 0 10px">BET</span>
-            <span id="betDisplay" class="value bet">100</span>
-          </div>
-          <div class="jackpot-display">
-            <span class="label">JACKPOT</span>
-            <span id="jp" class="value">5.555.555</span>
-          </div>
+    <div id="app">
+      <!-- ===== LOGIN SCREEN ===== -->
+      <div id="loginScreen">
+        <div class="login-box">
+          <div class="login-title">🎰 SLOT 777</div>
+          <div class="login-sub">Enter your credentials</div>
+          <input
+            type="text"
+            id="loginUser"
+            placeholder="Username"
+            autocomplete="off"
+          />
+          <input
+            type="password"
+            id="loginPin"
+            placeholder="PIN"
+            inputmode="numeric"
+          />
+          <div id="loginError" class="login-error"></div>
+          <button id="loginBtn" class="login-btn">PLAY</button>
+          <div class="login-hint">Ask admin for your account</div>
         </div>
       </div>
 
-      <!-- WIN MESSAGE + STATUS -->
-      <div id="winMessage">
-        <span id="winText">🎰 Good luck!</span>
-        <span id="connectionStatus"></span>
-      </div>
+      <!-- ===== GAME SCREEN ===== -->
+      <div id="gameScreen" style="display: none">
+        <div id="topBar">
+          <div class="left">
+            <span id="playerNameDisplay" class="player-name"></span>
+            <div class="money-display">
+              <span class="label">💰</span>
+              <span id="playerMoney" class="value">0</span>
+              <span class="label" style="margin: 0 4px 0 10px">BET</span>
+              <span id="betDisplay" class="value bet">100</span>
+            </div>
+          </div>
+          <button id="logoutBtn" class="logout-btn">✕</button>
+        </div>
 
-      <!-- REELS -->
-      <div id="reels">
-        <div class="reel"></div>
-        <div class="reel"></div>
-        <div class="reel"></div>
-        <div class="reel"></div>
-        <div class="reel"></div>
-      </div>
+        <div id="winMessage"><span id="winText">🎰 Pull the lever!</span></div>
 
-      <!-- CONTROLS -->
-      <div id="controls">
-        <button type="button" id="spin" disabled>SPIN</button>
-        <label>
-          <input type="checkbox" id="autoplay" />
-          Auto
-        </label>
+        <div id="reels">
+          <div class="reel"></div>
+          <div class="reel"></div>
+          <div class="reel"></div>
+          <div class="reel"></div>
+          <div class="reel"></div>
+        </div>
+
+        <div id="controls">
+          <button type="button" id="spin" disabled>SPIN</button>
+          <label><input type="checkbox" id="autoplay" /> Auto</label>
+        </div>
       </div>
     </div>
   </body>

@@ -1,55 +1,38 @@
 const API_BASE = window.location.origin;
 
 const JackpotAPI = {
-  async fetchConfig() {
+  async login(username, pin) {
     try {
-      const response = await fetch(`${API_BASE}/api/config`);
-      if (!response.ok) throw new Error("HTTP " + response.status);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Failed to fetch config:", error);
-      return null;
+      const r = await fetch(`${API_BASE}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, pin }),
+      });
+      return await r.json();
+    } catch (e) {
+      return { success: false, error: "Connection failed" };
     }
   },
 
-  async postConfig(body) {
+  async updateAccount(username, pin, balance) {
     try {
-      const response = await fetch(`${API_BASE}/api/config`, {
+      const r = await fetch(`${API_BASE}/api/account`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ username, pin, balance }),
       });
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Failed to post config:", error);
-      return null;
+      return await r.json();
+    } catch (e) {
+      return { success: false };
     }
   },
 
   async fetchJackpot() {
     try {
-      const response = await fetch(`${API_BASE}/api/jackpot`);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Failed to fetch jackpot:", error);
+      const r = await fetch(`${API_BASE}/api/jackpot`);
+      return await r.json();
+    } catch (e) {
       return { jackpot: 5555555, formatted: "5.555.555" };
-    }
-  },
-
-  async updatePlayerMoney(money) {
-    try {
-      const response = await fetch(`${API_BASE}/api/config`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerMoney: money }),
-      });
-      return await response.json();
-    } catch (error) {
-      console.error("Failed to sync money:", error);
-      return null;
     }
   },
 

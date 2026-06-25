@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#1a1a2e">
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Username" android:textColor="#888" android:textSize="13sp" />
+    <EditText android:id="@+id/dialogUsername" android:layout_width="match_parent"
+        android:layout_height="44dp" android:inputType="text" android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_input" android:padding="10dp"
+        android:textColor="#fff" android:hint="Player name" android:textSize="15sp" />
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="PIN" android:textColor="#888" android:textSize="13sp" />
+    <EditText android:id="@+id/dialogPin" android:layout_width="match_parent"
+        android:layout_height="44dp" android:inputType="number" android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_input" android:padding="10dp"
+        android:textColor="#fff" android:hint="1234" android:textSize="15sp"
+        android:digits="0123456789" />
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Balance" android:textColor="#888" android:textSize="13sp" />
+    <EditText android:id="@+id/dialogBalance" android:layout_width="match_parent"
+        android:layout_height="44dp" android:inputType="number"
+        android:background="@drawable/bg_input" android:padding="10dp"
+        android:textColor="#fff" android:hint="1000" android:textSize="15sp" />
+</LinearLayout>

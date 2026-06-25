@@ -5,403 +5,228 @@
     android:layout_height="match_parent"
     android:background="#1a1a2e">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <LinearLayout android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="12dp">
 
-        <!-- Header -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- HEADER -->
+        <LinearLayout android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="🎰 Slot Admin"
-                android:textColor="#D5AD6D"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/serverUrlDisplay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Starting..."
-                android:textColor="#4CAF50"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:text="🎰 Slot 777 Admin"
+                android:textColor="#D5AD6D" android:textSize="22sp" android:textStyle="bold" />
+            <TextView android:id="@+id/serverUrlText"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Starting..." android:textColor="#4CAF50"
+                android:textSize="12sp" android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Server Status -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardBackgroundColor="#16213e"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📡 Server"
-                    android:textColor="#D5AD6D"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/statusText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Starting..."
-                    android:textColor="#aaa"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Open on players' browsers:"
-                    android:textColor="#888"
-                    android:textSize="12sp"
-                    android:layout_marginTop="6dp" />
-
-                <TextView
-                    android:id="@+id/serverUrlText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="http://IP:8080"
-                    android:textColor="#4CAF50"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+        <!-- STATUS -->
+        <androidx.cardview.widget.CardView android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="#16213e" app:cardCornerRadius="10dp" app:cardElevation="3dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📡 Server" android:textColor="#D5AD6D"
+                    android:textSize="15sp" android:textStyle="bold" />
+                <TextView android:id="@+id/statusText" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="Starting..."
+                    android:textColor="#aaa" android:textSize="12sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Money Settings -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardBackgroundColor="#16213e"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+        <!-- ACCOUNTS -->
+        <androidx.cardview.widget.CardView android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="#16213e" app:cardCornerRadius="10dp" app:cardElevation="3dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="12dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💵 Money Settings"
-                    android:textColor="#D5AD6D"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="12dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="10dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:paddingEnd="6dp">
+                        android:text="👥 Accounts" android:textColor="#D5AD6D"
+                        android:textSize="15sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/accountCountText"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0 accounts" android:textColor="#888" android:textSize="12sp" />
+                    <TextView android:id="@+id/totalMoneyText"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textColor="#4CAF50" android:textSize="14sp"
+                        android:textStyle="bold" android:layout_marginStart="8dp" />
+                </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Starting Money"
-                            android:textColor="#888"
-                            android:textSize="12sp" />
+                <LinearLayout android:id="@+id/accountListLayout"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="8dp" />
 
-                        <EditText
-                            android:id="@+id/startingMoneyInput"
-                            android:layout_width="match_parent"
-                            android:layout_height="44dp"
-                            android:layout_marginTop="4dp"
-                            android:inputType="number"
-                            android:background="@drawable/bg_input"
-                            android:padding="10dp"
-                            android:textColor="#fff"
-                            android:textColorHint="#666"
-                            android:hint="1000"
-                            android:textSize="16sp" />
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+                    <Button android:id="@+id/btnAddAccount"
+                        android:layout_width="0dp" android:layout_height="40dp"
+                        android:layout_weight="1" android:layout_marginEnd="4dp"
+                        android:text="+ Add Account" android:textSize="13sp"
+                        android:textAllCaps="false"
+                        android:backgroundTint="#4CAF50" android:textColor="#fff" />
+                    <Button android:id="@+id/btnResetAll"
+                        android:layout_width="0dp" android:layout_height="40dp"
+                        android:layout_weight="1" android:layout_marginStart="4dp"
+                        android:text="Reset All" android:textSize="13sp"
+                        android:textAllCaps="false"
+                        android:backgroundTint="#ff9800" android:textColor="#fff" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- MONEY SETTINGS -->
+        <androidx.cardview.widget.CardView android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="#16213e" app:cardCornerRadius="10dp" app:cardElevation="3dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="💵 Economy" android:textColor="#D5AD6D"
+                    android:textSize="15sp" android:textStyle="bold" />
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical"
+                        android:paddingEnd="4dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Start Money" android:textColor="#888" android:textSize="12sp" />
+                        <EditText android:id="@+id/startingMoneyInput"
+                            android:layout_width="match_parent" android:layout_height="40dp"
+                            android:inputType="number" android:background="@drawable/bg_input"
+                            android:padding="8dp" android:textColor="#fff"
+                            android:textSize="14sp" />
                     </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:paddingStart="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Bet Amount"
-                            android:textColor="#888"
-                            android:textSize="12sp" />
-
-                        <EditText
-                            android:id="@+id/betAmountInput"
-                            android:layout_width="match_parent"
-                            android:layout_height="44dp"
-                            android:layout_marginTop="4dp"
-                            android:inputType="number"
-                            android:background="@drawable/bg_input"
-                            android:padding="10dp"
-                            android:textColor="#fff"
-                            android:textColorHint="#666"
-                            android:hint="100"
-                            android:textSize="16sp" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical"
+                        android:paddingStart="4dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Bet Amount" android:textColor="#888" android:textSize="12sp" />
+                        <EditText android:id="@+id/betAmountInput"
+                            android:layout_width="match_parent" android:layout_height="40dp"
+                            android:inputType="number" android:background="@drawable/bg_input"
+                            android:padding="8dp" android:textColor="#fff"
+                            android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/btnSaveMoney"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:text="💾 Save Money Settings &amp; Reset Player"
-                    android:backgroundTint="#4CAF50"
-                    android:textColor="#fff"
-                    android:textSize="14sp"
-                    android:textAllCaps="false" />
-
+                <Button android:id="@+id/btnSaveMoney"
+                    android:layout_width="match_parent" android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Save Economy Settings" android:textAllCaps="false"
+                    android:backgroundTint="#D5AD6D" android:textColor="#1a1a2e" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Jackpot -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardBackgroundColor="#16213e"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💰 Jackpot"
-                    android:textColor="#D5AD6D"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:id="@+id/currentJackpotText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="5.555.555"
-                    android:textColor="#D5AD6D"
-                    android:textSize="32sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <EditText
-                        android:id="@+id/jackpotInput"
-                        android:layout_width="0dp"
-                        android:layout_height="44dp"
+        <!-- JACKPOT -->
+        <androidx.cardview.widget.CardView android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="#16213e" app:cardCornerRadius="10dp" app:cardElevation="3dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="💰 Jackpot" android:textColor="#D5AD6D"
+                    android:textSize="15sp" android:textStyle="bold" />
+                <TextView android:id="@+id/currentJackpotText"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="5.555.555" android:textColor="#D5AD6D"
+                    android:textSize="28sp" android:textStyle="bold" />
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:layout_marginTop="6dp">
+                    <EditText android:id="@+id/jackpotInput"
+                        android:layout_width="0dp" android:layout_height="40dp"
                         android:layout_weight="1"
-                        android:inputType="number"
-                        android:background="@drawable/bg_input"
-                        android:padding="10dp"
-                        android:textColor="#fff"
-                        android:textColorHint="#666"
-                        android:hint="Jackpot"
-                        android:textSize="16sp" />
-
-                    <Button
-                        android:id="@+id/btnSaveJackpot"
-                        android:layout_width="wrap_content"
-                        android:layout_height="44dp"
-                        android:layout_marginStart="8dp"
-                        android:text="Set"
-                        android:backgroundTint="#D5AD6D"
-                        android:textColor="#1a1a2e"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp" />
+                        android:inputType="number" android:background="@drawable/bg_input"
+                        android:padding="8dp" android:textColor="#fff"
+                        android:hint="Jackpot" android:textSize="14sp" />
+                    <Button android:id="@+id/btnSaveJackpot"
+                        android:layout_width="wrap_content" android:layout_height="40dp"
+                        android:layout_marginStart="6dp"
+                        android:text="Set" android:backgroundTint="#D5AD6D"
+                        android:textColor="#1a1a2e" android:paddingStart="16dp" android:paddingEnd="16dp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Difficulty -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardBackgroundColor="#16213e"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+        <!-- DIFFICULTY -->
+        <androidx.cardview.widget.CardView android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="#16213e" app:cardCornerRadius="10dp" app:cardElevation="3dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🎯 Difficulty" android:textColor="#D5AD6D"
+                    android:textSize="15sp" android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🎯 Difficulty"
-                    android:textColor="#D5AD6D"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="10dp" />
-
-                <Spinner
-                    android:id="@+id/difficultySpinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_input"
-                    android:padding="8dp"
-                    android:textColor="#fff" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Win Rate:"
-                    android:textColor="#888"
-                    android:textSize="13sp"
-                    android:layout_marginTop="10dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <SeekBar
-                        android:id="@+id/winRateSeekBar"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:max="149"
-                        android:progressTint="#D5AD6D"
-                        android:progressBackgroundTint="#333" />
-
-                    <TextView
-                        android:id="@+id/winRateValue"
-                        android:layout_width="55dp"
-                        android:layout_height="wrap_content"
-                        android:text="15%"
-                        android:textColor="#D5AD6D"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:gravity="end" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Payout Multiplier:"
-                    android:textColor="#888"
-                    android:textSize="13sp"
+                <Spinner android:id="@+id/difficultySpinner"
+                    android:layout_width="match_parent" android:layout_height="40dp"
+                    android:background="@drawable/bg_input" android:padding="6dp"
                     android:layout_marginTop="6dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Win Rate:" android:textColor="#888" android:textSize="12sp"
+                    android:layout_marginTop="6dp" />
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
                     android:gravity="center_vertical">
-
-                    <SeekBar
-                        android:id="@+id/payoutSeekBar"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:max="49"
-                        android:progressTint="#D5AD6D"
-                        android:progressBackgroundTint="#333" />
-
-                    <TextView
-                        android:id="@+id/payoutValue"
-                        android:layout_width="55dp"
-                        android:layout_height="wrap_content"
-                        android:text="3x"
-                        android:textColor="#D5AD6D"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:gravity="end" />
+                    <SeekBar android:id="@+id/winRateSeekBar"
+                        android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:max="149"
+                        android:progressTint="#D5AD6D" android:progressBackgroundTint="#333" />
+                    <TextView android:id="@+id/winRateValue"
+                        android:layout_width="50dp" android:layout_height="wrap_content"
+                        android:text="15%" android:textColor="#D5AD6D"
+                        android:textSize="14sp" android:textStyle="bold" android:gravity="end" />
                 </LinearLayout>
 
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Payout:" android:textColor="#888" android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <SeekBar android:id="@+id/payoutSeekBar"
+                        android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:max="49"
+                        android:progressTint="#D5AD6D" android:progressBackgroundTint="#333" />
+                    <TextView android:id="@+id/payoutValue"
+                        android:layout_width="50dp" android:layout_height="wrap_content"
+                        android:text="3x" android:textColor="#D5AD6D"
+                        android:textSize="14sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Info -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardBackgroundColor="#16213e"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ℹ️ Info"
-                    android:textColor="#D5AD6D"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="6dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="• Players connect via browser to the server URL"
-                    android:textColor="#aaa"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="2dp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="• Difficulty changes affect win rate &amp; payout"
-                    android:textColor="#aaa"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="2dp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="• Players start with Starting Money each session"
-                    android:textColor="#aaa"
-                    android:textSize="12sp" />
-
+        <!-- INFO -->
+        <androidx.cardview.widget.CardView android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="#16213e" app:cardCornerRadius="10dp" app:cardElevation="3dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="ℹ️ Info" android:textColor="#D5AD6D"
+                    android:textSize="15sp" android:textStyle="bold" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="1. Create accounts from this admin panel\n2. Players open browser to server URL and login\n3. Each player has their own balance\n4. Admin controls difficulty & economy in real-time"
+                    android:textColor="#aaa" android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" android:layout_marginTop="4dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

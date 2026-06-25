@@ -1,37 +1,26 @@
 package com.slotmachine;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.SeekBar;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     private SlotServer server;
     private GameConfig gameConfig;
+    private AccountManager accountManager;
 
     // Views
-    private TextView serverUrlDisplay;
-    private TextView currentJackpotText;
+    private TextView serverUrlText, statusText, currentJackpotText;
     private Spinner difficultySpinner;
-    private TextView winRateValue;
-    private SeekBar winRateSeekBar;
-    private TextView payoutValue;
-    private SeekBar payoutSeekBar;
-    private EditText jackpotInput;
-    private Button btnSaveJackpot;
-    private TextView statusText;
-    private EditText startingMoneyInput;
-    private EditText betAmountInput;
-    private Button btnSaveMoney;
+    private SeekBar winRateSeekBar, payoutSeekBar;
+    private TextView winRateValue, payoutValue;
+    private EditText jackpotInput, startingMoneyInput, betAmountInput;
+    private Button btnSaveJackpot, btnSaveMoney, btnAddAccount, btnResetAll;
+    private TextView accountCountText, totalMoneyText;
+    private LinearLayout accountListLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +28,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         gameConfig = GameConfig.getInstance(this);
+        accountManager = AccountManager.getInstance(this);
 
-        // Initialize views
-        serverUrlDisplay = findViewById(R.id.serverUrlDisplay);
+        // Init views
+        serverUrlText = findViewById(R.id.serverUrlText);
+        statusText = findViewById(R.id.statusText);
         currentJackpotText = findViewById(R.id.currentJackpotText);
         difficultySpinner = findViewById(R.id.difficultySpinner);
         winRateValue = findViewById(R.id.winRateValue);
@@ -50,167 +41,230 @@ public class MainActivity extends AppCompatActivity {
         payoutSeekBar = findViewById(R.id.payoutSeekBar);
         jackpotInput = findViewById(R.id.jackpotInput);
         btnSaveJackpot = findViewById(R.id.btnSaveJackpot);
-        statusText = findViewById(R.id.statusText);
         startingMoneyInput = findViewById(R.id.startingMoneyInput);
         betAmountInput = findViewById(R.id.betAmountInput);
         btnSaveMoney = findViewById(R.id.btnSaveMoney);
+        btnAddAccount = findViewById(R.id.btnAddAccount);
+        btnResetAll = findViewById(R.id.btnResetAll);
+        accountCountText = findViewById(R.id.accountCountText);
+        totalMoneyText = findViewById(R.id.totalMoneyText);
+        accountListLayout = findViewById(R.id.accountListLayout);
 
-        // Start the embedded HTTP server
+        // Start server
         server = new SlotServer(this);
         server.startServer();
+        serverUrlText.setText(server.getServerUrl());
 
-        // Show server info
-        serverUrlDisplay.setText(server.getServerUrl());
-
-        // Setup difficulty spinner
-        setupDifficultySpinner();
-
-        // Setup seek bars
+        setupDifficulty();
         setupSeekBars();
-
-        // Setup jackpot
         setupJackpot();
-
-        // Setup money
         setupMoney();
+        setupAccounts();
 
-        // Update display
         updateDisplay();
     }
 
-    private void setupDifficultySpinner() {
-        String[] difficulties = {"Very Easy", "Easy", "Medium", "Hard", "Very Hard", "Impossible", "Custom"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-            android.R.layout.simple_spinner_dropdown_item, difficulties);
-        difficultySpinner.setAdapter(adapter);
+    // ===== DIFFICULTY =====
 
-        int defaultPos = gameConfig.getDifficulty().id;
-        if (defaultPos >= 0 && defaultPos < 6) {
-            difficultySpinner.setSelection(defaultPos);
-        }
-
+    private void setupDifficulty() {
+        String[] items = {"Very Easy","Easy","Medium","Hard","Very Hard","Impossible","Custom"};
+        difficultySpinner.setAdapter(new ArrayAdapter<>(this,
+            android.R.layout.simple_spinner_dropdown_item, items));
+        int pos = gameConfig.getDifficulty().id;
+        if (pos >= 0 && pos < 6) difficultySpinner.setSelection(pos);
         difficultySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position < 6) {
-                    GameConfig.Difficulty diff = GameConfig.Difficulty.fromId(position);
-                    gameConfig.setDifficulty(diff);
-                    // Reset player money when difficulty changes
-                    gameConfig.setPlayerMoney(gameConfig.getStartingMoney());
+            @Override public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
+                if (pos < 6) {
+                    gameConfig.setDifficulty(GameConfig.Difficulty.fromId(pos));
                     updateDisplay();
-                    Toast.makeText(MainActivity.this,
-                        "Difficulty: " + diff.label + " | Money reset!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Difficulty: " +
+                        GameConfig.Difficulty.fromId(pos).label, Toast.LENGTH_SHORT).show();
                 }
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            @Override public void onNothingSelected(AdapterView<?> p) {}
         });
     }
 
     private void setupSeekBars() {
-        // Win Rate (0.5% to 75%)
         winRateSeekBar.setMax(149);
         winRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                float rate = 0.5f + (progress * 0.5f);
-                winRateValue.setText(String.format("%.1f%%", rate));
+            @Override public void onProgressChanged(SeekBar s, int p, boolean u) {
+                winRateValue.setText(String.format("%.1f%%", 0.5f + p * 0.5f));
             }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                float rate = 0.5f + (seekBar.getProgress() * 0.5f);
-                gameConfig.setCustomConfig(rate / 100f,
-                    gameConfig.getPayoutMultiplier(),
-                    gameConfig.getMinSpinsBeforeWin(),
-                    gameConfig.getJackpotHitRate());
+            @Override public void onStartTrackingTouch(SeekBar s) {}
+            @Override public void onStopTrackingTouch(SeekBar s) {
+                float rate = 0.5f + s.getProgress() * 0.5f;
+                gameConfig.setCustomConfig(rate/100f, gameConfig.getPayoutMultiplier(),
+                    gameConfig.getMinSpinsBeforeWin(), gameConfig.getJackpotHitRate());
                 difficultySpinner.setSelection(6);
                 updateDisplay();
             }
         });
 
-        // Payout Multiplier (1x to 50x)
         payoutSeekBar.setMax(49);
         payoutSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                float mult = 1.0f + progress;
-                payoutValue.setText(String.format("%.0fx", mult));
+            @Override public void onProgressChanged(SeekBar s, int p, boolean u) {
+                payoutValue.setText(String.format("%.0fx", 1f + p));
             }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                float mult = 1.0f + seekBar.getProgress();
-                gameConfig.setCustomConfig(gameConfig.getWinRate(),
-                    mult,
-                    gameConfig.getMinSpinsBeforeWin(),
-                    gameConfig.getJackpotHitRate());
+            @Override public void onStartTrackingTouch(SeekBar s) {}
+            @Override public void onStopTrackingTouch(SeekBar s) {
+                float mult = 1f + s.getProgress();
+                gameConfig.setCustomConfig(gameConfig.getWinRate(), mult,
+                    gameConfig.getMinSpinsBeforeWin(), gameConfig.getJackpotHitRate());
                 difficultySpinner.setSelection(6);
                 updateDisplay();
             }
         });
     }
+
+    // ===== JACKPOT =====
 
     private void setupJackpot() {
         jackpotInput.setText(String.valueOf(gameConfig.getJackpot()));
         btnSaveJackpot.setOnClickListener(v -> {
-            String input = jackpotInput.getText().toString().trim();
-            if (input.isEmpty()) {
-                Toast.makeText(this, "Enter a value", Toast.LENGTH_SHORT).show();
-                return;
-            }
             try {
-                long value = Long.parseLong(input);
-                if (value < 0) {
-                    Toast.makeText(this, "Value cannot be negative", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                gameConfig.setJackpot(value);
+                long val = Long.parseLong(jackpotInput.getText().toString().trim());
+                if (val < 0) { Toast.makeText(this, "Invalid", Toast.LENGTH_SHORT).show(); return; }
+                gameConfig.setJackpot(val);
                 updateDisplay();
-                Toast.makeText(this, "Jackpot: " + gameConfig.getFormattedJackpot(),
-                    Toast.LENGTH_SHORT).show();
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Invalid number", Toast.LENGTH_SHORT).show();
-            }
+                Toast.makeText(this, "Jackpot: " + gameConfig.getFormattedJackpot(), Toast.LENGTH_SHORT).show();
+            } catch (Exception e) { Toast.makeText(this, "Invalid number", Toast.LENGTH_SHORT).show(); }
         });
     }
+
+    // ===== MONEY =====
 
     private void setupMoney() {
         startingMoneyInput.setText(String.valueOf(gameConfig.getStartingMoney()));
         betAmountInput.setText(String.valueOf(gameConfig.getBetAmount()));
-
         btnSaveMoney.setOnClickListener(v -> {
             try {
-                long startMoney = Long.parseLong(startingMoneyInput.getText().toString().trim());
+                long sm = Long.parseLong(startingMoneyInput.getText().toString().trim());
                 long bet = Long.parseLong(betAmountInput.getText().toString().trim());
-
-                if (startMoney < 1 || bet < 1) {
-                    Toast.makeText(this, "Values must be positive", Toast.LENGTH_SHORT).show();
-                    return;
+                if (sm < 1 || bet < 1 || bet > sm) {
+                    Toast.makeText(this, "Invalid values", Toast.LENGTH_SHORT).show(); return;
                 }
-                if (bet > startMoney) {
-                    Toast.makeText(this, "Bet cannot exceed starting money", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                gameConfig.setStartingMoney(startMoney);
+                gameConfig.setStartingMoney(sm);
                 gameConfig.setBetAmount(bet);
-                gameConfig.setPlayerMoney(startMoney); // Reset money
                 updateDisplay();
-                Toast.makeText(this, "Money settings saved!",
-                    Toast.LENGTH_SHORT).show();
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Invalid number format", Toast.LENGTH_SHORT).show();
-            }
+                Toast.makeText(this, "Money settings saved", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) { Toast.makeText(this, "Invalid", Toast.LENGTH_SHORT).show(); }
         });
     }
+
+    // ===== ACCOUNTS =====
+
+    private void setupAccounts() {
+        btnAddAccount.setOnClickListener(v -> showCreateAccountDialog());
+        btnResetAll.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                .setTitle("Reset All Accounts?")
+                .setMessage("All balances will be reset to " + gameConfig.getFormattedJackpot())
+                .setPositiveButton("Reset", (d, w) -> {
+                    accountManager.resetAllBalances(gameConfig.getStartingMoney());
+                    refreshAccountList();
+                    Toast.makeText(this, "All accounts reset", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+        });
+        refreshAccountList();
+    }
+
+    private void refreshAccountList() {
+        accountListLayout.removeViews(1, Math.max(0, accountListLayout.getChildCount() - 1));
+        String json = accountManager.getAllAccounts();
+        try {
+            org.json.JSONObject res = new org.json.JSONObject(json);
+            org.json.JSONArray list = res.getJSONArray("accounts");
+            accountCountText.setText(list.length() + " accounts");
+            long total = 0;
+            for (int i = 0; i < list.length(); i++) {
+                org.json.JSONObject acc = list.getJSONObject(i);
+                total += acc.optLong("balance", 0);
+                addAccountRow(acc);
+            }
+            totalMoneyText.setText(formatMoney(total));
+        } catch (Exception e) {
+            accountCountText.setText("0 accounts");
+            totalMoneyText.setText("0");
+        }
+    }
+
+    private void addAccountRow(org.json.JSONObject acc) throws Exception {
+        View row = getLayoutInflater().inflate(R.layout.item_account, accountListLayout, false);
+        TextView nameText = row.findViewById(R.id.accNameText);
+        TextView balanceText = row.findViewById(R.id.accBalanceText);
+        Button editBtn = row.findViewById(R.id.accEditBtn);
+        Button deleteBtn = row.findViewById(R.id.accDeleteBtn);
+
+        String username = acc.getString("username");
+        long balance = acc.optLong("balance", 0);
+
+        nameText.setText(username);
+        balanceText.setText(formatMoney(balance));
+
+        editBtn.setOnClickListener(v -> showEditAccountDialog(username, balance));
+        deleteBtn.setOnClickListener(v -> {
+            accountManager.deleteAccount(username);
+            refreshAccountList();
+            Toast.makeText(this, "Deleted: " + username, Toast.LENGTH_SHORT).show();
+        });
+
+        accountListLayout.addView(row);
+    }
+
+    private void showCreateAccountDialog() {
+        View v = getLayoutInflater().inflate(R.layout.dialog_account, null);
+        EditText userInput = v.findViewById(R.id.dialogUsername);
+        EditText pinInput = v.findViewById(R.id.dialogPin);
+        EditText balanceInput = v.findViewById(R.id.dialogBalance);
+        balanceInput.setText(String.valueOf(gameConfig.getStartingMoney()));
+
+        new AlertDialog.Builder(this)
+            .setTitle("Add Account")
+            .setView(v)
+            .setPositiveButton("Create", (d, w) -> {
+                String result = accountManager.createAccount(
+                    userInput.getText().toString(),
+                    pinInput.getText().toString(),
+                    Long.parseLong(balanceInput.getText().toString().replaceAll("[^0-9]", ""))
+                );
+                if (result.contains("\"success\":true")) {
+                    refreshAccountList();
+                    Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Error: account exists", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    private void showEditAccountDialog(String username, long currentBalance) {
+        View v = getLayoutInflater().inflate(R.layout.dialog_account, null);
+        EditText userInput = v.findViewById(R.id.dialogUsername);
+        EditText pinInput = v.findViewById(R.id.dialogPin);
+        EditText balanceInput = v.findViewById(R.id.dialogBalance);
+        userInput.setText(username);
+        userInput.setEnabled(false);
+        balanceInput.setText(String.valueOf(currentBalance));
+
+        new AlertDialog.Builder(this)
+            .setTitle("Edit: " + username)
+            .setView(v)
+            .setPositiveButton("Save", (d, w) -> {
+                String pin = pinInput.getText().toString().trim();
+                long bal = Long.parseLong(balanceInput.getText().toString().replaceAll("[^0-9]", ""));
+                if (!pin.isEmpty()) accountManager.createAccount(username, pin, bal);
+                refreshAccountList();
+                Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+
+    // ===== DISPLAY =====
 
     private void updateDisplay() {
         currentJackpotText.setText(gameConfig.getFormattedJackpot());
@@ -218,30 +272,34 @@ public class MainActivity extends AppCompatActivity {
         startingMoneyInput.setText(String.valueOf(gameConfig.getStartingMoney()));
         betAmountInput.setText(String.valueOf(gameConfig.getBetAmount()));
 
-        String diffLabel = gameConfig.getDifficulty().label;
         statusText.setText(
-            "Difficulty: " + diffLabel
-            + " | Win Rate: " + String.format("%.1f%%", gameConfig.getWinRate() * 100)
-            + " | Payout: " + String.format("%.0fx", gameConfig.getPayoutMultiplier())
-            + "\nServer: " + server.getServerUrl()
-            + " | Starting Money: " + gameConfig.getFormattedMoney(gameConfig.getStartingMoney())
-            + " | Bet: " + gameConfig.getFormattedMoney(gameConfig.getBetAmount()));
+            "Difficulty: " + gameConfig.getDifficulty().label
+            + " | Win: " + String.format("%.1f%%", gameConfig.getWinRate() * 100)
+            + " | Pay: " + String.format("%.0fx", gameConfig.getPayoutMultiplier())
+            + "\nServer: " + server.getServerUrl());
 
-        // Update seekbars
-        int winRateProgress = Math.round((gameConfig.getWinRate() * 100 - 0.5f) / 0.5f);
-        winRateSeekBar.setProgress(Math.max(0, Math.min(149, winRateProgress)));
+        int wrp = Math.round((gameConfig.getWinRate() * 100 - 0.5f) / 0.5f);
+        winRateSeekBar.setProgress(Math.max(0, Math.min(149, wrp)));
         winRateValue.setText(String.format("%.1f%%", gameConfig.getWinRate() * 100));
 
-        int payoutProgress = Math.round(gameConfig.getPayoutMultiplier() - 1);
-        payoutSeekBar.setProgress(Math.max(0, Math.min(49, payoutProgress)));
+        int pp = Math.round(gameConfig.getPayoutMultiplier() - 1);
+        payoutSeekBar.setProgress(Math.max(0, Math.min(49, pp)));
         payoutValue.setText(String.format("%.0fx", gameConfig.getPayoutMultiplier()));
+    }
+
+    private String formatMoney(long v) {
+        return String.format("%,d", v).replace(",", ".");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshAccountList();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (server != null) {
-            server.stop();
-        }
+        if (server != null) server.stop();
     }
 }

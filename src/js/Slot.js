@@ -3,144 +3,172 @@ import Symbol from "./Symbol.js";
 import JackpotAPI from "./JackpotAPI.js";
 
 export default class Slot {
-  constructor(domElement, config = {}) {
-    Symbol.preload();
-
-    this.container = domElement;
+  constructor(config = {}) {
     this.config = config;
+    this.ready = false;
+    this.money = 0;
+    this.bet = 100;
+    this.spinCount = 0;
+    this.gameConfig = null;
+    this.currentUser = null;
+    this.currentPin = null;
 
-    // DOM elements
+    // DOM
+    this.loginScreen = document.getElementById("loginScreen");
+    this.gameScreen = document.getElementById("gameScreen");
+    this.loginUser = document.getElementById("loginUser");
+    this.loginPin = document.getElementById("loginPin");
+    this.loginBtn = document.getElementById("loginBtn");
+    this.loginError = document.getElementById("loginError");
+    this.logoutBtn = document.getElementById("logoutBtn");
     this.jackpotDisplay = document.getElementById("jp");
     this.moneyDisplay = document.getElementById("playerMoney");
     this.betDisplay = document.getElementById("betDisplay");
     this.winMessage = document.getElementById("winMessage");
-    this.connectionStatus = document.getElementById("connectionStatus");
+    this.winText = document.getElementById("winText");
+    this.playerNameDisplay = document.getElementById("playerNameDisplay");
     this.spinButton = document.getElementById("spin");
     this.autoPlayCheckbox = document.getElementById("autoplay");
 
-    // State
-    this.ready = false;
-    this.money = 0;
-    this.bet = 100;
-    this.startingMoney = 1000;
-    this.spinCount = 0;
-    this.totalWins = 0;
-    this.gameConfig = null;
+    // Reels
+    this.currentSymbols = Array(5).fill(["seven", "seven", "seven"]);
+    this.nextSymbols = Array(5).fill(["seven", "seven", "seven"]);
 
-    // Reels initial state
-    this.currentSymbols = [
-      ["death_star", "death_star", "death_star"],
-      ["death_star", "death_star", "death_star"],
-      ["death_star", "death_star", "death_star"],
-      ["death_star", "death_star", "death_star"],
-      ["death_star", "death_star", "death_star"],
-    ];
-
-    this.nextSymbols = [
-      ["death_star", "death_star", "death_star"],
-      ["death_star", "death_star", "death_star"],
-      ["death_star", "death_star", "death_star"],
-      ["death_star", "death_star", "death_star"],
-      ["death_star", "death_star", "death_star"],
-    ];
-
-    this.reels = Array.from(this.container.getElementsByClassName("reel")).map(
-      (reelContainer, idx) =>
-        new Reel(reelContainer, idx, this.currentSymbols[idx]),
+    this.reels = Array.from(document.querySelectorAll(".reel")).map(
+      (el, i) => new Reel(el, i, this.currentSymbols[i]),
     );
 
     this.spinButton.addEventListener("click", () => this.spin());
+    this.logoutBtn.addEventListener("click", () => this.showLogin());
 
-    if (config.inverted) {
-      this.container.classList.add("inverted");
-    }
+    // Login handler
+    this.loginBtn.addEventListener("click", () => this.doLogin());
+    this.loginPin.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this.doLogin();
+    });
 
-    this.init();
+    Symbol.preload();
+    this.showLogin();
   }
 
-  async init() {
-    this.showStatus("", "#4CAF50");
-    this.spinButton.disabled = true;
+  showLogin() {
+    this.gameScreen.style.display = "none";
+    this.loginScreen.style.display = "flex";
+    this.loginUser.value = "";
+    this.loginPin.value = "";
+    this.loginError.textContent = "";
+    this.currentUser = null;
+    this.currentPin = null;
+    this.ready = false;
+  }
 
-    this.gameConfig = await JackpotAPI.fetchConfig();
+  async doLogin() {
+    const user = this.loginUser.value.trim();
+    const pin = this.loginPin.value.trim();
 
-    if (!this.gameConfig) {
-      this.showStatus("", "#ff4444");
-      this.gameConfig = {
-        difficulty: "Medium",
-        winRate: 0.15,
-        payoutMultiplier: 3,
-        minSpinsBeforeWin: 10,
-        startingMoney: 1000,
-        betAmount: 100,
-      };
-    } else {
-      this.showStatus("", "#4CAF50");
+    if (!user || !pin) {
+      this.loginError.textContent = "Enter username and PIN";
+      return;
     }
 
-    this.startingMoney = this.gameConfig.startingMoney || 1000;
-    this.bet = this.gameConfig.betAmount || 100;
-    this.money = this.gameConfig.playerMoney || this.startingMoney;
+    this.loginBtn.disabled = true;
+    this.loginBtn.textContent = "Connecting...";
+    this.loginError.textContent = "";
 
-    this.updateDisplay();
+    const result = await JackpotAPI.login(user, pin);
+
+    if (!result.success) {
+      this.loginError.textContent = result.error || "Login failed";
+      this.loginBtn.disabled = false;
+      this.loginBtn.textContent = "PLAY";
+      return;
+    }
+
+    const account = result.account;
+    this.gameConfig = result.config || {
+      winRate: 0.15,
+      payoutMultiplier: 3,
+      minSpinsBeforeWin: 10,
+      startingMoney: 1000,
+      betAmount: 100,
+    };
+
+    this.currentUser = user;
+    this.currentPin = pin;
+    this.money = account.balance || this.gameConfig.startingMoney || 1000;
+    this.bet = this.gameConfig.betAmount || 100;
+    this.spinCount = 0;
+
+    this.loginBtn.disabled = false;
+    this.loginBtn.textContent = "PLAY";
+
+    this.startGame();
+  }
+
+  startGame() {
+    this.loginScreen.style.display = "none";
+    this.gameScreen.style.display = "block";
     this.ready = true;
     this.spinButton.disabled = false;
 
-    console.log("Ready with config:", this.gameConfig);
-  }
-
-  showStatus(text, color) {
-    if (this.connectionStatus) {
-      this.connectionStatus.textContent = "";
-      this.connectionStatus.style.display = "none";
+    if (this.playerNameDisplay) {
+      this.playerNameDisplay.textContent = "👤 " + this.currentUser;
     }
+
+    this.updateDisplay();
+    this.setWinMessage("🎰 Good luck " + this.currentUser + "!", "#FFD700");
   }
 
   updateDisplay() {
+    if (this.moneyDisplay)
+      this.moneyDisplay.textContent = JackpotAPI.formatNumber(this.money);
+    if (this.betDisplay)
+      this.betDisplay.textContent = JackpotAPI.formatNumber(this.bet);
     if (this.jackpotDisplay && this.gameConfig) {
       this.jackpotDisplay.textContent =
         this.gameConfig.formattedJackpot ||
         JackpotAPI.formatNumber(this.gameConfig.jackpot || 5555555);
     }
-    if (this.moneyDisplay) {
-      this.moneyDisplay.textContent = JackpotAPI.formatNumber(this.money);
-    }
-    if (this.betDisplay) {
-      this.betDisplay.textContent = JackpotAPI.formatNumber(this.bet);
+  }
+
+  setWinMessage(text, color) {
+    if (this.winText) {
+      this.winText.textContent = text;
+      this.winText.style.color = color || "#FFD700";
     }
   }
 
   spin() {
     if (!this.ready) return;
+
     if (this.money < this.bet) {
-      this.setWinMessage("💸 Game Over! Not enough money!", "#ff4444");
+      this.setWinMessage("💸 Out of money! Ask admin to refill.", "#ff4444");
       this.spinButton.disabled = true;
       return;
     }
 
     this.money -= this.bet;
     this.updateDisplay();
-
     this.spinCount++;
+
     const result = this.determineWin();
 
     if (result.win) {
       const winnings = Math.floor(this.bet * result.payoutMult);
       this.money += winnings;
-      this.totalWins += winnings;
 
-      const winSymbol = result.symbol;
+      const sym = result.symbol;
       this.nextSymbols = [
         [Symbol.random(), Symbol.random(), Symbol.random()],
-        [winSymbol, winSymbol, winSymbol],
+        [sym, sym, sym],
         [Symbol.random(), Symbol.random(), Symbol.random()],
-        [winSymbol, winSymbol, winSymbol],
+        [sym, sym, sym],
         [Symbol.random(), Symbol.random(), Symbol.random()],
       ];
 
       this.setWinMessage(
-        "🎉 YOU WIN! " + JackpotAPI.formatNumber(winnings) + " coins!",
-        "#D5AD6D",
+        "🎉 WIN " + JackpotAPI.formatNumber(winnings) + "!",
+        "#FFD700",
       );
     } else {
       this.nextSymbols = [
@@ -150,79 +178,58 @@ export default class Slot {
         [Symbol.random(), Symbol.random(), Symbol.random()],
         [Symbol.random(), Symbol.random(), Symbol.random()],
       ];
-
-      this.setWinMessage("Try again!", "#888");
+      this.setWinMessage("", "#888");
     }
 
     this.currentSymbols = this.nextSymbols;
     this.updateDisplay();
 
-    JackpotAPI.updatePlayerMoney(this.money);
+    // Sync balance to server (async, don't wait)
+    JackpotAPI.updateAccount(this.currentUser, this.currentPin, this.money);
 
-    this.onSpinStart(this.nextSymbols);
+    this.onSpinStart();
 
     return Promise.all(
       this.reels.map((reel) => {
         reel.renderSymbols(this.nextSymbols[reel.idx]);
         return reel.spin();
       }),
-    ).then(() => this.onSpinEnd(this.nextSymbols));
-  }
-
-  setWinMessage(text, color) {
-    if (this.winMessage) {
-      this.winMessage.innerHTML = text;
-    }
-    if (this.connectionStatus && this.ready) {
-      this.connectionStatus.textContent = "●";
-      this.connectionStatus.style.color = "#4CAF50";
-    }
+    ).then(() => this.onSpinEnd());
   }
 
   determineWin() {
     if (!this.gameConfig) return { win: false };
+    const wr = this.gameConfig.winRate || 0.15;
+    const pm = this.gameConfig.payoutMultiplier || 3;
+    const ms = this.gameConfig.minSpinsBeforeWin || 10;
 
-    const winRate = this.gameConfig.winRate || 0.15;
-    const payoutMult = this.gameConfig.payoutMultiplier || 3;
-    const minSpins = this.gameConfig.minSpinsBeforeWin || 10;
+    let willWin = this.spinCount >= ms && this.spinCount % ms === 0;
+    if (!willWin) willWin = Math.random() < wr;
 
-    let willWin = false;
-    if (this.spinCount >= minSpins && this.spinCount % minSpins === 0) {
-      willWin = true;
-    }
-    if (!willWin && Math.random() < winRate) {
-      willWin = true;
-    }
-
-    if (willWin) {
-      return { win: true, payoutMult: payoutMult, symbol: Symbol.random() };
-    }
+    if (willWin) return { win: true, payoutMult: pm, symbol: Symbol.random() };
     return { win: false };
   }
 
-  onSpinStart(symbols) {
+  onSpinStart() {
     this.spinButton.disabled = true;
     this.setWinMessage("Spinning...", "#888");
-    this.config.onSpinStart?.(symbols);
   }
 
-  async onSpinEnd(symbols) {
+  async onSpinEnd() {
     this.spinButton.disabled = this.money < this.bet || !this.ready;
-    this.config.onSpinEnd?.(symbols);
 
+    // Refresh jackpot
     try {
       const data = await JackpotAPI.fetchJackpot();
       if (this.jackpotDisplay && data) {
         this.jackpotDisplay.textContent =
           data.formatted || JackpotAPI.formatNumber(data.jackpot);
       }
-    } catch (e) {
-      /* ignore */
-    }
+    } catch (e) {}
 
     if (this.autoPlayCheckbox && this.autoPlayCheckbox.checked) {
       if (this.money >= this.bet) {
-        return window.setTimeout(() => this.spin(), 200);
+        setTimeout(() => this.spin(), 200);
       } else {
         this.autoPlayCheckbox.checked = false;
       }

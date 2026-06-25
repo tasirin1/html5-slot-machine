@@ -22,12 +22,14 @@ public class SlotServer extends NanoHTTPD {
 
     private final Context context;
     private final GameConfig gameConfig;
+    private final AccountManager accountManager;
     private String localIp;
 
     public SlotServer(Context context) {
         super(PORT);
         this.context = context;
         this.gameConfig = GameConfig.getInstance(context);
+        this.accountManager = AccountManager.getInstance(context);
         this.localIp = getLocalIpAddress();
     }
 
@@ -35,210 +37,249 @@ public class SlotServer extends NanoHTTPD {
     public Response serve(IHTTPSession session) {
         String uri = session.getUri();
         Method method = session.getMethod();
-
         Log.d(TAG, method + " " + uri);
 
-        switch (uri) {
-            case "/api/config":
-                return handleConfigApi(method, session);
-            case "/api/jackpot":
-                return handleJackpotApi(method, session);
-            case "/api/status":
-                return handleStatusApi();
-            default:
-                return serveStaticFile(uri);
-        }
-    }
-
-    private Response handleConfigApi(Method method, IHTTPSession session) {
-        if (Method.GET.equals(method)) {
-            return newFixedLengthResponse(Response.Status.OK, "application/json",
-                gameConfig.toJson());
-        }
-
-        if (Method.POST.equals(method)) {
-            try {
-                Map<String, String> files = new HashMap<>();
-                session.parseBody(files);
-                String body = session.getQueryParameterString();
-                if (body == null || body.isEmpty()) {
-                    body = files.get("postData");
-                }
-
-                if (body != null && !body.isEmpty()) {
-                    // Parse difficulty
-                    if (body.contains("\"difficultyId\"")) {
-                        String valStr = body.replaceAll(".*\"difficultyId\"\\s*:\\s*(\\d+).*", "$1");
-                        if (!valStr.equals(body)) {
-                            int diffId = Integer.parseInt(valStr);
-                            gameConfig.setDifficulty(GameConfig.Difficulty.fromId(diffId));
-                        }
-                    }
-                    // Parse custom values
-                    // Parse money fields
-                    if (body.contains("\"playerMoney\"")) {
-                        try {
-                            long val = Long.parseLong(body.replaceAll(".*\"playerMoney\"\\s*:\\s*(\\d+).*", "$1"));
-                            gameConfig.setPlayerMoney(val);
-                        } catch (Exception ignored) {}
-                    }
-                    if (body.contains("\"startingMoney\"")) {
-                        try {
-                            long val = Long.parseLong(body.replaceAll(".*\"startingMoney\"\\s*:\\s*(\\d+).*", "$1"));
-                            gameConfig.setStartingMoney(val);
-                        } catch (Exception ignored) {}
-                    }
-                    if (body.contains("\"betAmount\"")) {
-                        try {
-                            long val = Long.parseLong(body.replaceAll(".*\"betAmount\"\\s*:\\s*(\\d+).*", "$1"));
-                            gameConfig.setBetAmount(val);
-                        } catch (Exception ignored) {}
-                    }
-                    if (body.contains("\"custom\"")) {
-                        float winRate = getJsonFloat(body, "winRate", 0.15f);
-                        float payoutMult = getJsonFloat(body, "payoutMultiplier", 3.0f);
-                        int minSpins = (int) getJsonFloat(body, "minSpinsBeforeWin", 10);
-                        float jackpotHitRate = getJsonFloat(body, "jackpotHitRate", 0.005f);
-                        gameConfig.setCustomConfig(winRate, payoutMult, minSpins, jackpotHitRate);
-                    }
-                    // Parse jackpot
-                    if (body.contains("\"jackpot\"")) {
-                        String valStr = body.replaceAll(".*\"jackpot\"\\s*:\\s*(\\d+).*", "$1");
-                        if (!valStr.equals(body)) {
-                            gameConfig.setJackpot(Long.parseLong(valStr));
-                        }
-                    }
-
-                    return newFixedLengthResponse(Response.Status.OK, "application/json",
-                        "{\"success\": true, \"config\": " + gameConfig.toJson() + "}");
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error parsing config POST", e);
+        try {
+            switch (uri) {
+                case "/api/config":      return jsonResponse(handleConfig(method, session));
+                case "/api/jackpot":     return jsonResponse(handleJackpot(method, session));
+                case "/api/status":      return jsonResponse(handleStatus());
+                case "/api/login":       return jsonResponse(handleLogin(method, session));
+                case "/api/account":     return jsonResponse(handleAccount(method, session));
+                case "/api/accounts":    return jsonResponse(handleAccounts(method, session));
+                default:                 return serveStaticFile(uri);
             }
-
-            return newFixedLengthResponse(Response.Status.BAD_REQUEST, "application/json",
-                "{\"error\": \"Invalid request\"}");
+        } catch (Exception e) {
+            Log.e(TAG, "Error serving " + uri, e);
+            return jsonResponse("{\"error\":\"Internal error\"}");
         }
-
-        return newFixedLengthResponse(Response.Status.METHOD_NOT_ALLOWED, "application/json",
-            "{\"error\": \"Method not allowed\"}");
     }
 
-    private Response handleJackpotApi(Method method, IHTTPSession session) {
-        if (Method.GET.equals(method)) {
-            String json = "{\"jackpot\": " + gameConfig.getJackpot()
-                + ", \"formatted\": \"" + gameConfig.getFormattedJackpot() + "\"}";
-            return newFixedLengthResponse(Response.Status.OK, "application/json", json);
-        }
+    // ========== CONFIG ==========
 
-        if (Method.POST.equals(method)) {
-            try {
-                Map<String, String> files = new HashMap<>();
-                session.parseBody(files);
-                String body = session.getQueryParameterString();
-                if (body == null || body.isEmpty()) {
-                    body = files.get("postData");
-                }
-                if (body != null && body.contains("\"value\"")) {
-                    String valStr = body.replaceAll(".*\"value\"\\s*:\\s*(\\d+).*", "$1");
-                    if (!valStr.equals(body)) {
-                        long value = Long.parseLong(valStr);
-                        gameConfig.setJackpot(value);
-                        return newFixedLengthResponse(Response.Status.OK, "application/json",
-                            "{\"success\": true, \"jackpot\": " + value + "}");
-                    }
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error parsing jackpot POST", e);
+    private String handleConfig(Method method, IHTTPSession session) throws Exception {
+        if (method == Method.GET) return gameConfig.toJson();
+
+        if (method == Method.POST) {
+            String body = readBody(session);
+            if (body == null) return "{\"error\":\"No body\"}";
+
+            if (body.contains("\"difficultyId\"")) {
+                int id = Integer.parseInt(extractJsonLong(body, "difficultyId"));
+                gameConfig.setDifficulty(GameConfig.Difficulty.fromId(id));
             }
-            return newFixedLengthResponse(Response.Status.BAD_REQUEST, "application/json",
-                "{\"error\": \"Invalid request\"}");
+            if (body.contains("\"startingMoney\""))
+                gameConfig.setStartingMoney(extractJsonLong(body, "startingMoney"));
+            if (body.contains("\"betAmount\""))
+                gameConfig.setBetAmount(extractJsonLong(body, "betAmount"));
+            if (body.contains("\"jackpot\""))
+                gameConfig.setJackpot(extractJsonLong(body, "jackpot"));
+            if (body.contains("\"winRate\"") && body.contains("\"custom\"")) {
+                float wr = extractJsonFloat(body, "winRate");
+                float pm = extractJsonFloat(body, "payoutMultiplier");
+                int ms = (int) extractJsonLong(body, "minSpinsBeforeWin");
+                float jhr = extractJsonFloat(body, "jackpotHitRate");
+                gameConfig.setCustomConfig(wr, pm, ms, jhr);
+            }
+            return "{\"success\":true,\"config\":" + gameConfig.toJson() + "}";
         }
-
-        return newFixedLengthResponse(Response.Status.METHOD_NOT_ALLOWED, "application/json",
-            "{\"error\": \"Method not allowed\"}");
+        return "{\"error\":\"Method not allowed\"}";
     }
 
-    private Response handleStatusApi() {
-        String json = "{"
-            + "\"status\": \"running\","
-            + "\"ip\": \"" + localIp + "\","
-            + "\"port\": " + PORT + ","
-            + "\"players\": 0,"
-            + "\"totalSpins\": 0,"
-            + "\"config\": " + gameConfig.toJson()
+    // ========== JACKPOT ==========
+
+    private String handleJackpot(Method method, IHTTPSession session) throws Exception {
+        if (method == Method.GET) {
+            return "{\"jackpot\":" + gameConfig.getJackpot()
+                + ",\"formatted\":\"" + gameConfig.getFormattedJackpot() + "\"}";
+        }
+        if (method == Method.POST) {
+            String body = readBody(session);
+            if (body != null && body.contains("\"value\"")) {
+                gameConfig.setJackpot(extractJsonLong(body, "value"));
+                return "{\"success\":true,\"jackpot\":" + gameConfig.getJackpot() + "}";
+            }
+        }
+        return "{\"error\":\"Invalid\"}";
+    }
+
+    // ========== STATUS ==========
+
+    private String handleStatus() {
+        return "{"
+            + "\"status\":\"running\","
+            + "\"ip\":\"" + localIp + "\","
+            + "\"port\":" + PORT + ","
+            + "\"accounts\":" + accountManager.getAccountCount() + ","
+            + "\"totalMoney\":" + accountManager.getTotalMoney() + ","
+            + "\"config\":" + gameConfig.toJson()
             + "}";
+    }
+
+    // ========== LOGIN ==========
+
+    private String handleLogin(Method method, IHTTPSession session) throws Exception {
+        if (method != Method.POST) return "{\"error\":\"Use POST\"}";
+        String body = readBody(session);
+        if (body == null) return "{\"error\":\"No body\"}";
+
+        String username = extractJsonString(body, "username");
+        String pin = extractJsonString(body, "pin");
+        if (username == null || pin == null) return "{\"error\":\"username and pin required\"}";
+
+        String result = accountManager.login(username, pin);
+        // Add config to response
+        if (result.contains("\"success\":true")) {
+            result = result.substring(0, result.length() - 1)
+                + ",\"config\":" + gameConfig.toJson() + "}";
+        }
+        return result;
+    }
+
+    // ========== ACCOUNT (player) ==========
+
+    private String handleAccount(Method method, IHTTPSession session) throws Exception {
+        String body = readBody(session);
+        if (body == null) return "{\"error\":\"No body\"}";
+
+        String username = extractJsonString(body, "username");
+        String pin = extractJsonString(body, "pin");
+        if (username == null || pin == null) return "{\"error\":\"auth required\"}";
+
+        if (method == Method.GET || method == Method.POST) {
+            String result = accountManager.login(username, pin);
+            if (!result.contains("\"success\":true"))
+                return result;
+
+            if (body.contains("\"balance\"")) {
+                long newBal = extractJsonLong(body, "balance");
+                result = accountManager.updateBalance(username, pin, newBal);
+            }
+
+            // Add config to response
+            if (result.contains("\"success\":true")) {
+                result = result.substring(0, result.length() - 1)
+                    + ",\"config\":" + gameConfig.toJson() + "}";
+            }
+            return result;
+        }
+        return "{\"error\":\"Method not allowed\"}";
+    }
+
+    // ========== ACCOUNTS (admin) ==========
+
+    private String handleAccounts(Method method, IHTTPSession session) throws Exception {
+        String body = readBody(session);
+
+        if (method == Method.GET) {
+            return accountManager.getAllAccounts();
+        }
+
+        if (method == Method.POST && body != null) {
+            if (body.contains("\"action\":\"create\"")) {
+                String u = extractJsonString(body, "username");
+                String p = extractJsonString(body, "pin");
+                long b = extractJsonLong(body, "balance");
+                return accountManager.createAccount(u, p, b);
+            }
+            if (body.contains("\"action\":\"delete\"")) {
+                String u = extractJsonString(body, "username");
+                return accountManager.deleteAccount(u);
+            }
+            if (body.contains("\"action\":\"reset\"")) {
+                long amount = extractJsonLong(body, "balance");
+                return accountManager.resetAllBalances(amount);
+            }
+            if (body.contains("\"action\":\"update\"")) {
+                String u = extractJsonString(body, "username");
+                String p = extractJsonString(body, "pin");
+                long b = extractJsonLong(body, "balance");
+                return accountManager.createAccount(u, p, b);
+            }
+        }
+        return "{\"error\":\"Invalid request\"}";
+    }
+
+    // ========== STATIC FILES ==========
+
+    private Response serveStaticFile(String uri) {
+        if (uri == null || uri.equals("/")) uri = "/index.html";
+
+        try {
+            InputStream is = context.getAssets().open("www" + uri);
+            byte[] bytes = readInputStream(is);
+            is.close();
+            return newChunkedResponse(Response.Status.OK, getMimeType(uri),
+                new ByteArrayInputStream(bytes));
+        } catch (IOException e) {
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain",
+                "404 - Not Found");
+        }
+    }
+
+    // ========== HELPERS ==========
+
+    private Response jsonResponse(String json) {
         return newFixedLengthResponse(Response.Status.OK, "application/json", json);
     }
 
-    private Response serveStaticFile(String uri) {
-        if (uri == null || uri.equals("/")) {
-            uri = "/index.html";
-        }
+    private String readBody(IHTTPSession session) throws Exception {
+        Map<String, String> files = new HashMap<>();
+        session.parseBody(files);
+        String body = session.getQueryParameterString();
+        if (body == null || body.isEmpty()) body = files.get("postData");
+        return body;
+    }
 
-        String assetPath = "www" + uri;
-
+    private long extractJsonLong(String json, String key) {
         try {
-            InputStream inputStream = context.getAssets().open(assetPath);
-            byte[] bytes = readInputStream(inputStream);
-            inputStream.close();
-            String mimeType = getMimeType(uri);
-            return newChunkedResponse(Response.Status.OK, mimeType,
-                new ByteArrayInputStream(bytes));
-        } catch (IOException e) {
-            Log.d(TAG, "File not found: " + assetPath);
-            return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain",
-                "404 - File Not Found");
-        }
+            String v = json.replaceAll(".*\"" + key + "\"\\s*:\\s*(\\d+).*", "$1");
+            return Long.parseLong(v);
+        } catch (Exception e) { return 0; }
+    }
+
+    private float extractJsonFloat(String json, String key) {
+        try {
+            String v = json.replaceAll(".*\"" + key + "\"\\s*:\\s*(\\d+\\.?\\d*).*", "$1");
+            return Float.parseFloat(v);
+        } catch (Exception e) { return 0; }
+    }
+
+    private String extractJsonString(String json, String key) {
+        try {
+            String v = json.replaceAll(".*\"" + key + "\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+            return v.equals(json) ? null : v;
+        } catch (Exception e) { return null; }
     }
 
     private byte[] readInputStream(InputStream inputStream) throws IOException {
         java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
         byte[] data = new byte[16384];
-        int nRead;
-        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
-        }
+        int n;
+        while ((n = inputStream.read(data, 0, data.length)) != -1) buffer.write(data, 0, n);
         return buffer.toByteArray();
     }
 
     private String getMimeType(String uri) {
         if (uri.endsWith(".html")) return "text/html; charset=utf-8";
-        if (uri.endsWith(".css")) return "text/css; charset=utf-8";
-        if (uri.endsWith(".js")) return "application/javascript; charset=utf-8";
-        if (uri.endsWith(".svg")) return "image/svg+xml";
-        if (uri.endsWith(".png")) return "image/png";
+        if (uri.endsWith(".css"))  return "text/css; charset=utf-8";
+        if (uri.endsWith(".js"))   return "application/javascript; charset=utf-8";
+        if (uri.endsWith(".svg"))  return "image/svg+xml";
+        if (uri.endsWith(".png"))  return "image/png";
         if (uri.endsWith(".jpg") || uri.endsWith(".jpeg")) return "image/jpeg";
-        if (uri.endsWith(".json")) return "application/json";
         return "text/plain";
-    }
-
-    private float getJsonFloat(String json, String key, float defaultVal) {
-        try {
-            String pattern = ".*\"" + key + "\"\\s*:\\s*([0-9.eE+-]+).*";
-            String val = json.replaceAll(pattern, "$1");
-            if (!val.equals(json)) {
-                return Float.parseFloat(val);
-            }
-        } catch (Exception ignored) {}
-        return defaultVal;
     }
 
     private String getLocalIpAddress() {
         try {
-            List<NetworkInterface> interfaces = Collections.list(
-                NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface intf : interfaces) {
-                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
-                for (InetAddress addr : addrs) {
-                    if (!addr.isLoopbackAddress() && addr instanceof java.net.Inet4Address) {
+            List<NetworkInterface> list = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface nif : list) {
+                for (InetAddress addr : Collections.list(nif.getInetAddresses())) {
+                    if (!addr.isLoopbackAddress() && addr instanceof java.net.Inet4Address)
                         return addr.getHostAddress();
-                    }
                 }
             }
-        } catch (Exception e) {
-            Log.e(TAG, "Error getting IP", e);
-        }
+        } catch (Exception e) { Log.e(TAG, "IP error", e); }
         return "127.0.0.1";
     }
 
@@ -247,11 +288,8 @@ public class SlotServer extends NanoHTTPD {
     public String getServerUrl() { return "http://" + localIp + ":" + PORT; }
 
     public void startServer() {
-        try {
-            start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-            Log.d(TAG, "Server started on " + getServerUrl());
-        } catch (IOException e) {
-            Log.e(TAG, "Could not start server", e);
-        }
+        try { start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+            Log.d(TAG, "Server: " + getServerUrl());
+        } catch (IOException e) { Log.e(TAG, "Server start failed", e); }
     }
 }
