@@ -59,16 +59,8 @@ public class MainActivity extends AppCompatActivity {
         totalMoneyText = findViewById(R.id.totalMoneyText);
         accountListLayout = findViewById(R.id.accountListLayout);
 
-        // Start server
-        try {
-            server = new SlotServer(this);
-            server.startServer();
-            serverUrlText.setText(server.getServerUrl());
-        } catch (Exception e) {
-            android.util.Log.e("MainActivity", "Server start error", e);
-            if (serverUrlText != null)
-                serverUrlText.setText("Server error: " + e.getMessage());
-        }
+        // Start server on background thread
+        startServerAsync();
 
         setupDifficulty();
         setupSeekBars();
@@ -77,6 +69,36 @@ public class MainActivity extends AppCompatActivity {
         setupAccounts();
 
         updateDisplay();
+    }
+
+    private void startServerAsync() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    server = new SlotServer(MainActivity.this);
+                    server.startServer();
+                    final String url = server.getServerUrl();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (serverUrlText != null)
+                                serverUrlText.setText(url);
+                        }
+                    });
+                } catch (final Exception e) {
+                    android.util.Log.e("MainActivity", "Server start error", e);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (serverUrlText != null)
+                                serverUrlText.setText("Server error: " + 
+                                    (e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()));
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     // ===== DIFFICULTY =====
