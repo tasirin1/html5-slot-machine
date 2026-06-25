@@ -65,7 +65,7 @@ public class SlotServer extends NanoHTTPD {
             if (body == null) return "{\"error\":\"No body\"}";
 
             if (body.contains("\"difficultyId\"")) {
-                int id = Integer.parseInt(extractJsonLong(body, "difficultyId"));
+                int id = (int) extractJsonLong(body, "difficultyId");
                 gameConfig.setDifficulty(GameConfig.Difficulty.fromId(id));
             }
             if (body.contains("\"startingMoney\""))
