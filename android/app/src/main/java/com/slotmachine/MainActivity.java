@@ -27,6 +27,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        try {
+            initApp();
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Init error", e);
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void initApp() {
         gameConfig = GameConfig.getInstance(this);
         accountManager = AccountManager.getInstance(this);
 
@@ -51,9 +60,14 @@ public class MainActivity extends AppCompatActivity {
         accountListLayout = findViewById(R.id.accountListLayout);
 
         // Start server
-        server = new SlotServer(this);
-        server.startServer();
-        serverUrlText.setText(server.getServerUrl());
+        try {
+            server = new SlotServer(this);
+            server.startServer();
+            serverUrlText.setText(server.getServerUrl());
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Server start error", e);
+            serverUrlText.setText("Server error: " + e.getMessage());
+        }
 
         setupDifficulty();
         setupSeekBars();

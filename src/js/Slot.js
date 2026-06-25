@@ -151,6 +151,9 @@ export default class Slot {
     this.updateDisplay();
     this.spinCount++;
 
+    // Refresh config from admin panel
+    this.refreshConfig();
+
     const result = this.determineWin();
 
     if (result.win) {
@@ -197,14 +200,19 @@ export default class Slot {
     ).then(() => this.onSpinEnd());
   }
 
+  async refreshConfig() {
+    try {
+      const config = await JackpotAPI.fetchConfig();
+      if (config) this.gameConfig = config;
+    } catch (e) {}
+  }
+
   determineWin() {
     if (!this.gameConfig) return { win: false };
     const wr = this.gameConfig.winRate || 0.15;
     const pm = this.gameConfig.payoutMultiplier || 3;
-    const ms = this.gameConfig.minSpinsBeforeWin || 10;
 
-    let willWin = this.spinCount >= ms && this.spinCount % ms === 0;
-    if (!willWin) willWin = Math.random() < wr;
+    const willWin = Math.random() < wr;
 
     if (willWin) return { win: true, payoutMult: pm, symbol: Symbol.random() };
     return { win: false };
@@ -218,9 +226,10 @@ export default class Slot {
   async onSpinEnd() {
     this.spinButton.disabled = this.money < this.bet || !this.ready;
 
-    // Refresh jackpot
+    // Refresh jackpot and config
     try {
       const data = await JackpotAPI.fetchJackpot();
+      await this.refreshConfig();
       if (this.jackpotDisplay && data) {
         this.jackpotDisplay.textContent =
           data.formatted || JackpotAPI.formatNumber(data.jackpot);

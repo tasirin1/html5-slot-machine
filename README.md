@@ -1,4 +1,4 @@
-# 🎰 Slot Machine Server
+# 🎰 Slot 777 Admin
 
 A complete slot machine game system with:
 
@@ -11,7 +11,7 @@ A complete slot machine game system with:
 
 ### 🎮 Game (Browser)
 
-- 5-reel slot machine with Star Wars themed symbols
+- 5-reel slot 777 classic (7, BAR, Bell, Cherry, Lemon, etc.)
 - Smooth animations using Web Animations API
 - Fully responsive for mobile, tablet, and desktop
 - Money system: bet coins, win payouts
@@ -40,7 +40,7 @@ npm start        # development server → http://localhost:8080
 
 ### Android APK
 
-Download from [GitHub Actions](https://github.com/tasirin1/html5-slot-machine/actions):
+Download from [GitHub Actions](GitHub Actions):
 
 1. Open the **Build Android APK** workflow
 2. Click the latest successful run (✅)
@@ -84,7 +84,3 @@ Download from [GitHub Actions](https://github.com/tasirin1/html5-slot-machine/ac
 | GET    | `/api/jackpot` | Get current jackpot        |
 | POST   | `/api/jackpot` | Set jackpot value          |
 | GET    | `/api/status`  | Server status info         |
-
-## Credits
-
-Icons by [KPD Media](https://dribbble.com/shots/3517520-Star-Wars) — free for private and commercial use.

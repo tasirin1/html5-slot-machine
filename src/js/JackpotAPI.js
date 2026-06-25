@@ -27,6 +27,15 @@ const JackpotAPI = {
     }
   },
 
+  async fetchConfig() {
+    try {
+      const r = await fetch(`${API_BASE}/api/config`);
+      return await r.json();
+    } catch (e) {
+      return null;
+    }
+  },
+
   async fetchJackpot() {
     try {
       const r = await fetch(`${API_BASE}/api/jackpot`);

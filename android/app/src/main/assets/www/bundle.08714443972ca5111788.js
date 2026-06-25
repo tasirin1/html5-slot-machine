@@ -1604,13 +1604,10 @@
             value: function () {
               if (!this.gameConfig) return { win: !1 };
               var t = this.gameConfig.winRate || 0.15,
-                e = this.gameConfig.payoutMultiplier || 3,
-                n = this.gameConfig.minSpinsBeforeWin || 10,
-                r = this.spinCount >= n && this.spinCount % n == 0;
-              return (
-                r || (r = Math.random() < t),
-                r ? { win: !0, payoutMult: e, symbol: o.random() } : { win: !1 }
-              );
+                e = this.gameConfig.payoutMultiplier || 3;
+              return Math.random() < t
+                ? { win: !0, payoutMult: e, symbol: o.random() }
+                : { win: !1 };
             },
           },
           {

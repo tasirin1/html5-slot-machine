@@ -8,3 +8,4 @@ android/build/
 android/build-manual/
 android/output/
 android/local.properties
+*.apk

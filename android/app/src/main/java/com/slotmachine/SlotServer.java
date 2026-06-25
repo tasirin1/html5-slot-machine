@@ -288,8 +288,12 @@ public class SlotServer extends NanoHTTPD {
     public String getServerUrl() { return "http://" + localIp + ":" + PORT; }
 
     public void startServer() {
-        try { start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-            Log.d(TAG, "Server: " + getServerUrl());
-        } catch (IOException e) { Log.e(TAG, "Server start failed", e); }
+        try {
+            start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+            Log.d(TAG, "Server running on " + getServerUrl());
+        } catch (Exception e) {
+            Log.e(TAG, "Server start failed", e);
+            localIp = getLocalIpAddress(); // fallback
+        }
     }
 }
