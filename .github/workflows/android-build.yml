@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: android
 
     steps:
       - name: Checkout code
@@ -22,48 +19,34 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
-      - name: Install Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK packages
         run: |
-          # Download and install command-line tools
-          ANDROID_SDK=/usr/local/lib/android/sdk
-          mkdir -p $ANDROID_SDK/cmdline-tools
-          curl -sL -o /tmp/cmdline-tools.zip \
-            "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
-          unzip -q /tmp/cmdline-tools.zip -d /tmp/
-          mv /tmp/cmdline-tools/cmdline-tools $ANDROID_SDK/cmdline-tools/latest
+          yes | sdkmanager "platforms;android-34" "build-tools;34.0.0"
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
-          # Accept licenses and install SDK components
-          yes | $ANDROID_SDK/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK --install \
-            "platforms;android-34" \
-            "build-tools;34.0.0" 2>&1
+      - name: Verify SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "JAVA_HOME=$JAVA_HOME"
+          ls -la $ANDROID_HOME/platforms/
+          ls -la $ANDROID_HOME/build-tools/
 
-          # Set environment variables
-          echo "ANDROID_HOME=$ANDROID_SDK" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK" >> $GITHUB_ENV
-          echo "$ANDROID_SDK/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$ANDROID_SDK/platform-tools" >> $GITHUB_PATH
-
-          # Verify installation
-          echo "SDK installed at $ANDROID_SDK"
-          ls $ANDROID_SDK/platforms/
-          ls $ANDROID_SDK/build-tools/
-
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: "package-lock.json"
+          node-version: "22"
 
       - name: Build web app
         run: |
-          cd ..
           npm ci
           npm run build
 
-      - name: Prepare assets
+      - name: Prepare Android assets
         run: |
-          cd ..
           mkdir -p android/app/src/main/assets/www
           cp -r dist/* android/app/src/main/assets/www/
           curl -sL -o android/app/src/main/assets/www/bootstrap-reboot.min.css \
@@ -71,12 +54,17 @@ jobs:
           sed -i 's|https://unpkg.com/bootstrap@5.2.3/dist/css/bootstrap-reboot.min.css|bootstrap-reboot.min.css|' \
             android/app/src/main/assets/www/index.html
 
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
       - name: Build APK
         run: |
-          echo "sdk.dir=${ANDROID_HOME}" > local.properties
-          cat local.properties
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
+          cd android
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "Building APK..."
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle.log
+          echo "BUILD EXIT CODE: ${PIPESTATUS[0]}"
+        shell: bash
 
       - name: Upload APK
         if: success()
@@ -85,3 +73,11 @@ jobs:
           name: slot-machine-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+      - name: Upload Gradle log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-log
+          path: android/gradle.log
+          retention-days: 7
