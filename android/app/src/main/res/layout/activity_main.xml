@@ -224,9 +224,17 @@
                     android:text="ℹ️ Info" android:textColor="#D5AD6D"
                     android:textSize="15sp" android:textStyle="bold" />
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="1. Create accounts from this admin panel\n2. Players open browser to server URL and login\n3. Each player has their own balance\n4. Admin controls difficulty & economy in real-time"
-                    android:textColor="#aaa" android:textSize="12sp"
-                    android:lineSpacingExtra="3dp" android:layout_marginTop="4dp" />
+                    android:text="1. Create accounts from this admin panel"
+                    android:textColor="#aaa" android:textSize="12sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="2. Players open browser to server URL and login"
+                    android:textColor="#aaa" android:textSize="12sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="3. Each player has their own balance"
+                    android:textColor="#aaa" android:textSize="12sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="4. Admin controls difficulty &amp; economy in real-time"
+                    android:textColor="#aaa" android:textSize="12sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
