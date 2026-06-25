@@ -224,39 +224,22 @@ public class SlotServer extends NanoHTTPD {
     }
 
     private String readBody(IHTTPSession session) throws Exception {
-        String contentType = session.getHeaders().get("content-type");
-        
-        // For unsupported content types, parseBody will throw.
-        // Read raw body via NanoHTTPD.HTTPSession downcast.
-        if (contentType == null || (!contentType.contains("x-www-form-urlencoded") 
-            && !contentType.contains("multipart/form-data"))) {
-            return readRawBody(session);
-        }
-        
-        // For form data, use parseBody (works natively)
+        // parseBody always stores raw body as "content" before checking content-type.
+        // For JSON/others it throws, but the raw body is still accessible.
         Map<String, String> files = new HashMap<>();
-        session.parseBody(files);
-        String body = session.getQueryParameterString();
-        if (body == null || body.isEmpty()) body = files.get("postData");
-        return body;
-    }
-    
-    private String readRawBody(IHTTPSession session) throws Exception {
-        // NanoHTTPD.HTTPSession is a public inner class with getInputStream()
-        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-        byte[] tmp = new byte[4096];
-        int n;
-        try (java.io.InputStream is = ((NanoHTTPD.HTTPSession) session).getInputStream()) {
-            while ((n = is.read(tmp, 0, tmp.length)) != -1) {
-                baos.write(tmp, 0, n);
-                if (n < tmp.length) break;
-            }
+        String body = null;
+        try {
+            session.parseBody(files);
+            // Form-urlencoded or multipart was parsed successfully
+            body = files.get("postData");
         } catch (Exception e) {
-            // If downcast fails, try session.getQueryParameterString()
-            return session.getQueryParameterString();
+            // parseBody threw (e.g. for application/json), but raw body is in "content" key
+            body = files.get("content");
         }
-        String body = baos.toString("UTF-8");
-        return body.isEmpty() ? null : body;
+        if (body == null || body.isEmpty()) {
+            body = session.getQueryParameterString();
+        }
+        return (body == null || body.isEmpty()) ? null : body;
     }
 
     private long extractJsonLong(String json, String key) {
