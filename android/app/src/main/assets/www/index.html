@@ -1,29 +1,38 @@
 <!doctype html>
 <html>
   <head>
-    <title>HTML 5 Slot Machine</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Slot Machine</title>
     <link rel="stylesheet" href="bootstrap-reboot.min.css" />
-    <script defer="defer" src="bundle.e8302b76f359369bda55.js"></script>
-    <link href="main.6ab3ef825b1ecea6cd22.css" rel="stylesheet" />
+    <script defer="defer" src="bundle.0e668c1125af2f8b7491.js"></script>
+    <link href="main.425932f16a931f903b05.css" rel="stylesheet" />
   </head>
   <body>
     <div id="slot">
-      <div id="statusBar"><span id="configStatus">Loading...</span></div>
-      <div id="moneyArea">
+      <div id="moneyBar">
         <div class="money-item">
-          <span class="money-label">💰 Money</span>
+          <span class="money-icon">💰</span>
+          <span class="money-label">Money</span>
           <span id="playerMoney" class="money-value">0</span>
         </div>
         <div class="money-item">
+          <span class="money-icon">🎲</span>
           <span class="money-label">Bet</span>
           <span id="betDisplay" class="money-value bet">100</span>
         </div>
-        <div class="money-item jackpot-item">
-          <span class="money-label">🎰 Jackpot</span>
+        <div class="money-item">
+          <span class="money-icon">🏆</span>
+          <span class="money-label">Jackpot</span>
           <span id="jp" class="money-value jackpot">5.555.555</span>
         </div>
       </div>
-      <div id="winMessage">Pull the lever!</div>
+      <div id="winMessage">
+        <span>Pull the lever!</span> <span id="connectionStatus"></span>
+      </div>
       <div id="reels">
         <div class="reel"></div>
         <div class="reel"></div>

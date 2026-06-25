@@ -1,4 +1,4 @@
-/*! For license information please see bundle.e8302b76f359369bda55.js.LICENSE.txt */
+/*! For license information please see bundle.0e668c1125af2f8b7491.js.LICENSE.txt */
 (() => {
   var t = {
       138: (t, e, r) => {
@@ -342,9 +342,9 @@
         );
         var t, e;
       })();
-      function l(t) {
+      function h(t) {
         return (
-          (l =
+          (h =
             "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               ? function (t) {
                   return typeof t;
@@ -357,11 +357,11 @@
                     ? "symbol"
                     : typeof t;
                 }),
-          l(t)
+          h(t)
         );
       }
-      function h() {
-        h = function () {
+      function l() {
+        l = function () {
           return e;
         };
         var t,
@@ -399,7 +399,7 @@
           var i = e && e.prototype instanceof b ? e : b,
             a = Object.create(i.prototype),
             s = new T(n || []);
-          return o(a, "_invoke", { value: j(t, r, s) }), a;
+          return o(a, "_invoke", { value: C(t, r, s) }), a;
         }
         function p(t, e, r) {
           try {
@@ -432,14 +432,14 @@
             });
           });
         }
-        function C(t, e) {
+        function j(t, e) {
           function r(o, i, a, s) {
             var c = p(t[o], t, i);
             if ("throw" !== c.type) {
               var u = c.arg,
-                h = u.value;
-              return h && "object" == l(h) && n.call(h, "__await")
-                ? e.resolve(h.__await).then(
+                l = u.value;
+              return l && "object" == h(l) && n.call(l, "__await")
+                ? e.resolve(l.__await).then(
                     function (t) {
                       r("next", t, a, s);
                     },
@@ -447,7 +447,7 @@
                       r("throw", t, a, s);
                     },
                   )
-                : e.resolve(h).then(
+                : e.resolve(l).then(
                     function (t) {
                       (u.value = t), a(u);
                     },
@@ -470,7 +470,7 @@
             },
           });
         }
-        function j(e, r, n) {
+        function C(e, r, n) {
           var o = y;
           return function (i, a) {
             if (o === m) throw Error("Generator is already running");
@@ -571,7 +571,7 @@
               return (i.next = i);
             }
           }
-          throw new TypeError(l(e) + " is not iterable");
+          throw new TypeError(h(e) + " is not iterable");
         }
         return (
           (w.prototype = x),
@@ -597,14 +597,14 @@
           (e.awrap = function (t) {
             return { __await: t };
           }),
-          L(C.prototype),
-          u(C.prototype, s, function () {
+          L(j.prototype),
+          u(j.prototype, s, function () {
             return this;
           }),
-          (e.AsyncIterator = C),
+          (e.AsyncIterator = j),
           (e.async = function (t, r, n, o, i) {
             void 0 === i && (i = Promise);
-            var a = new C(f(t, r, n, o), i);
+            var a = new j(f(t, r, n, o), i);
             return e.isGeneratorFunction(r)
               ? a
               : a.next().then(function (t) {
@@ -792,9 +792,9 @@
       var y = window.location.origin;
       const d = function () {
           return p(
-            h().mark(function t() {
+            l().mark(function t() {
               var e, r;
-              return h().wrap(
+              return l().wrap(
                 function (t) {
                   for (;;)
                     switch ((t.prev = t.next)) {
@@ -835,9 +835,9 @@
         },
         m = function () {
           return p(
-            h().mark(function t() {
+            l().mark(function t() {
               var e, r;
-              return h().wrap(
+              return l().wrap(
                 function (t) {
                   for (;;)
                     switch ((t.prev = t.next)) {
@@ -875,9 +875,9 @@
         },
         v = function (t) {
           return p(
-            h().mark(function e() {
+            l().mark(function e() {
               var r;
-              return h().wrap(
+              return l().wrap(
                 function (e) {
                   for (;;)
                     switch ((e.prev = e.next)) {
@@ -970,20 +970,20 @@
             return (t[e] = r);
           };
         }
-        function l(t, e, r, n) {
+        function h(t, e, r, n) {
           var i = e && e.prototype instanceof v ? e : v,
             a = Object.create(i.prototype),
             s = new T(n || []);
-          return o(a, "_invoke", { value: j(t, r, s) }), a;
+          return o(a, "_invoke", { value: C(t, r, s) }), a;
         }
-        function h(t, e, r) {
+        function l(t, e, r) {
           try {
             return { type: "normal", arg: t.call(e, r) };
           } catch (t) {
             return { type: "throw", arg: t };
           }
         }
-        e.wrap = l;
+        e.wrap = h;
         var f = "suspendedStart",
           p = "suspendedYield",
           y = "executing",
@@ -1007,14 +1007,14 @@
             });
           });
         }
-        function C(t, e) {
+        function j(t, e) {
           function r(o, i, a, s) {
-            var c = h(t[o], t, i);
+            var c = l(t[o], t, i);
             if ("throw" !== c.type) {
               var u = c.arg,
-                l = u.value;
-              return l && "object" == b(l) && n.call(l, "__await")
-                ? e.resolve(l.__await).then(
+                h = u.value;
+              return h && "object" == b(h) && n.call(h, "__await")
+                ? e.resolve(h.__await).then(
                     function (t) {
                       r("next", t, a, s);
                     },
@@ -1022,7 +1022,7 @@
                       r("throw", t, a, s);
                     },
                   )
-                : e.resolve(l).then(
+                : e.resolve(h).then(
                     function (t) {
                       (u.value = t), a(u);
                     },
@@ -1045,7 +1045,7 @@
             },
           });
         }
-        function j(e, r, n) {
+        function C(e, r, n) {
           var o = f;
           return function (i, a) {
             if (o === y) throw Error("Generator is already running");
@@ -1068,7 +1068,7 @@
                 n.dispatchException(n.arg);
               } else "return" === n.method && n.abrupt("return", n.arg);
               o = y;
-              var u = h(e, r, n);
+              var u = l(e, r, n);
               if ("normal" === u.type) {
                 if (((o = n.done ? d : p), u.arg === m)) continue;
                 return { value: u.arg, done: n.done };
@@ -1097,7 +1097,7 @@
                   )))),
               m
             );
-          var i = h(o, e.iterator, r.arg);
+          var i = l(o, e.iterator, r.arg);
           if ("throw" === i.type)
             return (
               (r.method = "throw"), (r.arg = i.arg), (r.delegate = null), m
@@ -1172,14 +1172,14 @@
           (e.awrap = function (t) {
             return { __await: t };
           }),
-          L(C.prototype),
-          u(C.prototype, s, function () {
+          L(j.prototype),
+          u(j.prototype, s, function () {
             return this;
           }),
-          (e.AsyncIterator = C),
+          (e.AsyncIterator = j),
           (e.async = function (t, r, n, o, i) {
             void 0 === i && (i = Promise);
-            var a = new C(l(t, r, n, o), i);
+            var a = new j(h(t, r, n, o), i);
             return e.isGeneratorFunction(r)
               ? a
               : a.next().then(function (t) {
@@ -1405,9 +1405,10 @@
                 (this.moneyDisplay = document.getElementById("playerMoney")),
                 (this.betDisplay = document.getElementById("betDisplay")),
                 (this.winMessage = document.getElementById("winMessage")),
+                (this.connectionStatus =
+                  document.getElementById("connectionStatus")),
                 (this.spinButton = document.getElementById("spin")),
                 (this.autoPlayCheckbox = document.getElementById("autoplay")),
-                (this.configStatus = document.getElementById("configStatus")),
                 (this.ready = !1),
                 (this.money = 0),
                 (this.bet = 100),
@@ -1452,11 +1453,7 @@
                             switch ((t.prev = t.next)) {
                               case 0:
                                 return (
-                                  this.configStatus &&
-                                    ((this.configStatus.textContent =
-                                      "Loading config from server..."),
-                                    (this.configStatus.style.color =
-                                      "#ffaa00")),
+                                  this.showStatus("Connecting...", "#ffaa00"),
                                   (this.spinButton.disabled = !0),
                                   (t.next = 4),
                                   d()
@@ -1464,18 +1461,8 @@
                               case 4:
                                 (this.gameConfig = t.sent),
                                   this.gameConfig
-                                    ? this.configStatus &&
-                                      ((this.configStatus.textContent =
-                                        "Difficulty: " +
-                                        (this.gameConfig.difficulty ||
-                                          "Medium")),
-                                      (this.configStatus.style.color =
-                                        "#4CAF50"))
-                                    : (this.configStatus &&
-                                        ((this.configStatus.textContent =
-                                          "⚠️ Server offline, using defaults"),
-                                        (this.configStatus.style.color =
-                                          "#ff4444")),
+                                    ? this.showStatus("Connected", "#4CAF50")
+                                    : (this.showStatus("Offline", "#ff4444"),
                                       (this.gameConfig = {
                                         difficulty: "Medium",
                                         winRate: 0.15,
@@ -1494,7 +1481,7 @@
                                   (this.ready = !0),
                                   (this.spinButton.disabled = !1),
                                   console.log(
-                                    "Slot machine initialized with config:",
+                                    "Ready with config:",
                                     this.gameConfig,
                                   );
                               case 13:
@@ -1510,6 +1497,14 @@
                   function () {
                     return n.apply(this, arguments);
                   }),
+              },
+              {
+                key: "showStatus",
+                value: function (t, e) {
+                  this.connectionStatus &&
+                    ((this.connectionStatus.textContent = t),
+                    (this.connectionStatus.style.color = e || "#888"));
+                },
               },
               {
                 key: "updateDisplay",
@@ -1532,10 +1527,10 @@
                   if (this.ready) {
                     if (this.money < this.bet)
                       return (
-                        this.winMessage &&
-                          ((this.winMessage.textContent =
-                            "💸 Game Over! Not enough money!"),
-                          (this.winMessage.style.color = "#ff4444")),
+                        this.setWinMessage(
+                          "💸 Game Over! Not enough money!",
+                          "#ff4444",
+                        ),
                         void (this.spinButton.disabled = !0)
                       );
                     (this.money -= this.bet),
@@ -1553,10 +1548,10 @@
                         [n, n, n],
                         [i.random(), i.random(), i.random()],
                       ]),
-                        this.winMessage &&
-                          ((this.winMessage.textContent =
-                            "🎉 YOU WIN! " + g(r) + " coins!"),
-                          (this.winMessage.style.color = "#D5AD6D"));
+                        this.setWinMessage(
+                          "🎉 YOU WIN! " + g(r) + " coins!",
+                          "#D5AD6D",
+                        );
                     } else
                       (this.nextSymbols = [
                         [i.random(), i.random(), i.random()],
@@ -1565,9 +1560,7 @@
                         [i.random(), i.random(), i.random()],
                         [i.random(), i.random(), i.random()],
                       ]),
-                        this.winMessage &&
-                          ((this.winMessage.textContent = "Try again!"),
-                          (this.winMessage.style.color = "#888"));
+                        this.setWinMessage("Try again!", "#888");
                     return (
                       (this.currentSymbols = this.nextSymbols),
                       this.updateDisplay(),
@@ -1584,7 +1577,22 @@
                       })
                     );
                   }
-                  console.log("Game not ready yet");
+                },
+              },
+              {
+                key: "setWinMessage",
+                value: function (t, e) {
+                  this.winMessage &&
+                    ((this.winMessage.innerHTML =
+                      "<span>" +
+                      t +
+                      '</span><span id="connectionStatus"></span>'),
+                    (this.connectionStatus =
+                      document.getElementById("connectionStatus")),
+                    this.ready &&
+                      this.connectionStatus &&
+                      ((this.connectionStatus.textContent = "Connected"),
+                      (this.connectionStatus.style.color = "#4CAF50")));
                 },
               },
               {
@@ -1609,9 +1617,7 @@
                 value: function (t) {
                   var e, r;
                   (this.spinButton.disabled = !0),
-                    this.winMessage &&
-                      ((this.winMessage.textContent = "Spinning..."),
-                      (this.winMessage.style.color = "#888")),
+                    this.setWinMessage("Spinning...", "#888"),
                     null === (e = (r = this.config).onSpinStart) ||
                       void 0 === e ||
                       e.call(r, t);

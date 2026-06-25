@@ -10,7 +10,7 @@ body {
 }
 
 body {
-  background-image: url("../assets/bg.jpg");
+  background-image: url(dbdfdc8f51630ddfbb3f.jpg);
   background-size: cover;
   background-position: center;
   display: flex;
@@ -20,7 +20,7 @@ body {
 
 @media only screen and (max-width: 1200px) {
   body {
-    background-image: url("../assets/bg_small.jpg");
+    background-image: url(01e008fb4d3f3df23e7d.jpg);
   }
 }
 
