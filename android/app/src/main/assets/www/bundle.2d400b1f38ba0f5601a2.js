@@ -1,4 +1,4 @@
-/*! For license information please see bundle.7ea1f035133ab57ae852.js.LICENSE.txt */
+/*! For license information please see bundle.2d400b1f38ba0f5601a2.js.LICENSE.txt */
 (() => {
   "use strict";
   (() => {
@@ -118,21 +118,6 @@
               key: "random",
               value: function () {
                 return o[Math.floor(Math.random() * o.length)];
-              },
-            },
-            {
-              key: "createDiv",
-              value: function (t) {
-                var e = n[t] || n.seven,
-                  r = document.createElement("div");
-                return (
-                  (r.className = "sym"),
-                  (r.textContent = e.icon),
-                  (r.style.cssText = "background:"
-                    .concat(e.bg, ";color:")
-                    .concat(e.color, ";")),
-                  r
-                );
               },
             },
           ]),
@@ -1934,6 +1919,8 @@
             (this.config = null),
             (this.spinning = !1),
             (this.isRegister = !1),
+            (this.spinCount = 0),
+            (this.lossStreak = 0),
             (this.el = {});
           for (
             var r = 0,
@@ -2022,6 +2009,8 @@
                 (this.pin = null),
                 (this.spinning = !1),
                 (this.isRegister = !1),
+                (this.spinCount = 0),
+                (this.lossStreak = 0),
                 (this.el.loginSub.textContent = "Masuk ke akun kamu"),
                 (this.el.loginBtn.textContent = "PLAY"),
                 (this.el.registerBtn.textContent = "Buat Akun Baru"),
@@ -2201,7 +2190,13 @@
               (this.el.loginScreen.style.display = "none"),
                 (this.el.gameScreen.style.display = ""),
                 this.el.gameScreen.classList.add("active"),
-                (this.el.spinBtn.disabled = !1),
+                (this.el.spinBtn.disabled = !1);
+              var t = this.reels.map(function () {
+                return [i.random(), i.random(), i.random()];
+              });
+              this.reels.forEach(function (e, r) {
+                return e.setSymbols(t[r]);
+              }),
                 this.el.playerName &&
                   (this.el.playerName.textContent = this.user),
                 this.updateUI(),
@@ -2272,7 +2267,8 @@
                     c,
                     s,
                     l,
-                    f = this;
+                    f,
+                    h = this;
                   return T().wrap(
                     function (t) {
                       for (;;)
@@ -2314,39 +2310,49 @@
                               (r =
                                 (this.config && this.config.payoutMultiplier) ||
                                 3),
-                              (n = Math.random() < e),
-                              (a = 0),
-                              n
-                                ? ((u = i.random()),
-                                  (o = [
-                                    [this.randExcept(u), u, this.randExcept(u)],
-                                    [this.randExcept(u), u, this.randExcept(u)],
-                                    [this.randExcept(u), u, this.randExcept(u)],
+                              (n =
+                                (this.config &&
+                                  this.config.minSpinsBeforeWin) ||
+                                0),
+                              (this.lossStreak = this.lossStreak || 0),
+                              n > 0 && this.lossStreak >= n
+                                ? ((o = !0), (this.lossStreak = 0))
+                                : (o = Math.random() < e)
+                                  ? (this.lossStreak = 0)
+                                  : this.lossStreak++,
+                              this.spinCount++,
+                              (u = 0),
+                              o
+                                ? ((c = i.random()),
+                                  (a = [
+                                    [this.randExcept(c), c, this.randExcept(c)],
+                                    [this.randExcept(c), c, this.randExcept(c)],
+                                    [this.randExcept(c), c, this.randExcept(c)],
                                   ]),
-                                  (c = i.getData(u).mult * r),
-                                  (a = Math.floor(this.bet * c)),
-                                  (this.money += a))
-                                : (o = [
+                                  (s = i.getData(c).mult * r),
+                                  (u = Math.floor(this.bet * s)),
+                                  (this.money += u))
+                                : (a = [
                                     [i.random(), i.random(), i.random()],
                                     [i.random(), i.random(), i.random()],
                                     [i.random(), i.random(), i.random()],
                                   ]),
-                              (s = [0, 150, 300]),
-                              (l = this.reels.map(function (t, e) {
+                              (l = [0, 150, 300]),
+                              (f = this.reels.map(function (t, e) {
                                 return new Promise(function (r) {
                                   setTimeout(function () {
-                                    t.spin(o[e]).then(r);
-                                  }, s[e]);
+                                    t.spin(a[e]).then(r);
+                                  }, l[e]);
                                 });
                               })),
-                              (t.next = 23),
-                              Promise.all(l)
+                              (t.next = 26),
+                              Promise.all(f)
                             );
-                          case 23:
+                          case 26:
                             this.updateUI(),
-                              n
+                              o
                                 ? this.showMsg(
-                                    "🎉 MENANG " + C(a) + "!",
+                                    "🎉 MENANG " + C(u) + "!",
                                     "#FFD700",
                                   )
                                 : this.showMsg("", "#888"),
@@ -2356,10 +2362,10 @@
                                 this.money < this.bet),
                               this.el.autoplay.checked && this.money >= this.bet
                                 ? setTimeout(function () {
-                                    return f.spin();
+                                    return h.spin();
                                   }, 300)
                                 : (this.el.autoplay.checked = !1);
-                          case 29:
+                          case 32:
                           case "end":
                             return t.stop();
                         }

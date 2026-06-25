@@ -65,13 +65,4 @@ export default class Symbol {
   static random() {
     return SYMBOL_NAMES[Math.floor(Math.random() * SYMBOL_NAMES.length)];
   }
-
-  static createDiv(name) {
-    const d = SYMBOLS[name] || SYMBOLS.seven;
-    const div = document.createElement("div");
-    div.className = "sym";
-    div.textContent = d.icon;
-    div.style.cssText = `background:${d.bg};color:${d.color};`;
-    return div;
-  }
 }

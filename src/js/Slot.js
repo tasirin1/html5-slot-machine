@@ -11,6 +11,8 @@ export default class Slot {
     this.config = null;
     this.spinning = false;
     this.isRegister = false;
+    this.spinCount = 0;
+    this.lossStreak = 0;
 
     // DOM
     this.el = {};
@@ -80,6 +82,8 @@ export default class Slot {
     this.pin = null;
     this.spinning = false;
     this.isRegister = false;
+    this.spinCount = 0;
+    this.lossStreak = 0;
     this.el.loginSub.textContent = "Masuk ke akun kamu";
     this.el.loginBtn.textContent = "PLAY";
     this.el.registerBtn.textContent = "Buat Akun Baru";
@@ -173,6 +177,14 @@ export default class Slot {
     this.el.gameScreen.classList.add("active");
     this.el.spinBtn.disabled = false;
 
+    // Initialize reels with random symbols (fix empty boxes on game start)
+    const initSymbols = this.reels.map(() => [
+      Symbol.random(),
+      Symbol.random(),
+      Symbol.random(),
+    ]);
+    this.reels.forEach((reel, i) => reel.setSymbols(initSymbols[i]));
+
     if (this.el.playerName) this.el.playerName.textContent = this.user;
     this.updateUI();
     this.showMsg("Mainkan " + this.user + "!", "#FFD700");
@@ -219,7 +231,20 @@ export default class Slot {
 
     const wr = (this.config && this.config.winRate) || 0.15;
     const pm = (this.config && this.config.payoutMultiplier) || 3;
-    const win = Math.random() < wr;
+    const minSpins = (this.config && this.config.minSpinsBeforeWin) || 0;
+
+    // Force win if loss streak exceeds minSpinsBeforeWin
+    this.lossStreak = this.lossStreak || 0;
+    let win;
+    if (minSpins > 0 && this.lossStreak >= minSpins) {
+      win = true;
+      this.lossStreak = 0;
+    } else {
+      win = Math.random() < wr;
+      if (win) this.lossStreak = 0;
+      else this.lossStreak++;
+    }
+    this.spinCount++;
 
     let resultSymbols;
     let winnings = 0;
