@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
 
     steps:
       - name: Checkout code
@@ -19,44 +22,48 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Print environment
+      - name: Install Android SDK
         run: |
-          echo "ANDROID_HOME=${ANDROID_HOME}"
-          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT}"
-          which sdkmanager || echo "sdkmanager not in PATH"
-          ls -la ${ANDROID_HOME}/ 2>/dev/null | head -10
-          echo "=== command line tools ==="
-          ls ${ANDROID_HOME}/cmdline-tools/latest/bin/ 2>/dev/null || echo "no cmdline-tools"
-          echo "=== existing platforms ==="
-          ls ${ANDROID_HOME}/platforms/ 2>/dev/null || echo "no platforms"
-          echo "=== existing build-tools ==="
-          ls ${ANDROID_HOME}/build-tools/ 2>/dev/null || echo "no build-tools"
+          # Download and install command-line tools
+          ANDROID_SDK=/usr/local/lib/android/sdk
+          mkdir -p $ANDROID_SDK/cmdline-tools
+          curl -sL -o /tmp/cmdline-tools.zip \
+            "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
+          unzip -q /tmp/cmdline-tools.zip -d /tmp/
+          mv /tmp/cmdline-tools/cmdline-tools $ANDROID_SDK/cmdline-tools/latest
 
-      - name: Install SDK components
-        run: |
-          yes | sdkmanager --sdk_root=${ANDROID_HOME} \
+          # Accept licenses and install SDK components
+          yes | $ANDROID_SDK/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK --install \
             "platforms;android-34" \
             "build-tools;34.0.0" 2>&1
-          echo "=== installed ==="
-          ls ${ANDROID_HOME}/platforms/
-          ls ${ANDROID_HOME}/build-tools/
+
+          # Set environment variables
+          echo "ANDROID_HOME=$ANDROID_SDK" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK" >> $GITHUB_ENV
+          echo "$ANDROID_SDK/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_SDK/platform-tools" >> $GITHUB_PATH
+
+          # Verify installation
+          echo "SDK installed at $ANDROID_SDK"
+          ls $ANDROID_SDK/platforms/
+          ls $ANDROID_SDK/build-tools/
 
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
+          cache-dependency-path: "package-lock.json"
 
       - name: Build web app
         run: |
+          cd ..
           npm ci
           npm run build
 
-      - name: Prepare Android assets
+      - name: Prepare assets
         run: |
+          cd ..
           mkdir -p android/app/src/main/assets/www
           cp -r dist/* android/app/src/main/assets/www/
           curl -sL -o android/app/src/main/assets/www/bootstrap-reboot.min.css \
@@ -66,12 +73,10 @@ jobs:
 
       - name: Build APK
         run: |
-          cd android
-          chmod +x gradlew
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
           cat local.properties
+          chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
-        shell: bash
 
       - name: Upload APK
         if: success()
