@@ -21,8 +21,28 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: "platforms;android-34 build-tools;34.0.0"
+
+      - name: Print environment
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME}"
+          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT}"
+          which sdkmanager || echo "sdkmanager not in PATH"
+          ls -la ${ANDROID_HOME}/ 2>/dev/null | head -10
+          echo "=== command line tools ==="
+          ls ${ANDROID_HOME}/cmdline-tools/latest/bin/ 2>/dev/null || echo "no cmdline-tools"
+          echo "=== existing platforms ==="
+          ls ${ANDROID_HOME}/platforms/ 2>/dev/null || echo "no platforms"
+          echo "=== existing build-tools ==="
+          ls ${ANDROID_HOME}/build-tools/ 2>/dev/null || echo "no build-tools"
+
+      - name: Install SDK components
+        run: |
+          yes | sdkmanager --sdk_root=${ANDROID_HOME} \
+            "platforms;android-34" \
+            "build-tools;34.0.0" 2>&1
+          echo "=== installed ==="
+          ls ${ANDROID_HOME}/platforms/
+          ls ${ANDROID_HOME}/build-tools/
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -39,42 +59,24 @@ jobs:
         run: |
           mkdir -p android/app/src/main/assets/www
           cp -r dist/* android/app/src/main/assets/www/
-          # Download bootstrap locally for offline use
           curl -sL -o android/app/src/main/assets/www/bootstrap-reboot.min.css \
             "https://unpkg.com/bootstrap@5.2.3/dist/css/bootstrap-reboot.min.css"
-          # Replace CDN link with local file
           sed -i 's|https://unpkg.com/bootstrap@5.2.3/dist/css/bootstrap-reboot.min.css|bootstrap-reboot.min.css|' \
             android/app/src/main/assets/www/index.html
-          # Verify assets
-          echo "Assets prepared:"
-          ls -la android/app/src/main/assets/www/
 
-      - name: Create local.properties
-        run: |
-          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
-          cat android/local.properties
-
-      - name: Build APK with Gradle
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          echo "sdk.dir=${ANDROID_HOME}" > local.properties
+          cat local.properties
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
+        shell: bash
 
-      - name: Upload APK Artifact
+      - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: slot-machine-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
-
-      - name: Upload build reports (if failed)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-reports
-          path: |
-            android/app/build/reports/
-            android/.gradle/
