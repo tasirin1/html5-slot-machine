@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -127,7 +128,7 @@ public class SlotServer extends NanoHTTPD {
             byte[] bytes = readInputStream(inputStream);
             inputStream.close();
 
-            return newFixedLengthResponse(Response.Status.OK, mimeType, bytes);
+            return newChunkedResponse(Response.Status.OK, mimeType, new java.io.ByteArrayInputStream(bytes));
         } catch (IOException e) {
             Log.d(TAG, "File not found: " + assetPath);
             return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain",
