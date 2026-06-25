@@ -3,12 +3,27 @@
   <head>
     <title>HTML 5 Slot Machine</title>
     <link rel="stylesheet" href="bootstrap-reboot.min.css" />
-    <script defer="defer" src="bundle.392fa3ce09a6e258fb70.js"></script>
-    <link href="main.1924d74bdddd5f06826a.css" rel="stylesheet" />
+    <script defer="defer" src="bundle.e8302b76f359369bda55.js"></script>
+    <link href="main.6ab3ef825b1ecea6cd22.css" rel="stylesheet" />
   </head>
   <body>
     <div id="slot">
-      <div id="jackpot">Jackpot: <span id="jp">5.555.555</span></div>
+      <div id="statusBar"><span id="configStatus">Loading...</span></div>
+      <div id="moneyArea">
+        <div class="money-item">
+          <span class="money-label">💰 Money</span>
+          <span id="playerMoney" class="money-value">0</span>
+        </div>
+        <div class="money-item">
+          <span class="money-label">Bet</span>
+          <span id="betDisplay" class="money-value bet">100</span>
+        </div>
+        <div class="money-item jackpot-item">
+          <span class="money-label">🎰 Jackpot</span>
+          <span id="jp" class="money-value jackpot">5.555.555</span>
+        </div>
+      </div>
+      <div id="winMessage">Pull the lever!</div>
       <div id="reels">
         <div class="reel"></div>
         <div class="reel"></div>
@@ -17,7 +32,7 @@
         <div class="reel"></div>
       </div>
       <div id="controls">
-        <button type="button" id="spin">SPIN</button>
+        <button type="button" id="spin" disabled="disabled">SPIN</button>
         <label
           ><input type="checkbox" name="autoplay" id="autoplay" />
           Autoplay</label

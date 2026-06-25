@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private GameConfig gameConfig;
 
     // Views
-    private TextView serverUrlText;
+    private TextView serverUrlDisplay;
     private TextView currentJackpotText;
     private Spinner difficultySpinner;
     private TextView winRateValue;
@@ -29,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText jackpotInput;
     private Button btnSaveJackpot;
     private TextView statusText;
+    private EditText startingMoneyInput;
+    private EditText betAmountInput;
+    private Button btnSaveMoney;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
         gameConfig = GameConfig.getInstance(this);
 
         // Initialize views
-        serverUrlText = findViewById(R.id.serverUrlText);
-        TextView serverUrlDisplay = findViewById(R.id.serverUrlDisplay);
+        serverUrlDisplay = findViewById(R.id.serverUrlDisplay);
         currentJackpotText = findViewById(R.id.currentJackpotText);
         difficultySpinner = findViewById(R.id.difficultySpinner);
         winRateValue = findViewById(R.id.winRateValue);
@@ -49,15 +51,16 @@ public class MainActivity extends AppCompatActivity {
         jackpotInput = findViewById(R.id.jackpotInput);
         btnSaveJackpot = findViewById(R.id.btnSaveJackpot);
         statusText = findViewById(R.id.statusText);
+        startingMoneyInput = findViewById(R.id.startingMoneyInput);
+        betAmountInput = findViewById(R.id.betAmountInput);
+        btnSaveMoney = findViewById(R.id.btnSaveMoney);
 
         // Start the embedded HTTP server
         server = new SlotServer(this);
         server.startServer();
 
         // Show server info
-        serverUrlText.setText(server.getServerUrl());
         serverUrlDisplay.setText(server.getServerUrl());
-        statusText.setText("Server is running on port " + server.getPort());
 
         // Setup difficulty spinner
         setupDifficultySpinner();
@@ -67,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup jackpot
         setupJackpot();
+
+        // Setup money
+        setupMoney();
 
         // Update display
         updateDisplay();
@@ -89,9 +95,11 @@ public class MainActivity extends AppCompatActivity {
                 if (position < 6) {
                     GameConfig.Difficulty diff = GameConfig.Difficulty.fromId(position);
                     gameConfig.setDifficulty(diff);
+                    // Reset player money when difficulty changes
+                    gameConfig.setPlayerMoney(gameConfig.getStartingMoney());
                     updateDisplay();
                     Toast.makeText(MainActivity.this,
-                        "Difficulty set to: " + diff.label, Toast.LENGTH_SHORT).show();
+                        "Difficulty: " + diff.label + " | Money reset!", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -102,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupSeekBars() {
         // Win Rate (0.5% to 75%)
-        winRateSeekBar.setMax(149); // 0.5% to 75% in 0.5% steps
+        winRateSeekBar.setMax(149);
         winRateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -120,10 +128,8 @@ public class MainActivity extends AppCompatActivity {
                     gameConfig.getPayoutMultiplier(),
                     gameConfig.getMinSpinsBeforeWin(),
                     gameConfig.getJackpotHitRate());
-                difficultySpinner.setSelection(6); // Custom
+                difficultySpinner.setSelection(6);
                 updateDisplay();
-                Toast.makeText(MainActivity.this,
-                    "Win rate set to " + String.format("%.1f%%", rate), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -146,10 +152,8 @@ public class MainActivity extends AppCompatActivity {
                     mult,
                     gameConfig.getMinSpinsBeforeWin(),
                     gameConfig.getJackpotHitRate());
-                difficultySpinner.setSelection(6); // Custom
+                difficultySpinner.setSelection(6);
                 updateDisplay();
-                Toast.makeText(MainActivity.this,
-                    "Payout multiplier set to " + String.format("%.0fx", mult), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -178,15 +182,50 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setupMoney() {
+        startingMoneyInput.setText(String.valueOf(gameConfig.getStartingMoney()));
+        betAmountInput.setText(String.valueOf(gameConfig.getBetAmount()));
+
+        btnSaveMoney.setOnClickListener(v -> {
+            try {
+                long startMoney = Long.parseLong(startingMoneyInput.getText().toString().trim());
+                long bet = Long.parseLong(betAmountInput.getText().toString().trim());
+
+                if (startMoney < 1 || bet < 1) {
+                    Toast.makeText(this, "Values must be positive", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (bet > startMoney) {
+                    Toast.makeText(this, "Bet cannot exceed starting money", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                gameConfig.setStartingMoney(startMoney);
+                gameConfig.setBetAmount(bet);
+                gameConfig.setPlayerMoney(startMoney); // Reset money
+                updateDisplay();
+                Toast.makeText(this, "Money settings saved!",
+                    Toast.LENGTH_SHORT).show();
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid number format", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void updateDisplay() {
         currentJackpotText.setText(gameConfig.getFormattedJackpot());
         jackpotInput.setText(String.valueOf(gameConfig.getJackpot()));
+        startingMoneyInput.setText(String.valueOf(gameConfig.getStartingMoney()));
+        betAmountInput.setText(String.valueOf(gameConfig.getBetAmount()));
 
         String diffLabel = gameConfig.getDifficulty().label;
-        statusText.setText("Difficulty: " + diffLabel
+        statusText.setText(
+            "Difficulty: " + diffLabel
             + " | Win Rate: " + String.format("%.1f%%", gameConfig.getWinRate() * 100)
             + " | Payout: " + String.format("%.0fx", gameConfig.getPayoutMultiplier())
-            + "\nServer: " + server.getServerUrl());
+            + "\nServer: " + server.getServerUrl()
+            + " | Starting Money: " + gameConfig.getFormattedMoney(gameConfig.getStartingMoney())
+            + " | Bet: " + gameConfig.getFormattedMoney(gameConfig.getBetAmount()));
 
         // Update seekbars
         int winRateProgress = Math.round((gameConfig.getWinRate() * 100 - 0.5f) / 0.5f);

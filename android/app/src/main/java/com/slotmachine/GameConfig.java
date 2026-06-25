@@ -11,6 +11,11 @@ public class GameConfig {
     private static final String KEY_PAYOUT_MULTIPLIER = "payout_multiplier";
     private static final String KEY_MIN_SPINS = "min_spins_before_win";
     private static final String KEY_JACKPOT_HIT_RATE = "jackpot_hit_rate";
+    private static final String KEY_STARTING_MONEY = "starting_money";
+    private static final String KEY_BET_AMOUNT = "bet_amount";
+    private static final String KEY_PLAYER_MONEY = "player_money";
+    private static final String KEY_MIN_BET = "min_bet";
+    private static final String KEY_MAX_BET = "max_bet";
 
     private static GameConfig instance;
     private final SharedPreferences prefs;
@@ -67,6 +72,22 @@ public class GameConfig {
         return instance;
     }
 
+    public void saveAll() {
+        prefs.edit()
+            .putInt(KEY_DIFFICULTY, getDifficulty().id)
+            .putFloat(KEY_WIN_RATE, getWinRate())
+            .putFloat(KEY_PAYOUT_MULTIPLIER, getPayoutMultiplier())
+            .putInt(KEY_MIN_SPINS, getMinSpinsBeforeWin())
+            .putFloat(KEY_JACKPOT_HIT_RATE, getJackpotHitRate())
+            .putLong(KEY_JACKPOT, getJackpot())
+            .putLong(KEY_STARTING_MONEY, getStartingMoney())
+            .putLong(KEY_BET_AMOUNT, getBetAmount())
+            .putLong(KEY_PLAYER_MONEY, getPlayerMoney())
+            .apply();
+    }
+
+    // === Difficulty ===
+
     public Difficulty getDifficulty() {
         return Difficulty.fromId(prefs.getInt(KEY_DIFFICULTY, 2));
     }
@@ -81,34 +102,22 @@ public class GameConfig {
             .apply();
     }
 
-    public long getJackpot() {
-        return prefs.getLong(KEY_JACKPOT, 5555555L);
-    }
+    // === Jackpot ===
 
-    public void setJackpot(long value) {
-        prefs.edit().putLong(KEY_JACKPOT, value).apply();
-    }
+    public long getJackpot() { return prefs.getLong(KEY_JACKPOT, 5555555L); }
+    public void setJackpot(long value) { prefs.edit().putLong(KEY_JACKPOT, value).apply(); }
 
-    public float getWinRate() {
-        return prefs.getFloat(KEY_WIN_RATE, 0.15f);
-    }
+    // === Win Config ===
 
-    public float getPayoutMultiplier() {
-        return prefs.getFloat(KEY_PAYOUT_MULTIPLIER, 3.0f);
-    }
-
-    public int getMinSpinsBeforeWin() {
-        return prefs.getInt(KEY_MIN_SPINS, 10);
-    }
-
-    public float getJackpotHitRate() {
-        return prefs.getFloat(KEY_JACKPOT_HIT_RATE, 0.005f);
-    }
+    public float getWinRate() { return prefs.getFloat(KEY_WIN_RATE, 0.15f); }
+    public float getPayoutMultiplier() { return prefs.getFloat(KEY_PAYOUT_MULTIPLIER, 3.0f); }
+    public int getMinSpinsBeforeWin() { return prefs.getInt(KEY_MIN_SPINS, 10); }
+    public float getJackpotHitRate() { return prefs.getFloat(KEY_JACKPOT_HIT_RATE, 0.005f); }
 
     public void setCustomConfig(float winRate, float payoutMultiplier,
                                  int minSpins, float jackpotHitRate) {
         prefs.edit()
-            .putInt(KEY_DIFFICULTY, -1) // custom
+            .putInt(KEY_DIFFICULTY, -1)
             .putFloat(KEY_WIN_RATE, winRate)
             .putFloat(KEY_PAYOUT_MULTIPLIER, payoutMultiplier)
             .putInt(KEY_MIN_SPINS, minSpins)
@@ -116,8 +125,23 @@ public class GameConfig {
             .apply();
     }
 
+    // === Money ===
+
+    public long getStartingMoney() { return prefs.getLong(KEY_STARTING_MONEY, 1000); }
+    public void setStartingMoney(long value) { prefs.edit().putLong(KEY_STARTING_MONEY, value).apply(); }
+
+    public long getBetAmount() { return prefs.getLong(KEY_BET_AMOUNT, 100); }
+    public void setBetAmount(long value) { prefs.edit().putLong(KEY_BET_AMOUNT, value).apply(); }
+
+    public long getPlayerMoney() { return prefs.getLong(KEY_PLAYER_MONEY, getStartingMoney()); }
+    public void setPlayerMoney(long value) { prefs.edit().putLong(KEY_PLAYER_MONEY, value).apply(); }
+
     public String getFormattedJackpot() {
         return String.format("%,d", getJackpot()).replace(",", ".");
+    }
+
+    public String getFormattedMoney(long value) {
+        return String.format("%,d", value).replace(",", ".");
     }
 
     /** Generate JSON with all config */
@@ -130,7 +154,10 @@ public class GameConfig {
             + "\"winRate\": " + getWinRate() + ","
             + "\"payoutMultiplier\": " + getPayoutMultiplier() + ","
             + "\"minSpinsBeforeWin\": " + getMinSpinsBeforeWin() + ","
-            + "\"jackpotHitRate\": " + getJackpotHitRate()
+            + "\"jackpotHitRate\": " + getJackpotHitRate() + ","
+            + "\"startingMoney\": " + getStartingMoney() + ","
+            + "\"betAmount\": " + getBetAmount() + ","
+            + "\"playerMoney\": " + getPlayerMoney()
             + "}";
     }
 }

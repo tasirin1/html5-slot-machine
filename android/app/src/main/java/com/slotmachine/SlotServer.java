@@ -75,6 +75,25 @@ public class SlotServer extends NanoHTTPD {
                         }
                     }
                     // Parse custom values
+                    // Parse money fields
+                    if (body.contains("\"playerMoney\"")) {
+                        try {
+                            long val = Long.parseLong(body.replaceAll(".*\"playerMoney\"\\s*:\\s*(\\d+).*", "$1"));
+                            gameConfig.setPlayerMoney(val);
+                        } catch (Exception ignored) {}
+                    }
+                    if (body.contains("\"startingMoney\"")) {
+                        try {
+                            long val = Long.parseLong(body.replaceAll(".*\"startingMoney\"\\s*:\\s*(\\d+).*", "$1"));
+                            gameConfig.setStartingMoney(val);
+                        } catch (Exception ignored) {}
+                    }
+                    if (body.contains("\"betAmount\"")) {
+                        try {
+                            long val = Long.parseLong(body.replaceAll(".*\"betAmount\"\\s*:\\s*(\\d+).*", "$1"));
+                            gameConfig.setBetAmount(val);
+                        } catch (Exception ignored) {}
+                    }
                     if (body.contains("\"custom\"")) {
                         float winRate = getJsonFloat(body, "winRate", 0.15f);
                         float payoutMult = getJsonFloat(body, "payoutMultiplier", 3.0f);
