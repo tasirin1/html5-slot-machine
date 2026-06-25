@@ -8,10 +8,9 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  margin: 0;
-  padding: 0;
   background: #0a0015;
   font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 body {
   background: radial-gradient(ellipse at center, #1a0030 0%, #0a0015 70%);
@@ -20,7 +19,7 @@ body {
   justify-content: center;
 }
 
-/* ===== LOGIN SCREEN ===== */
+/* ===== LOGIN ===== */
 #loginScreen {
   display: flex;
   align-items: center;
@@ -63,13 +62,9 @@ body {
   font-size: 16px;
   text-align: center;
   outline: none;
-  transition: border-color 0.2s;
 }
 .login-box input:focus {
   border-color: #ffd700;
-}
-.login-box input::placeholder {
-  color: #555;
 }
 .login-error {
   color: #ff4444;
@@ -89,7 +84,6 @@ body {
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 3px;
-  transition: transform 0.1s;
 }
 .login-btn:active {
   transform: scale(0.97);
@@ -102,14 +96,14 @@ body {
 
 /* ===== GAME ===== */
 #gameScreen {
+  display: none;
   width: 100vw;
   height: 100vh;
   max-width: 100%;
-  padding: 0;
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
+  background: radial-gradient(ellipse at center, #1a0030 0%, #0a0015 70%);
 }
 #gameScreen.active {
   display: flex;
@@ -123,53 +117,51 @@ body {
   background: rgba(0, 0, 0, 0.8);
   padding: 4px 8px;
   border-bottom: 2px solid #d5ad6d;
-  min-height: 32px;
+  min-height: 36px;
 }
-.player-name {
+.pname {
   color: #ffd700;
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 8px;
+}
+.mlabel {
+  color: #888;
+  font-size: 11px;
+}
+.mval {
+  color: #4caf50;
   font-size: 15px;
   font-weight: bold;
-  margin-right: 10px;
+}
+.betlabel {
+  margin: 0 4px 0 10px;
+}
+.betval {
+  color: #ff9800;
 }
 .logout-btn {
   background: none;
   border: 1px solid #ff4444;
   color: #ff4444;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  font-size: 14px;
+  width: 30px;
+  height: 30px;
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.money-display {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-.money-display .label {
-  color: #888;
-  font-size: 11px;
-}
-.money-display .value {
-  color: #4caf50;
-  font-size: 16px;
-  font-weight: bold;
-}
-.money-display .value.bet {
-  color: #ff9800;
-}
 
-#winMessage {
+#winMsg {
   text-align: center;
-  padding: 4px;
-  font-size: 15px;
+  padding: 3px;
+  font-size: 14px;
   font-weight: bold;
   color: #ffd700;
   background: rgba(0, 0, 0, 0.5);
-  min-height: 28px;
+  min-height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -180,23 +172,29 @@ body {
   display: flex;
   width: 100%;
   flex: 1;
-  height: 0;
   min-height: 100px;
-  background: linear-gradient(180deg, #0a0015, #1a0030);
-  padding: 4px 2px;
-  gap: 2px;
-  touch-action: none;
+  padding: 3px;
+  gap: 3px;
 }
 .reel {
-  overflow: hidden;
-  width: 33.33%;
-  height: 100%;
-  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 6px;
+  padding: 3px;
 }
-.reel > .icons {
-  position: relative;
+.reel .sym {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: clamp(28px, 7vw, 56px);
+  font-weight: bold;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* ===== CONTROLS ===== */
@@ -206,11 +204,11 @@ body {
   justify-content: center;
   align-items: center;
   gap: 16px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-top: 1px solid rgba(213, 173, 109, 0.2);
 }
-#spin {
-  background: linear-gradient(180deg, #ffd700 0%, #d5ad6d 100%);
+#spinBtn {
+  background: linear-gradient(180deg, #ffd700, #d5ad6d);
   border: none;
   color: #1a1a2e;
   font-size: 20px;
@@ -220,14 +218,11 @@ body {
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 3px;
-  transition:
-    transform 0.1s,
-    opacity 0.2s;
 }
-#spin:active {
+#spinBtn:active {
   transform: scale(0.97);
 }
-#spin:disabled {
+#spinBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
@@ -247,53 +242,31 @@ body {
 
 /* ===== LANDSCAPE ===== */
 @media (orientation: landscape) {
-  #gameScreen {
-    width: 100vw;
-    height: 100vh;
-  }
-  #reels {
-    min-height: 200px;
-    padding: 3px 2px;
-    gap: 2px;
-  }
   #topBar {
     padding: 2px 6px;
-    min-height: 26px;
+    min-height: 30px;
   }
-  .player-name {
+  .pname {
     font-size: 12px;
   }
-  .money-display .value {
+  .mval {
     font-size: 13px;
   }
-  #winMessage {
+  #winMsg {
     padding: 2px;
     font-size: 12px;
-    min-height: 20px;
+    min-height: 22px;
   }
-  #spin {
-    font-size: 15px;
-    padding: 4px 24px;
+  .reel .sym {
+    font-size: clamp(24px, 6vw, 48px);
+  }
+  #spinBtn {
+    font-size: 16px;
+    padding: 6px 30px;
   }
   #controls {
-    padding: 3px 10px;
+    padding: 4px 10px;
     gap: 10px;
-  }
-  .reel > .icons div.sym {
-    font-size: clamp(22px, 6vw, 48px) !important;
-  }
-}
-
-/* ===== SMALL SCREENS ===== */
-@media (max-width: 480px) {
-  #reels {
-    height: calc(min(55vh, 320px));
-  }
-  .login-box {
-    padding: 24px 16px;
-  }
-  .login-title {
-    font-size: 28px;
   }
 }
 
