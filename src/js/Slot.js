@@ -41,7 +41,8 @@ export default class Slot {
     this.el.logoutBtn.addEventListener("click", () => this.showLogin());
     this.el.spinBtn.addEventListener("click", () => this.spin());
     this.el.autoplay.addEventListener("change", () => {
-      if (this.el.autoplay.checked && !this.spinning) this.autoSpin();
+      if (this.el.autoplay.checked && !this.spinning && this.money >= this.bet)
+        this.spin();
     });
 
     this.showLogin();
