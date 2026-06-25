@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
     // ===== DISPLAY =====
 
-        private void updateDisplay() {
+    private void updateDisplay() {
         try {
             if (gameConfig == null) return;
             if (currentJackpotText != null)
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             android.util.Log.e("MainActivity", "updateDisplay error", e);
         }
-    }}
+    }
 
     private String formatMoney(long v) {
         return String.format("%,d", v).replace(",", ".");
