@@ -210,7 +210,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshAccountList() {
         if (accountListLayout == null) return;
-        accountListLayout.removeViews(1, Math.max(0, accountListLayout.getChildCount() - 1));
+        // Remove all existing account rows safely
+        while (accountListLayout.getChildCount() > 0) {
+            accountListLayout.removeViewAt(0);
+        }
         String json = accountManager.getAllAccounts();
         try {
             org.json.JSONObject res = new org.json.JSONObject(json);
