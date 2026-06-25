@@ -52,6 +52,7 @@ export default class Slot {
   }
 
   showLogin() {
+    this.gameScreen.classList.remove("active");
     this.gameScreen.style.display = "none";
     this.loginScreen.style.display = "flex";
     this.loginUser.value = "";
@@ -107,7 +108,8 @@ export default class Slot {
 
   startGame() {
     this.loginScreen.style.display = "none";
-    this.gameScreen.style.display = "block";
+    this.gameScreen.style.display = "";
+    this.gameScreen.classList.add("active");
     this.ready = true;
     this.spinButton.disabled = false;
 
