@@ -140,15 +140,15 @@ public class SlotServer extends NanoHTTPD {
     // ========== REGISTER ==========
 
     private String handleRegister(Method method, IHTTPSession session) throws Exception {
-        if (method != Method.POST) return "{"error":"Use POST"}";
+        if (method != Method.POST) return "{\"error\":\"Use POST\"}";
         String body = readBody(session);
-        if (body == null) return "{"error":"No body"}";
+        if (body == null) return "{\"error\":\"No body\"}";
 
         String username = extractJsonString(body, "username");
         String pin = extractJsonString(body, "pin");
-        if (username == null || pin == null) return "{"error":"username and pin required"}";
-        if (username.length() < 3) return "{"error":"Username min 3 characters"}";
-        if (pin.length() < 3) return "{"error":"PIN min 3 characters"}";
+        if (username == null || pin == null) return "{\"error\":\"username and pin required\"}";
+        if (username.length() < 3) return "{\"error\":\"Username min 3 characters\"}";
+        if (pin.length() < 3) return "{\"error\":\"PIN min 3 characters\"}";
 
         long startingMoney = gameConfig.getStartingMoney();
         String result = accountManager.createAccount(username, pin, startingMoney);
