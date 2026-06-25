@@ -31,8 +31,8 @@ export default class Slot {
     this.autoPlayCheckbox = document.getElementById("autoplay");
 
     // Reels
-    this.currentSymbols = Array(5).fill(["seven", "seven", "seven"]);
-    this.nextSymbols = Array(5).fill(["seven", "seven", "seven"]);
+    this.currentSymbols = Array(3).fill(["seven", "seven", "seven"]);
+    this.nextSymbols = Array(3).fill(["seven", "seven", "seven"]);
 
     this.reels = Array.from(document.querySelectorAll(".reel")).map(
       (el, i) => new Reel(el, i, this.currentSymbols[i]),
@@ -162,11 +162,9 @@ export default class Slot {
 
       const sym = result.symbol;
       this.nextSymbols = [
-        [Symbol.random(), Symbol.random(), Symbol.random()],
         [sym, sym, sym],
-        [Symbol.random(), Symbol.random(), Symbol.random()],
         [sym, sym, sym],
-        [Symbol.random(), Symbol.random(), Symbol.random()],
+        [sym, sym, sym],
       ];
 
       this.setWinMessage(
@@ -175,8 +173,6 @@ export default class Slot {
       );
     } else {
       this.nextSymbols = [
-        [Symbol.random(), Symbol.random(), Symbol.random()],
-        [Symbol.random(), Symbol.random(), Symbol.random()],
         [Symbol.random(), Symbol.random(), Symbol.random()],
         [Symbol.random(), Symbol.random(), Symbol.random()],
         [Symbol.random(), Symbol.random(), Symbol.random()],

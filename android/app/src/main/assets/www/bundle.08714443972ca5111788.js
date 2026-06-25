@@ -1393,8 +1393,8 @@
               document.getElementById("playerNameDisplay")),
             (this.spinButton = document.getElementById("spin")),
             (this.autoPlayCheckbox = document.getElementById("autoplay")),
-            (this.currentSymbols = Array(5).fill(["seven", "seven", "seven"])),
-            (this.nextSymbols = Array(5).fill(["seven", "seven", "seven"])),
+            (this.currentSymbols = Array(3).fill(["seven", "seven", "seven"])),
+            (this.nextSymbols = Array(3).fill(["seven", "seven", "seven"])),
             (this.reels = Array.from(document.querySelectorAll(".reel")).map(
               function (t, n) {
                 return new c(t, n, e.currentSymbols[n]);
@@ -1567,17 +1567,13 @@
                   this.money += n;
                   var r = e.symbol;
                   (this.nextSymbols = [
-                    [o.random(), o.random(), o.random()],
                     [r, r, r],
-                    [o.random(), o.random(), o.random()],
                     [r, r, r],
-                    [o.random(), o.random(), o.random()],
+                    [r, r, r],
                   ]),
                     this.setWinMessage("🎉 WIN " + g(n) + "!", "#FFD700");
                 } else
                   (this.nextSymbols = [
-                    [o.random(), o.random(), o.random()],
-                    [o.random(), o.random(), o.random()],
                     [o.random(), o.random(), o.random()],
                     [o.random(), o.random(), o.random()],
                     [o.random(), o.random(), o.random()],
