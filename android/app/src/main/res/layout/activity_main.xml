@@ -391,7 +391,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="• Difficulty changes affect win rate & payout"
+                    android:text="• Difficulty changes affect win rate &amp; payout"
                     android:textColor="#aaa"
                     android:textSize="12sp"
                     android:layout_marginBottom="2dp" />
