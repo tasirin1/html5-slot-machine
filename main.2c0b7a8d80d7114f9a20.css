@@ -1,0 +1,262 @@
+/* === Base === */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: 24px;
+}
+
+body {
+  background-image: url(dbdfdc8f51630ddfbb3f.jpg);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media only screen and (max-width: 1200px) {
+  body {
+    background-image: url(01e008fb4d3f3df23e7d.jpg);
+  }
+}
+
+#slot {
+  width: 100%;
+  height: 100%;
+  max-width: 800px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+/* === Money Bar === */
+#moneyBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 6px 14px;
+  border-radius: 8px 8px 0 0;
+  flex-shrink: 0;
+  min-height: 40px;
+}
+
+.money-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.money-icon {
+  font-size: 18px;
+}
+
+.money-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.money-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.money-value.bet {
+  color: #ff9800;
+}
+
+.money-value.jackpot {
+  color: #d5ad6d;
+}
+
+/* === Win Message === */
+#winMessage {
+  text-align: center;
+  padding: 4px 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #d5ad6d;
+  background: rgba(0, 0, 0, 0.5);
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+#connectionStatus {
+  font-size: 11px;
+  font-weight: normal;
+  color: #4caf50;
+  margin-left: auto;
+}
+
+/* === Reels === */
+#reels {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  gap: 2px;
+}
+
+.reel {
+  overflow: hidden;
+  flex: 1;
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+}
+
+.reel > .icons {
+  position: relative;
+}
+
+.reel > .icons > img {
+  width: calc(100% + 6px);
+  margin: -3px 0 0 -3px;
+  height: auto;
+  display: block;
+  transform: translate3d(0, 0, 0);
+}
+
+/* === Controls === */
+#controls {
+  background: rgba(255, 255, 255, 0.92);
+  height: 52px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 20px;
+  border-radius: 0 0 8px 8px;
+  flex-shrink: 0;
+}
+
+#spin {
+  min-width: 120px;
+  height: 44px;
+  font-size: 22px;
+  font-weight: bold;
+  background: #d5ad6d;
+  border: none;
+  border-radius: 6px;
+  color: #1a1a2e;
+  cursor: pointer;
+  padding: 0 24px;
+}
+
+#spin:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+}
+
+#controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+}
+
+/* === Landscape Optimizations === */
+@media (orientation: landscape) {
+  #slot {
+    max-width: 100%;
+    max-height: 100%;
+    padding: 2px;
+  }
+
+  #moneyBar {
+    padding: 4px 14px;
+    min-height: 34px;
+  }
+
+  .money-value {
+    font-size: 17px;
+  }
+
+  .money-icon {
+    font-size: 15px;
+  }
+
+  #winMessage {
+    font-size: 15px;
+    min-height: 26px;
+    padding: 2px 10px;
+  }
+
+  #controls {
+    height: 44px;
+    padding: 2px 16px;
+  }
+
+  #spin {
+    height: 38px;
+    font-size: 18px;
+    min-width: 100px;
+  }
+
+  input[type="checkbox"] {
+    width: 30px;
+    height: 30px;
+  }
+
+  #controls label {
+    font-size: 14px;
+  }
+}
+
+/* === Small screens === */
+@media (max-height: 400px) {
+  .money-value {
+    font-size: 14px;
+  }
+  .money-label {
+    font-size: 9px;
+  }
+  .money-icon {
+    font-size: 12px;
+  }
+  #moneyBar {
+    min-height: 28px;
+    padding: 2px 10px;
+  }
+  #winMessage {
+    font-size: 12px;
+    min-height: 20px;
+  }
+  #controls {
+    height: 36px;
+  }
+  #spin {
+    height: 32px;
+    font-size: 15px;
+    min-width: 80px;
+  }
+  input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+  }
+  #controls label {
+    font-size: 12px;
+  }
+}
+
