@@ -1,3 +1,10 @@
+node_modules/
+dist/
 .DS_Store
-dist
-node_modules
+*.log
+android/.gradle/
+android/app/build/
+android/build/
+android/build-manual/
+android/output/
+android/local.properties
