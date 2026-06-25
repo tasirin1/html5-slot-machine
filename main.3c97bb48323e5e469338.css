@@ -88,11 +88,6 @@ body {
 .login-btn:active {
   transform: scale(0.97);
 }
-.login-hint {
-  color: #555;
-  font-size: 12px;
-  margin-top: 16px;
-}
 
 /* ===== GAME ===== */
 #gameScreen {
