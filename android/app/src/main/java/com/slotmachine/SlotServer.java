@@ -224,54 +224,39 @@ public class SlotServer extends NanoHTTPD {
     }
 
     private String readBody(IHTTPSession session) throws Exception {
-        // For JSON content types, read raw body directly from input stream
-        String contentType = session.getHeader("content-type");
-        if (contentType != null && contentType.toLowerCase().contains("application/json")) {
-            int contentLength = 0;
-            try {
-                String cl = session.getHeader("content-length");
-                if (cl != null) contentLength = Integer.parseInt(cl);
-            } catch (Exception e) {}
-            if (contentLength > 0) {
-                byte[] buf = new byte[contentLength];
-                int off = 0;
-                while (off < contentLength) {
-                    int r = session.getInputStream().read(buf, off, contentLength - off);
-                    if (r < 0) break;
-                    off += r;
-                }
-                return new String(buf, 0, off, "UTF-8");
-            }
-            // Fallback: read all available bytes
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            byte[] tmp = new byte[4096];
-            int n;
-            while ((n = session.getInputStream().read(tmp, 0, tmp.length)) != -1) {
-                baos.write(tmp, 0, n);
-                if (n < tmp.length) break;
-            }
-            String body = baos.toString("UTF-8");
-            return body.isEmpty() ? null : body;
+        String contentType = session.getHeaders().get("content-type");
+        
+        // For unsupported content types, parseBody will throw.
+        // Read raw body via NanoHTTPD.HTTPSession downcast.
+        if (contentType == null || (!contentType.contains("x-www-form-urlencoded") 
+            && !contentType.contains("multipart/form-data"))) {
+            return readRawBody(session);
         }
-        // For form data, use parseBody
+        
+        // For form data, use parseBody (works natively)
         Map<String, String> files = new HashMap<>();
-        try {
-            session.parseBody(files);
-        } catch (Exception e) {
-            // If parseBody fails, try reading raw body
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            byte[] tmp = new byte[4096];
-            int n;
-            while ((n = session.getInputStream().read(tmp, 0, tmp.length)) != -1) {
-                baos.write(tmp, 0, n);
-                if (n < tmp.length) break;
-            }
-            String body = baos.toString("UTF-8");
-            return body.isEmpty() ? null : body;
-        }
+        session.parseBody(files);
         String body = session.getQueryParameterString();
         if (body == null || body.isEmpty()) body = files.get("postData");
         return body;
+    }
+    
+    private String readRawBody(IHTTPSession session) throws Exception {
+        // NanoHTTPD.HTTPSession is a public inner class with getInputStream()
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        byte[] tmp = new byte[4096];
+        int n;
+        try (java.io.InputStream is = ((NanoHTTPD.HTTPSession) session).getInputStream()) {
+            while ((n = is.read(tmp, 0, tmp.length)) != -1) {
+                baos.write(tmp, 0, n);
+                if (n < tmp.length) break;
+            }
+        } catch (Exception e) {
+            // If downcast fails, try session.getQueryParameterString()
+            return session.getQueryParameterString();
+        }
+        String body = baos.toString("UTF-8");
+        return body.isEmpty() ? null : body;
     }
 
     private long extractJsonLong(String json, String key) {
