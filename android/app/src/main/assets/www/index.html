@@ -8,30 +8,28 @@
     />
     <title>Slot Machine</title>
     <link rel="stylesheet" href="bootstrap-reboot.min.css" />
-    <script defer="defer" src="bundle.0e668c1125af2f8b7491.js"></script>
-    <link href="main.425932f16a931f903b05.css" rel="stylesheet" />
+    <script defer="defer" src="bundle.1d4f2abdb31c45bd954f.js"></script>
+    <link href="main.b34cf2b18758e5894142.css" rel="stylesheet" />
   </head>
   <body>
     <div id="slot">
-      <div id="moneyBar">
-        <div class="money-item">
-          <span class="money-icon">💰</span>
-          <span class="money-label">Money</span>
-          <span id="playerMoney" class="money-value">0</span>
-        </div>
-        <div class="money-item">
-          <span class="money-icon">🎲</span>
-          <span class="money-label">Bet</span>
-          <span id="betDisplay" class="money-value bet">100</span>
-        </div>
-        <div class="money-item">
-          <span class="money-icon">🏆</span>
-          <span class="money-label">Jackpot</span>
-          <span id="jp" class="money-value jackpot">5.555.555</span>
+      <div id="topBar">
+        <div class="left">
+          <div class="money-display">
+            <span class="label">💰</span>
+            <span id="playerMoney" class="value">0</span>
+            <span class="label" style="margin: 0 4px 0 10px">BET</span>
+            <span id="betDisplay" class="value bet">100</span>
+          </div>
+          <div class="jackpot-display">
+            <span class="label">JACKPOT</span>
+            <span id="jp" class="value">5.555.555</span>
+          </div>
         </div>
       </div>
       <div id="winMessage">
-        <span>Pull the lever!</span> <span id="connectionStatus"></span>
+        <span id="winText">🎰 Good luck!</span>
+        <span id="connectionStatus"></span>
       </div>
       <div id="reels">
         <div class="reel"></div>
@@ -42,10 +40,7 @@
       </div>
       <div id="controls">
         <button type="button" id="spin" disabled="disabled">SPIN</button>
-        <label
-          ><input type="checkbox" name="autoplay" id="autoplay" />
-          Autoplay</label
-        >
+        <label><input type="checkbox" id="autoplay" /> Auto</label>
       </div>
     </div>
   </body>

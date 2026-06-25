@@ -59,13 +59,13 @@ export default class Slot {
   }
 
   async init() {
-    this.showStatus("Connecting...", "#ffaa00");
+    this.showStatus("", "#4CAF50");
     this.spinButton.disabled = true;
 
     this.gameConfig = await JackpotAPI.fetchConfig();
 
     if (!this.gameConfig) {
-      this.showStatus("Offline", "#ff4444");
+      this.showStatus("", "#ff4444");
       this.gameConfig = {
         difficulty: "Medium",
         winRate: 0.15,
@@ -75,7 +75,7 @@ export default class Slot {
         betAmount: 100,
       };
     } else {
-      this.showStatus("Connected", "#4CAF50");
+      this.showStatus("", "#4CAF50");
     }
 
     this.startingMoney = this.gameConfig.startingMoney || 1000;
@@ -91,8 +91,8 @@ export default class Slot {
 
   showStatus(text, color) {
     if (this.connectionStatus) {
-      this.connectionStatus.textContent = text;
-      this.connectionStatus.style.color = color || "#888";
+      this.connectionStatus.textContent = "";
+      this.connectionStatus.style.display = "none";
     }
   }
 
@@ -171,13 +171,11 @@ export default class Slot {
 
   setWinMessage(text, color) {
     if (this.winMessage) {
-      this.winMessage.innerHTML =
-        "<span>" + text + '</span><span id="connectionStatus"></span>';
-      this.connectionStatus = document.getElementById("connectionStatus");
-      if (this.ready && this.connectionStatus) {
-        this.connectionStatus.textContent = "Connected";
-        this.connectionStatus.style.color = "#4CAF50";
-      }
+      this.winMessage.innerHTML = text;
+    }
+    if (this.connectionStatus && this.ready) {
+      this.connectionStatus.textContent = "●";
+      this.connectionStatus.style.color = "#4CAF50";
     }
   }
 

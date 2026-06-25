@@ -1,4 +1,4 @@
-/*! For license information please see bundle.0e668c1125af2f8b7491.js.LICENSE.txt */
+/*! For license information please see bundle.1d4f2abdb31c45bd954f.js.LICENSE.txt */
 (() => {
   var t = {
       138: (t, e, r) => {
@@ -1453,7 +1453,7 @@
                             switch ((t.prev = t.next)) {
                               case 0:
                                 return (
-                                  this.showStatus("Connecting...", "#ffaa00"),
+                                  this.showStatus("", "#4CAF50"),
                                   (this.spinButton.disabled = !0),
                                   (t.next = 4),
                                   d()
@@ -1461,8 +1461,8 @@
                               case 4:
                                 (this.gameConfig = t.sent),
                                   this.gameConfig
-                                    ? this.showStatus("Connected", "#4CAF50")
-                                    : (this.showStatus("Offline", "#ff4444"),
+                                    ? this.showStatus("", "#4CAF50")
+                                    : (this.showStatus("", "#ff4444"),
                                       (this.gameConfig = {
                                         difficulty: "Medium",
                                         winRate: 0.15,
@@ -1502,8 +1502,8 @@
                 key: "showStatus",
                 value: function (t, e) {
                   this.connectionStatus &&
-                    ((this.connectionStatus.textContent = t),
-                    (this.connectionStatus.style.color = e || "#888"));
+                    ((this.connectionStatus.textContent = ""),
+                    (this.connectionStatus.style.display = "none"));
                 },
               },
               {
@@ -1582,17 +1582,11 @@
               {
                 key: "setWinMessage",
                 value: function (t, e) {
-                  this.winMessage &&
-                    ((this.winMessage.innerHTML =
-                      "<span>" +
-                      t +
-                      '</span><span id="connectionStatus"></span>'),
-                    (this.connectionStatus =
-                      document.getElementById("connectionStatus")),
-                    this.ready &&
-                      this.connectionStatus &&
-                      ((this.connectionStatus.textContent = "Connected"),
-                      (this.connectionStatus.style.color = "#4CAF50")));
+                  this.winMessage && (this.winMessage.innerHTML = t),
+                    this.connectionStatus &&
+                      this.ready &&
+                      ((this.connectionStatus.textContent = "●"),
+                      (this.connectionStatus.style.color = "#4CAF50"));
                 },
               },
               {

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
     <title>Slot Machine</title>
     <link
@@ -14,32 +14,29 @@
   </head>
   <body>
     <div id="slot">
-      <!-- Money Bar -->
-      <div id="moneyBar">
-        <div class="money-item">
-          <span class="money-icon">💰</span>
-          <span class="money-label">Money</span>
-          <span id="playerMoney" class="money-value">0</span>
-        </div>
-        <div class="money-item">
-          <span class="money-icon">🎲</span>
-          <span class="money-label">Bet</span>
-          <span id="betDisplay" class="money-value bet">100</span>
-        </div>
-        <div class="money-item">
-          <span class="money-icon">🏆</span>
-          <span class="money-label">Jackpot</span>
-          <span id="jp" class="money-value jackpot">5.555.555</span>
+      <!-- TOP BAR: Money | Jackpot -->
+      <div id="topBar">
+        <div class="left">
+          <div class="money-display">
+            <span class="label">💰</span>
+            <span id="playerMoney" class="value">0</span>
+            <span class="label" style="margin: 0 4px 0 10px">BET</span>
+            <span id="betDisplay" class="value bet">100</span>
+          </div>
+          <div class="jackpot-display">
+            <span class="label">JACKPOT</span>
+            <span id="jp" class="value">5.555.555</span>
+          </div>
         </div>
       </div>
 
-      <!-- Win Message -->
+      <!-- WIN MESSAGE + STATUS -->
       <div id="winMessage">
-        <span>Pull the lever!</span>
+        <span id="winText">🎰 Good luck!</span>
         <span id="connectionStatus"></span>
       </div>
 
-      <!-- Reels -->
+      <!-- REELS -->
       <div id="reels">
         <div class="reel"></div>
         <div class="reel"></div>
@@ -48,12 +45,12 @@
         <div class="reel"></div>
       </div>
 
-      <!-- Controls -->
+      <!-- CONTROLS -->
       <div id="controls">
         <button type="button" id="spin" disabled>SPIN</button>
         <label>
-          <input type="checkbox" name="autoplay" id="autoplay" />
-          Autoplay
+          <input type="checkbox" id="autoplay" />
+          Auto
         </label>
       </div>
     </div>
