@@ -22,14 +22,12 @@ public class SlotServer extends NanoHTTPD {
 
     private final Context context;
     private final GameConfig gameConfig;
-    private final AccountManager accountManager;
     private String localIp;
 
     public SlotServer(Context context) {
         super(PORT);
         this.context = context;
         this.gameConfig = GameConfig.getInstance(context);
-        this.accountManager = AccountManager.getInstance(context);
         this.localIp = getLocalIpAddress();
     }
 
@@ -44,10 +42,7 @@ public class SlotServer extends NanoHTTPD {
                 case "/api/config":      return jsonResponse(handleConfig(method, session));
                 case "/api/jackpot":     return jsonResponse(handleJackpot(method, session));
                 case "/api/status":      return jsonResponse(handleStatus());
-                case "/api/login":       return jsonResponse(handleLogin(method, session));
-                case "/api/register":    return jsonResponse(handleRegister(method, session));
-                case "/api/account":     return jsonResponse(handleAccount(method, session));
-                case "/api/accounts":    return jsonResponse(handleAccounts(method, session));
+                case "/api/money":       return jsonResponse(handleMoney(method, session));
                 default:                 return serveStaticFile(uri);
             }
         } catch (Exception e) {
@@ -111,120 +106,26 @@ public class SlotServer extends NanoHTTPD {
             + "\"status\":\"running\","
             + "\"ip\":\"" + localIp + "\","
             + "\"port\":" + PORT + ","
-            + "\"accounts\":" + accountManager.getAccountCount() + ","
-            + "\"totalMoney\":" + accountManager.getTotalMoney() + ","
             + "\"config\":" + gameConfig.toJson()
             + "}";
     }
 
-    // ========== LOGIN ==========
+    // ========== MONEY ==========
 
-    private String handleLogin(Method method, IHTTPSession session) throws Exception {
-        if (method != Method.POST) return "{\"error\":\"Use POST\"}";
-        String body = readBody(session);
-        if (body == null) return "{\"error\":\"No body\"}";
-
-        String username = extractJsonString(body, "username");
-        String pin = extractJsonString(body, "pin");
-        if (username == null || pin == null) return "{\"error\":\"username and pin required\"}";
-
-        String result = accountManager.login(username, pin);
-        // Add config to response
-        if (result.contains("\"success\":true")) {
-            result = result.substring(0, result.length() - 1)
-                + ",\"config\":" + gameConfig.toJson() + "}";
+    private String handleMoney(Method method, IHTTPSession session) throws Exception {
+        if (method == Method.POST) {
+            String body = readBody(session);
+            if (body != null && body.contains("\"balance\"")) {
+                long bal = extractJsonLong(body, "balance");
+                gameConfig.setCurrentMoney(bal);
+                return "{\"success\":true,\"balance\":" + bal + ",\"startingMoney\":" + gameConfig.getStartingMoney() + "}";
+            }
         }
-        return result;
+        long current = gameConfig.getCurrentMoney();
+        return "{\"success\":true,\"balance\":" + current + ",\"startingMoney\":" + gameConfig.getStartingMoney() + "}";
     }
 
-    // ========== REGISTER ==========
-
-    private String handleRegister(Method method, IHTTPSession session) throws Exception {
-        if (method != Method.POST) return "{\"error\":\"Use POST\"}";
-        String body = readBody(session);
-        if (body == null) return "{\"error\":\"No body\"}";
-
-        String username = extractJsonString(body, "username");
-        String pin = extractJsonString(body, "pin");
-        if (username == null || pin == null) return "{\"error\":\"username and pin required\"}";
-        if (username.length() < 3) return "{\"error\":\"Username min 3 characters\"}";
-        if (pin.length() < 3) return "{\"error\":\"PIN min 3 characters\"}";
-
-        long startingMoney = gameConfig.getStartingMoney();
-        String result = accountManager.createAccount(username, pin, startingMoney);
-        if (result.contains("\"success\":true")) {
-            // Auto-login: add config to response
-            result = result.substring(0, result.length() - 1)
-                + ",\"config\":" + gameConfig.toJson() + "}";
-        }
-        return result;
-    }
-
-    // ========== ACCOUNT (player) ==========
-
-    private String handleAccount(Method method, IHTTPSession session) throws Exception {
-        String body = readBody(session);
-        if (body == null) return "{\"error\":\"No body\"}";
-
-        String username = extractJsonString(body, "username");
-        String pin = extractJsonString(body, "pin");
-        if (username == null || pin == null) return "{\"error\":\"auth required\"}";
-
-        if (method == Method.GET || method == Method.POST) {
-            String result = accountManager.login(username, pin);
-            if (!result.contains("\"success\":true"))
-                return result;
-
-            if (body.contains("\"balance\"")) {
-                long newBal = extractJsonLong(body, "balance");
-                result = accountManager.updateBalance(username, pin, newBal);
-            }
-
-            // Add config to response
-            if (result.contains("\"success\":true")) {
-                result = result.substring(0, result.length() - 1)
-                    + ",\"config\":" + gameConfig.toJson() + "}";
-            }
-            return result;
-        }
-        return "{\"error\":\"Method not allowed\"}";
-    }
-
-    // ========== ACCOUNTS (admin) ==========
-
-    private String handleAccounts(Method method, IHTTPSession session) throws Exception {
-        String body = readBody(session);
-
-        if (method == Method.GET) {
-            return accountManager.getAllAccounts();
-        }
-
-        if (method == Method.POST && body != null) {
-            if (body.contains("\"action\":\"create\"")) {
-                String u = extractJsonString(body, "username");
-                String p = extractJsonString(body, "pin");
-                long b = extractJsonLong(body, "balance");
-                return accountManager.createAccount(u, p, b);
-            }
-            if (body.contains("\"action\":\"delete\"")) {
-                String u = extractJsonString(body, "username");
-                return accountManager.deleteAccount(u);
-            }
-            if (body.contains("\"action\":\"reset\"")) {
-                long amount = extractJsonLong(body, "balance");
-                return accountManager.resetAllBalances(amount);
-            }
-            if (body.contains("\"action\":\"update\"")) {
-                String u = extractJsonString(body, "username");
-                String p = extractJsonString(body, "pin");
-                long b = extractJsonLong(body, "balance");
-                return accountManager.createAccount(u, p, b);
-            }
-        }
-        return "{\"error\":\"Invalid request\"}";
-    }
-
-    // ========== STATIC FILES ==========
+    // ========== STATIC FILES ==========    // ========== STATIC FILES ==========
 
     private Response serveStaticFile(String uri) {
         if (uri == null || uri.equals("/")) uri = "/index.html";

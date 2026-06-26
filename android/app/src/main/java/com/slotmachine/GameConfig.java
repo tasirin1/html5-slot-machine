@@ -136,6 +136,9 @@ public class GameConfig {
     public long getPlayerMoney() { return prefs.getLong(KEY_PLAYER_MONEY, getStartingMoney()); }
     public void setPlayerMoney(long value) { prefs.edit().putLong(KEY_PLAYER_MONEY, value).apply(); }
 
+    public long getCurrentMoney() { return prefs.getLong("current_money", getStartingMoney()); }
+    public void setCurrentMoney(long value) { prefs.edit().putLong("current_money", value).apply(); }
+
     public String getFormattedJackpot() {
         return String.format("%,d", getJackpot()).replace(",", ".");
     }

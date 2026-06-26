@@ -27,25 +27,17 @@ async function apiGet(path) {
 }
 
 const JackpotAPI = {
-  async login(username, pin) {
-    return apiPost("/api/login", { username, pin });
-  },
-
-  async register(username, pin) {
-    return apiPost("/api/register", { username, pin });
-  },
-
-  async updateBalance(username, pin, balance) {
-    return apiPost("/api/account", { username, pin, balance });
-  },
-
   async fetchConfig() {
     return apiGet("/api/config");
   },
 
-  async fetchJackpot() {
-    const d = await apiGet("/api/jackpot");
-    return d || { jackpot: 5555555, formatted: "5.555.555" };
+  async saveMoney(balance) {
+    return apiPost("/api/money", { balance });
+  },
+
+  async fetchMoney() {
+    const d = await apiGet("/api/money");
+    return d || { balance: 1000 };
   },
 
   formatNumber(num) {

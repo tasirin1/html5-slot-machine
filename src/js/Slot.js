@@ -4,35 +4,23 @@ import JackpotAPI from "./JackpotAPI.js";
 
 export default class Slot {
   constructor() {
-    this.user = null;
-    this.pin = null;
     this.money = 0;
     this.bet = 100;
     this.config = null;
     this.spinning = false;
-    this.isRegister = false;
     this.spinCount = 0;
     this.lossStreak = 0;
 
     // DOM
     this.el = {};
     const ids = [
-      "loginScreen",
       "gameScreen",
-      "loginUser",
-      "loginPin",
-      "loginBtn",
-      "registerBtn",
-      "loginError",
-      "loginSub",
-      "loginToggle",
-      "logoutBtn",
       "playerMoney",
       "betDisplay",
       "winText",
-      "playerName",
       "spinBtn",
       "autoplay",
+      "resetBtn",
     ];
     for (const id of ids) this.el[id] = document.getElementById(id);
 
@@ -40,144 +28,41 @@ export default class Slot {
     this.reels = Array.from(this.reelElements).map((el) => new Reel(el));
 
     // Events
-    this.el.loginBtn.addEventListener("click", () => this.doLogin());
-    this.el.registerBtn.addEventListener("click", () => this.doRegister());
-    this.el.loginToggle.addEventListener("click", () => this.toggleRegister());
-    this.el.loginPin.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") this.doLogin();
-    });
-    this.el.logoutBtn.addEventListener("click", () => this.showLogin());
     this.el.spinBtn.addEventListener("click", () => this.spin());
+    if (this.el.resetBtn) {
+      this.el.resetBtn.addEventListener("click", () => this.resetMoney());
+    }
     this.el.autoplay.addEventListener("change", () => {
       if (this.el.autoplay.checked && !this.spinning && this.money >= this.bet)
         this.spin();
     });
 
-    this.showLogin();
+    this.init();
   }
 
-  toggleRegister() {
-    this.isRegister = !this.isRegister;
-    if (this.isRegister) {
-      this.el.loginSub.textContent = "Buat akun baru";
-      this.el.loginBtn.textContent = "DAFTAR";
-      this.el.registerBtn.textContent = "Kembali ke Login";
-      this.el.loginToggle.textContent = "Sudah punya akun? Klik login";
+  async init() {
+    // Fetch config and money from server
+    const config = await JackpotAPI.fetchConfig();
+    this.config = config || {
+      winRate: 0.15,
+      payoutMultiplier: 3,
+      startingMoney: 1000,
+      betAmount: 100,
+    };
+    this.bet = this.config.betAmount || 100;
+
+    // Load saved money or use default
+    const saved = localStorage.getItem("slot777_money");
+    if (saved !== null) {
+      this.money = parseInt(saved, 10) || this.config.startingMoney || 1000;
     } else {
-      this.el.loginSub.textContent = "Masuk ke akun kamu";
-      this.el.loginBtn.textContent = "PLAY";
-      this.el.registerBtn.textContent = "Buat Akun Baru";
-      this.el.loginToggle.textContent = "Belum punya akun? Klik daftar";
-    }
-    this.el.loginError.textContent = "";
-  }
-
-  showLogin() {
-    this.el.gameScreen.classList.remove("active");
-    this.el.loginScreen.style.display = "flex";
-    this.el.loginUser.value = "";
-    this.el.loginPin.value = "";
-    this.el.loginError.textContent = "";
-    this.user = null;
-    this.pin = null;
-    this.spinning = false;
-    this.isRegister = false;
-    this.spinCount = 0;
-    this.lossStreak = 0;
-    this.el.loginSub.textContent = "Masuk ke akun kamu";
-    this.el.loginBtn.textContent = "PLAY";
-    this.el.registerBtn.textContent = "Buat Akun Baru";
-    this.el.loginToggle.textContent = "Belum punya akun? Klik daftar";
-  }
-
-  async doRegister() {
-    const user = this.el.loginUser.value.trim();
-    const pin = this.el.loginPin.value.trim();
-    if (!user || !pin) {
-      this.el.loginError.textContent = "Isi username dan PIN";
-      return;
-    }
-    if (user.length < 3) {
-      this.el.loginError.textContent = "Username minimal 3 karakter";
-      return;
-    }
-    if (pin.length < 3) {
-      this.el.loginError.textContent = "PIN minimal 3 karakter";
-      return;
+      this.money = this.config.startingMoney || 1000;
     }
 
-    this.el.loginBtn.disabled = true;
-    this.el.loginBtn.textContent = "Mendaftar...";
+    // Sync money to server
+    JackpotAPI.saveMoney(this.money);
 
-    const res = await JackpotAPI.register(user, pin);
-    if (!res || !res.success) {
-      this.el.loginError.textContent = (res && res.error) || "Daftar gagal";
-      this.el.loginBtn.disabled = false;
-      this.el.loginBtn.textContent = "DAFTAR";
-      return;
-    }
-
-    // Auto-login after register
-    this.user = user;
-    this.pin = pin;
-    this.config = res.config || {
-      winRate: 0.15,
-      payoutMultiplier: 3,
-      startingMoney: 1000,
-      betAmount: 100,
-    };
-    this.money = this.config.startingMoney || 1000;
-    this.bet = this.config.betAmount || 100;
-
-    this.el.loginBtn.disabled = false;
-    this.el.loginBtn.textContent = "PLAY";
-    this.startGame();
-  }
-
-  async doLogin() {
-    const user = this.el.loginUser.value.trim();
-    const pin = this.el.loginPin.value.trim();
-    if (!user || !pin) {
-      this.el.loginError.textContent = "Isi username dan PIN";
-      return;
-    }
-
-    this.el.loginBtn.disabled = true;
-    this.el.loginBtn.textContent = "Connecting...";
-
-    const res = await JackpotAPI.login(user, pin);
-    if (!res || !res.success) {
-      this.el.loginError.textContent =
-        (res && res.error) || "Login gagal. Cek username & PIN";
-      this.el.loginBtn.disabled = false;
-      this.el.loginBtn.textContent = "PLAY";
-      return;
-    }
-
-    this.user = user;
-    this.pin = pin;
-    this.config = res.config || {
-      winRate: 0.15,
-      payoutMultiplier: 3,
-      startingMoney: 1000,
-      betAmount: 100,
-    };
-    this.money =
-      (res.account && res.account.balance) || this.config.startingMoney || 1000;
-    this.bet = this.config.betAmount || 100;
-
-    this.el.loginBtn.disabled = false;
-    this.el.loginBtn.textContent = "PLAY";
-    this.startGame();
-  }
-
-  startGame() {
-    this.el.loginScreen.style.display = "none";
-    this.el.gameScreen.style.display = "";
-    this.el.gameScreen.classList.add("active");
-    this.el.spinBtn.disabled = false;
-
-    // Initialize reels with random symbols (fix empty boxes on game start)
+    // Init reels with random symbols
     const initSymbols = this.reels.map(() => [
       Symbol.random(),
       Symbol.random(),
@@ -185,9 +70,19 @@ export default class Slot {
     ]);
     this.reels.forEach((reel, i) => reel.setSymbols(initSymbols[i]));
 
-    if (this.el.playerName) this.el.playerName.textContent = this.user;
     this.updateUI();
-    this.showMsg("Mainkan " + this.user + "!", "#FFD700");
+    this.showMsg("🎰 Selamat Bermain!", "#FFD700");
+  }
+
+  async resetMoney() {
+    const config = await JackpotAPI.fetchConfig();
+    this.config = config || this.config;
+    this.money = (config && config.startingMoney) || 1000;
+    this.bet = (config && config.betAmount) || 100;
+    localStorage.setItem("slot777_money", this.money);
+    JackpotAPI.saveMoney(this.money);
+    this.updateUI();
+    this.showMsg("💰 Uang direset!", "#4CAF50");
   }
 
   updateUI() {
@@ -212,9 +107,9 @@ export default class Slot {
   }
 
   async spin() {
-    if (this.spinning || !this.user) return;
+    if (this.spinning) return;
     if (this.money < this.bet) {
-      this.showMsg("💸 Uang habis! Minta admin isi ulang.", "#ff4444");
+      this.showMsg("💸 Uang habis! Klik ↻ untuk reset.", "#ff4444");
       this.el.spinBtn.disabled = true;
       return;
     }
@@ -225,15 +120,12 @@ export default class Slot {
     this.updateUI();
     this.showMsg("Memutar...", "#888");
 
-    JackpotAPI.updateBalance(this.user, this.pin, this.money);
-
     await this.refreshConfig();
 
     const wr = (this.config && this.config.winRate) || 0.15;
     const pm = (this.config && this.config.payoutMultiplier) || 3;
     const minSpins = (this.config && this.config.minSpinsBeforeWin) || 0;
 
-    // Force win if loss streak exceeds minSpinsBeforeWin
     this.lossStreak = this.lossStreak || 0;
     let win;
     if (minSpins > 0 && this.lossStreak >= minSpins) {
@@ -288,7 +180,9 @@ export default class Slot {
       this.showMsg("", "#888");
     }
 
-    JackpotAPI.updateBalance(this.user, this.pin, this.money);
+    // Save money
+    localStorage.setItem("slot777_money", this.money);
+    JackpotAPI.saveMoney(this.money);
 
     this.spinning = false;
     this.el.spinBtn.disabled = this.money < this.bet;
