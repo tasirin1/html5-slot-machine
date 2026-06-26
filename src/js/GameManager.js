@@ -1,9 +1,10 @@
 /**
- * GameManager — Main game controller
- * Orchestrates reel engine, paylines, UI, animations, balance
+ * GameManager — 3-Reel Classic Slot Machine
+ * Orchestrates spinning, RNG, paylines, balance, UI
  */
 
-import { evaluate } from "./Paylines.js";
+import { evaluate, totalWin } from "./Paylines.js";
+import { weightedRandom, buildReelStrips } from "./Symbols.js";
 import AnimationManager from "./AnimationManager.js";
 import JackpotAPI from "./JackpotAPI.js";
 
@@ -11,35 +12,45 @@ export default class GameManager {
   constructor() {
     this.anim = new AnimationManager();
 
-    // Game state
+    // State
     this.state = {
       balance: 1000,
       bet: 100,
-      totalWin: 0,
+      lastWin: 0,
+      totalWins: 0,
       spinning: false,
       autoplay: false,
       turbo: false,
-      freeSpins: 0,
       spinCount: 0,
       lossStreak: 0,
-      lastWin: 0,
-      history: [],
       config: null,
     };
 
-    // Reel state
-    this.grid = []; // 5x3 grid of symbol IDs
-    this.winResults = []; // Current spin win results
+    // Reel strips (virtual)
+    this.strips = buildReelStrips();
 
-    // DOM refs
+    // Grid: [reel][row] = symbol ID, 3x3
+    this.grid = [
+      ["BAR", "BAR", "BAR"],
+      ["BAR", "BAR", "BAR"],
+      ["BAR", "BAR", "BAR"],
+    ];
+
+    // DOM cache
     this.el = {};
-    this.cacheDOM();
-
-    // RNG state for reel strips
-    this.reelPositions = [0, 0, 0, 0, 0];
-    this.reelStrips = this.buildStrips();
+    this.reelEls = null;
 
     this.init();
+  }
+
+  init() {
+    this.cacheDOM();
+    this.ensureSymbols();
+    this.loadConfig();
+    this.bindEvents();
+    this.renderGrid();
+    this.updateUI();
+    this.showMsg("🎰 PULL TO WIN");
   }
 
   cacheDOM() {
@@ -51,185 +62,82 @@ export default class GameManager {
       "winText",
       "spinBtn",
       "autoplay",
+      "turboMode",
       "resetBtn",
-      "controls",
-      "topBar",
-      "winMsg",
       "totalWinDisplay",
       "betDown",
       "betUp",
-      "turboMode",
       "maxBet",
-      "winHistory",
     ];
-    for (const id of ids) this.el[id] = document.getElementById(id);
-
+    for (const id of ids) {
+      this.el[id] = document.getElementById(id);
+    }
     this.reelEls = document.querySelectorAll(".reel");
-    this.reelCount = this.reelEls.length;
   }
 
-  buildStrips() {
-    // 5 reel strips (virtual reels) - each ~30 positions
-    const syms = [
-      "SEVEN",
-      "BAR",
-      "BELL",
-      "CHERRY",
-      "LEMON",
-      "ORANGE",
-      "PLUM",
-      "MELON",
-      "GRAPES",
-      "WILD",
-    ];
-    const strips = [];
-    for (let r = 0; r < 5; r++) {
-      const strip = [];
-      for (let i = 0; i < 30; i++) {
-        // Weighted random — higher symbols are rarer
-        const idx =
-          Math.random() < 0.7
-            ? Math.floor(Math.random() * 7) + 2 // common: 2-9 (CHERRY to GRAPES)
-            : Math.floor(Math.random() * 3); // rare: 0-2 (SEVEN, BAR, BELL)
-        strip.push(syms[Math.min(idx, syms.length - 1)]);
-      }
-      // Ensure WILD appears ~3% of positions
-      for (let i = 0; i < strip.length; i++) {
-        if (Math.random() < 0.03) strip[i] = "WILD";
-      }
-      strips.push(strip);
-    }
-    return strips;
-  }
-
-  async init() {
-    // Fetch config
-    try {
-      const config = await JackpotAPI.fetchConfig();
-      this.state.config = config;
-    } catch (e) {}
-
-    this.state.bet = (this.state.config && this.state.config.betAmount) || 100;
-
-    // Load saved money
-    const saved = localStorage.getItem("slot777_balance");
-    this.state.balance = saved
-      ? parseInt(saved, 10)
-      : (this.state.config && this.state.config.startingMoney) || 1000;
-
-    // Save initial balance
-    JackpotAPI.saveMoney(this.state.balance);
-
-    // Build reels DOM if needed
-    this.buildReelDOM();
-
-    // Init grid with random symbols
-    this.randomizeGrid();
-    this.renderGrid();
-
-    // Event listeners
-    this.bindEvents();
-
-    // Update UI
-    this.updateUI();
-    this.showMsg("🎰 SPIN TO WIN");
-  }
-
-  buildReelDOM() {
-    // Create 5 reel elements if they don't exist
-    const container = document.getElementById("reels");
-    if (!container) return;
-
-    // Clear existing
-    container.innerHTML = "";
-
-    for (let r = 0; r < 5; r++) {
-      const reel = document.createElement("div");
-      reel.className = "reel";
-      for (let i = 0; i < 3; i++) {
-        const sym = document.createElement("div");
-        sym.className = "sym";
-        reel.appendChild(sym);
-      }
-      container.appendChild(reel);
-    }
-
-    // Update reelEls
-    this.reelEls = document.querySelectorAll(".reel");
-    this.reelCount = this.reelEls.length;
-  }
-
-  randomizeGrid() {
-    this.grid = [];
-    const syms = [
-      "SEVEN",
-      "BAR",
-      "BELL",
-      "CHERRY",
-      "LEMON",
-      "ORANGE",
-      "PLUM",
-      "MELON",
-      "GRAPES",
-      "WILD",
-    ];
-    for (let r = 0; r < 5; r++) {
-      const col = [];
-      for (let i = 0; i < 3; i++) {
-        col.push(syms[Math.floor(Math.random() * syms.length)]);
-      }
-      this.grid.push(col);
-    }
-  }
-
-  renderGrid() {
+  /**
+   * Ensure each reel has 3 .sym children, creating them if missing
+   */
+  ensureSymbols() {
     if (!this.reelEls) return;
-    const syms = getSymbolDataMap();
-    for (let r = 0; r < 5 && r < this.reelEls.length; r++) {
-      const reelEl = this.reelEls[r];
-      const items = reelEl.querySelectorAll(".sym");
-      for (let i = 0; i < 3 && i < items.length; i++) {
-        const symId = this.grid[r] ? this.grid[r][i] : "BAR";
-        const data = syms[symId] || syms.BAR;
-        items[i].textContent = data.icon;
-        items[i].style.background = data.bg;
-        items[i].style.color = data.color;
+    for (const reel of this.reelEls) {
+      let items = reel.querySelectorAll(".sym");
+      if (items.length === 0) {
+        // Create 3 .sym elements
+        for (let i = 0; i < 3; i++) {
+          const sym = document.createElement("div");
+          sym.className = "sym";
+          reel.appendChild(sym);
+        }
+        items = reel.querySelectorAll(".sym");
       }
     }
+  }
+
+  async loadConfig() {
+    try {
+      const cfg = await JackpotAPI.fetchConfig();
+      this.state.config = cfg;
+      if (cfg && cfg.betAmount) this.state.bet = cfg.betAmount;
+    } catch (_) {
+      // No server - use defaults
+    }
+
+    // Try to load saved balance
+    const saved = localStorage.getItem("slot777_balance");
+    if (saved) {
+      this.state.balance = parseInt(saved, 10);
+    } else if (this.state.config && this.state.config.startingMoney) {
+      this.state.balance = this.state.config.startingMoney;
+    }
+
+    JackpotAPI.saveMoney(this.state.balance);
+    this.updateUI();
   }
 
   bindEvents() {
-    if (this.el.spinBtn)
-      this.el.spinBtn.addEventListener("click", () => this.spin());
-    if (this.el.resetBtn)
-      this.el.resetBtn.addEventListener("click", () => this.resetBalance());
-    if (this.el.betDown)
-      this.el.betDown.addEventListener("click", () => this.adjustBet(-50));
-    if (this.el.betUp)
-      this.el.betUp.addEventListener("click", () => this.adjustBet(50));
-    if (this.el.maxBet)
-      this.el.maxBet.addEventListener("click", () => this.maxBet());
+    this.el.spinBtn?.addEventListener("click", () => this.spin());
+    this.el.resetBtn?.addEventListener("click", () => this.resetBalance());
+    this.el.betDown?.addEventListener("click", () => this.adjustBet(-50));
+    this.el.betUp?.addEventListener("click", () => this.adjustBet(50));
+    this.el.maxBet?.addEventListener("click", () => this.maxBet());
 
-    if (this.el.autoplay) {
-      this.el.autoplay.addEventListener("change", () => {
-        this.state.autoplay = this.el.autoplay.checked;
-        if (
-          this.state.autoplay &&
-          !this.state.spinning &&
-          this.state.balance >= this.state.bet
-        ) {
-          this.spin();
-        }
-      });
-    }
+    this.el.autoplay?.addEventListener("change", () => {
+      this.state.autoplay = this.el.autoplay.checked;
+      if (
+        this.state.autoplay &&
+        !this.state.spinning &&
+        this.state.balance >= this.state.bet
+      ) {
+        this.spin();
+      }
+    });
 
-    if (this.el.turboMode) {
-      this.el.turboMode.addEventListener("change", () => {
-        this.state.turbo = this.el.turboMode.checked;
-      });
-    }
+    this.el.turboMode?.addEventListener("change", () => {
+      this.state.turbo = this.el.turboMode.checked;
+    });
 
-    // Keyboard shortcuts
+    // Space bar to spin
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space" && !this.state.spinning) {
         e.preventDefault();
@@ -239,11 +147,9 @@ export default class GameManager {
   }
 
   adjustBet(delta) {
-    const minBet = 10;
-    const maxBet = 10000;
-    let newBet = this.state.bet + delta;
-    newBet = Math.max(minBet, Math.min(maxBet, newBet));
-    this.state.bet = newBet;
+    const min = 10;
+    const max = Math.min(10000, this.state.balance);
+    this.state.bet = Math.max(min, Math.min(max, this.state.bet + delta));
     this.updateUI();
   }
 
@@ -253,50 +159,62 @@ export default class GameManager {
   }
 
   async resetBalance() {
-    const config = await JackpotAPI.fetchConfig();
-    this.state.config = config || this.state.config;
-    this.state.balance = (config && config.startingMoney) || 1000;
+    try {
+      const cfg = await JackpotAPI.fetchConfig();
+      this.state.config = cfg;
+    } catch (_) {}
+    this.state.balance = this.state.config?.startingMoney || 1000;
     this.state.lossStreak = 0;
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
-    this.state.spinBtn?.removeAttribute("disabled");
+    if (this.el.spinBtn) this.el.spinBtn.disabled = false;
     this.updateUI();
     this.showMsg("💰 BALANCE RESET");
   }
 
+  renderGrid() {
+    const SYM_RENDER = this.getSymRender();
+    for (let r = 0; r < 3 && this.reelEls && r < this.reelEls.length; r++) {
+      const reel = this.reelEls[r];
+      const items = reel.querySelectorAll(".sym");
+      for (let i = 0; i < 3 && i < items.length; i++) {
+        const id = this.grid[r]?.[i] || "BAR";
+        const d = SYM_RENDER[id] || SYM_RENDER.BAR;
+        items[i].textContent = d.icon;
+        items[i].style.background = d.bg;
+        items[i].style.color = d.color;
+        items[i].className = "sym";
+      }
+    }
+  }
+
+  // ---- SPIN ----
+
   async spin() {
     if (this.state.spinning) return;
     if (this.state.balance < this.state.bet) {
-      this.showMsg("💸 INSUFFICIENT BALANCE");
+      this.showMsg("💸 BALANCE LOW");
       return;
     }
 
-    // Deduct bet
     this.state.spinning = true;
     this.state.balance -= this.state.bet;
     this.state.spinCount++;
     this.updateUI();
 
     if (this.el.spinBtn) this.el.spinBtn.disabled = true;
-
-    // Clear previous highlights
     this.anim.clearHighlights();
-
-    // Show spin message
-    this.showMsg(this.state.turbo ? "⚡ SPINNING..." : "🎰 SPINNING...");
     this.anim.pulseSpinBtn(this.el.spinBtn);
 
-    // Save updated balance
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
 
-    // ---- RNG phase: determine result BEFORE animation ----
-    const config = this.state.config || {};
-    const wr = config.winRate || 0.15;
-    const pm = config.payoutMultiplier || 3;
-    const minSpins = config.minSpinsBeforeWin || 0;
+    // ---- RNG: determine result BEFORE animation ----
+    const cfg = this.state.config || {};
+    const wr = cfg.winRate ?? 0.15;
+    const pm = cfg.payoutMultiplier ?? 3;
+    const minSpins = cfg.minSpinsBeforeWin ?? 0;
 
-    // Near miss / forced win logic
     this.state.lossStreak = this.state.lossStreak || 0;
     let forceWin = false;
     if (minSpins > 0 && this.state.lossStreak >= minSpins) {
@@ -304,151 +222,138 @@ export default class GameManager {
       this.state.lossStreak = 0;
     }
 
-    // Generate final grid
-    const resultGrid = this.generateResult(forceWin ? 1 : wr, pm);
-    this.grid = resultGrid.grid;
-    this.winResults = resultGrid.wins;
+    const { grid, wins } = this.generateResult(forceWin ? 1.0 : wr, pm);
+    this.grid = grid;
 
-    // ---- Animation phase: spin with results ----
-    const spinDuration = this.state.turbo ? 300 : 800;
-    const staggerDelay = this.state.turbo ? 40 : 80;
+    // Re-render grid to DOM and animate
+    const total = totalWin(wins);
+    const duration = this.state.turbo ? 300 : 700;
+    const stagger = this.state.turbo ? 80 : 150;
 
+    this.showMsg(total > 0 ? "🎰 WINNING..." : "🎰 SPINNING...");
+
+    // Spin each reel sequentially: left → middle → right
     const promises = [];
-    for (let r = 0; r < 5 && r < this.reelEls.length; r++) {
+    for (let r = 0; r < 3 && r < this.reelEls.length; r++) {
       const reelEl = this.reelEls[r];
-      const finalCol = this.grid[r] || ["BAR", "BAR", "BAR"];
+      const resultCol = this.grid[r] || ["BAR", "BAR", "BAR"];
       promises.push(
-        this.anim.spinReel(reelEl, finalCol, spinDuration, r * staggerDelay),
+        this.anim.spinReel(reelEl, resultCol, duration, r * stagger),
       );
     }
     await Promise.all(promises);
 
-    // ---- Win evaluation ----
-    const wins = resultGrid.wins;
-    const totalWin = wins.reduce((sum, w) => sum + w.amount, 0);
-    this.state.lastWin = totalWin;
+    // ---- WIN EVALUATION ----
+    this.state.lastWin = total;
+    this.state.totalWins += total;
 
-    if (totalWin > 0) {
-      this.state.balance += totalWin;
-      this.state.totalWin += totalWin;
+    if (total > 0) {
+      this.state.balance += total;
       this.state.lossStreak = 0;
 
-      // Highlight winning positions
-      const allPositions = [];
+      // Highlight wins
+      const allPos = [];
       for (const w of wins) {
-        for (const pos of w.positions) {
-          allPositions.push(pos);
-        }
+        for (const pos of w.positions) allPos.push(pos);
       }
-      this.anim.highlightWins(allPositions, this.grid);
+      this.anim.highlightWins(allPos);
 
       // Show win
-      const winStr = totalWin.toLocaleString("id-ID");
-      this.showMsg(`🎉 WIN ${winStr}!`, "#FF6B6B");
+      this.showMsg(`🎉 WIN ${this.fmt(total)}!`, "#FF6B6B");
 
       if (this.el.totalWinDisplay) {
-        this.anim.countUp(this.el.totalWinDisplay, totalWin);
+        this.anim.countUp(this.el.totalWinDisplay, total);
         this.anim.flashWin(this.el.totalWinDisplay);
       }
 
-      // Particle burst
+      // Particles
       if (this.el.spinBtn) {
         const rect = this.el.spinBtn.getBoundingClientRect();
         this.anim.burst(rect.left + rect.width / 2, rect.top);
       }
     } else {
       this.state.lossStreak++;
-      this.showMsg("", "#888");
     }
 
-    // Save final balance
+    // Save balance
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
 
-    // Auto-spin
     this.state.spinning = false;
     if (this.el.spinBtn) this.el.spinBtn.disabled = false;
+    this.updateUI();
 
+    // Auto-spin
     if (this.state.autoplay && this.state.balance >= this.state.bet) {
-      const delay = this.state.turbo ? 150 : 600;
-      setTimeout(() => this.spin(), delay);
+      setTimeout(() => this.spin(), this.state.turbo ? 100 : 400);
     } else {
       if (this.el.autoplay) this.el.autoplay.checked = false;
       this.state.autoplay = false;
     }
-
-    this.updateUI();
   }
 
-  generateResult(winChance, payoutMult) {
+  /**
+   * Generate RNG result for 3 reels x 3 rows
+   */
+  generateResult(winChance, pm) {
     const win = Math.random() < winChance;
-    const grid = [];
-    let wins = [];
 
     if (win) {
-      // Generate a winning grid
+      // Generate a guaranteed winning grid
       const winSym = weightedRandom();
+      const grid = [
+        [weightedRandom(), winSym, weightedRandom()],
+        [weightedRandom(), winSym, weightedRandom()],
+        [weightedRandom(), winSym, weightedRandom()],
+      ];
 
-      // Fill grid
-      for (let r = 0; r < 5; r++) {
-        const col = [];
-        for (let i = 0; i < 3; i++) {
-          // Middle row gets the win symbol
-          if (i === 1 && r < 5) {
-            col.push(winSym);
-          } else {
-            col.push(weightedRandom());
-          }
-        }
-        grid.push(col);
+      let wins = evaluate(grid, this.state.bet);
+      if (pm && pm !== 1) {
+        for (const w of wins) w.amount = Math.floor(w.amount * pm);
       }
 
-      // Evaluate wins
-      wins = evaluate(grid, this.state.bet);
-
-      // If no wins generated, add a 3-of-a-kind on middle line
       if (wins.length === 0) {
-        for (let r = 0; r < 5; r++) {
-          grid[r][1] = winSym;
-        }
+        // Force middle line win
+        grid[0][1] = winSym;
+        grid[1][1] = winSym;
+        grid[2][1] = winSym;
         wins = evaluate(grid, this.state.bet);
-      }
-    } else {
-      // Generate random grid with near-miss possibility
-      const nearMiss = Math.random() < 0.3;
-      for (let r = 0; r < 5; r++) {
-        const col = [];
-        for (let i = 0; i < 3; i++) {
-          if (nearMiss && r < 4 && i === 1) {
-            // First 4 reels show same symbol, 5th breaks it
-            col.push("SEVEN");
-          } else if (nearMiss && r === 4 && i === 1) {
-            col.push("CHERRY"); // Breaks the near-miss
-          } else {
-            col.push(weightedRandom());
-          }
+        if (pm && pm !== 1) {
+          for (const w of wins) w.amount = Math.floor(w.amount * pm);
         }
-        grid.push(col);
       }
-      wins = [];
+
+      return { grid, wins };
     }
 
-    return { grid, wins };
+    // No win — generate a non-winning grid
+    let grid;
+    let attempts = 0;
+    do {
+      grid = [
+        [weightedRandom(), weightedRandom(), weightedRandom()],
+        [weightedRandom(), weightedRandom(), weightedRandom()],
+        [weightedRandom(), weightedRandom(), weightedRandom()],
+      ];
+      attempts++;
+    } while (evaluate(grid, this.state.bet).length > 0 && attempts < 50);
+
+    return { grid, wins: [] };
+  }
+
+  // ---- UI ----
+
+  fmt(n) {
+    return (n ?? 0).toLocaleString("id-ID");
   }
 
   updateUI() {
-    const fmt = (n) => (n || 0).toLocaleString("id-ID");
-
     if (this.el.playerMoney)
-      this.el.playerMoney.textContent = fmt(this.state.balance);
+      this.el.playerMoney.textContent = this.fmt(this.state.balance);
     if (this.el.betDisplay)
-      this.el.betDisplay.textContent = fmt(this.state.bet);
+      this.el.betDisplay.textContent = this.fmt(this.state.bet);
     if (this.el.betDisplay2)
-      this.el.betDisplay2.textContent = fmt(this.state.bet);
-
-    if (this.el.totalWinDisplay && this.state.lastWin > 0) {
-      this.el.totalWinDisplay.textContent = fmt(this.state.lastWin);
-    }
+      this.el.betDisplay2.textContent = this.fmt(this.state.bet);
   }
 
   showMsg(text, color) {
@@ -457,103 +362,59 @@ export default class GameManager {
       this.el.winText.style.color = color || "#D5AD6D";
     }
   }
-}
 
-/** Weighted random symbol (rarer symbols are less likely) */
-function weightedRandom() {
-  const pool = [
-    "SEVEN",
-    "SEVEN",
-    "SEVEN",
-    "SEVEN",
-    "BAR",
-    "BAR",
-    "BAR",
-    "BAR",
-    "BAR",
-    "BAR",
-    "BELL",
-    "BELL",
-    "BELL",
-    "BELL",
-    "CHERRY",
-    "CHERRY",
-    "CHERRY",
-    "CHERRY",
-    "CHERRY",
-    "LEMON",
-    "LEMON",
-    "LEMON",
-    "LEMON",
-    "LEMON",
-    "ORANGE",
-    "ORANGE",
-    "ORANGE",
-    "ORANGE",
-    "PLUM",
-    "PLUM",
-    "PLUM",
-    "MELON",
-    "MELON",
-    "GRAPES",
-    "GRAPES",
-    "WILD",
-  ];
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
-/** Inline symbol data map */
-function getSymbolDataMap() {
-  return {
-    SEVEN: {
-      icon: "7",
-      bg: "linear-gradient(135deg,#8B0000,#DC143C,#8B0000)",
-      color: "#FFD700",
-    },
-    BAR: {
-      icon: "BAR",
-      bg: "linear-gradient(135deg,#1a1a2e,#333,#1a1a2e)",
-      color: "#FFFFFF",
-    },
-    BELL: {
-      icon: "🔔",
-      bg: "linear-gradient(135deg,#4a0030,#8b0060,#4a0030)",
-      color: "#FFD700",
-    },
-    CHERRY: {
-      icon: "🍒",
-      bg: "linear-gradient(135deg,#600,#cc0033,#600)",
-      color: "#FFFFFF",
-    },
-    LEMON: {
-      icon: "🍋",
-      bg: "linear-gradient(135deg,#3a5000,#6b8e00,#3a5000)",
-      color: "#FFFFFF",
-    },
-    ORANGE: {
-      icon: "🍊",
-      bg: "linear-gradient(135deg,#803000,#cc5500,#803000)",
-      color: "#FFFFFF",
-    },
-    PLUM: {
-      icon: "🍑",
-      bg: "linear-gradient(135deg,#400060,#7a00b3,#400060)",
-      color: "#FFFFFF",
-    },
-    MELON: {
-      icon: "🍉",
-      bg: "linear-gradient(135deg,#004d00,#008000,#004d00)",
-      color: "#FFFFFF",
-    },
-    GRAPES: {
-      icon: "🍇",
-      bg: "linear-gradient(135deg,#1a003a,#4a0080,#1a003a)",
-      color: "#FFFFFF",
-    },
-    WILD: {
-      icon: "⭐",
-      bg: "linear-gradient(135deg,#8B4500,#FFD700,#8B4500)",
-      color: "#1a0020",
-    },
-  };
+  getSymRender() {
+    return {
+      DIAMOND: {
+        icon: "💎",
+        bg: "linear-gradient(135deg,#003366,#0099FF,#003366)",
+        color: "#00FFFF",
+      },
+      SEVEN: {
+        icon: "7",
+        bg: "linear-gradient(135deg,#8B0000,#FF0000,#8B0000)",
+        color: "#FFD700",
+      },
+      BAR: {
+        icon: "BAR",
+        bg: "linear-gradient(135deg,#1a1a2e,#444466,#1a1a2e)",
+        color: "#FFFFFF",
+      },
+      BELL: {
+        icon: "🔔",
+        bg: "linear-gradient(135deg,#4a0030,#8b0060,#4a0030)",
+        color: "#FFD700",
+      },
+      CHERRY: {
+        icon: "🍒",
+        bg: "linear-gradient(135deg,#660000,#CC0033,#660000)",
+        color: "#FFCCCC",
+      },
+      LEMON: {
+        icon: "🍋",
+        bg: "linear-gradient(135deg,#3a5000,#8BB800,#3a5000)",
+        color: "#FFFFCC",
+      },
+      ORANGE: {
+        icon: "🍊",
+        bg: "linear-gradient(135deg,#803000,#FF6600,#803000)",
+        color: "#FFFFFF",
+      },
+      PLUM: {
+        icon: "🍑",
+        bg: "linear-gradient(135deg,#400060,#9900CC,#400060)",
+        color: "#FFDDFF",
+      },
+      WATERMELON: {
+        icon: "🍉",
+        bg: "linear-gradient(135deg,#004D00,#00AA00,#004D00)",
+        color: "#CCFFCC",
+      },
+      GRAPES: {
+        icon: "🍇",
+        bg: "linear-gradient(135deg,#1a003a,#6600AA,#1a003a)",
+        color: "#DDCCFF",
+      },
+    };
+  }
 }

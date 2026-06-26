@@ -1,86 +1,42 @@
-# 🎰 Slot 777 Admin
+# 🎰 777 Slot - Premium Casino Game
 
-A complete slot machine game system with:
+Aplikasi Android server embedded untuk mesin slot klasik 3-reel.
+Game diakses melalui browser di perangkat lain dalam jaringan lokal.
+Admin panel tersedia di dalam aplikasi untuk mengontrol pengaturan game.
 
-- **Web-based slot machine** playable from any browser
-- **Android APK** with embedded HTTP server and admin panel
-- **Local network hosting** — play on multiple devices via WiFi
-- **Admin dashboard** to control difficulty, jackpot, and money settings
+## Fitur
 
-## Features
+- **Slot 3 Reel Klasik** dengan simbol BAR, 7, Cherry, Lemon, Bell, dll.
+- **Server Embedded** — hosting game di jaringan lokal via NanoHTTPD
+- **Admin Panel** — atur jackpot, tingkat kesulitan, win rate, payout multiplier
+- **Manajemen Akun** — buat/atur akun pemain langsung dari aplikasi
+- **Real-time Config** — perubahan pengaturan langsung teraplikasi ke game
+- **Landing Page** — tampilkan URL server dan QR code untuk akses mudah
 
-### 🎮 Game (Browser)
+## Cara Pakai
 
-- 5-reel slot 777 classic (7, BAR, Bell, Cherry, Lemon, etc.)
-- Smooth animations using Web Animations API
-- Fully responsive for mobile, tablet, and desktop
-- Money system: bet coins, win payouts
-- Autoplay mode
-- Landscape optimized
+1. Install APK di perangkat Android
+2. Buka aplikasi → server otomatis berjalan
+3. Lihat URL server (contoh: `http://192.168.1.5:8080`)
+4. Buka URL tersebut dari perangkat lain dalam jaringan yang sama
+5. Mainkan slot dari browser perangkat lain
+6. Atur jackpot, kesulitan, dan kelola akun dari admin panel di aplikasi
 
-### 📱 Admin Panel (Android APK)
-
-- Start/stop local HTTP server on port 8080
-- **Difficulty Level**: Very Easy → Impossible (6 presets)
-- **Win Rate**: 0.5% — 75%
-- **Payout Multiplier**: 1× — 50×
-- **Jackpot**: Set any amount
-- **Starting Money & Bet Amount**: Configure player economy
-- Works on Android 6+ and Android TV
-
-## Installation
-
-### Web App
+## Build APK
 
 ```bash
-npm install
-npm run build    # production build → /dist
-npm start        # development server → http://localhost:8080
+npm ci
+npm run build
+cp dist/* android/app/src/main/assets/www/
+cd android
+./gradlew assembleDebug
 ```
 
-### Android APK
+APK output: `android/app/build/outputs/apk/debug/app-debug.apk`
 
-Download from [GitHub Actions](GitHub Actions):
+## Tech Stack
 
-1. Open the **Build Android APK** workflow
-2. Click the latest successful run (✅)
-3. Scroll to **Artifacts** → download **slot-machine-apk**
-4. Extract ZIP and install `app-debug.apk` on Android
-
-## How to Play
-
-1. Install the APK on an Android device and open it
-2. The admin dashboard shows the **server URL** (e.g., `http://192.168.1.5:8080`)
-3. Adjust **Difficulty**, **Jackpot**, and **Money** settings
-4. Open a browser on any device on the same WiFi network
-5. Navigate to the server URL
-6. Start spinning! (The game follows the rules set from the admin panel)
-
-## Architecture
-
-```
-┌─────────────────┐     WiFi      ┌──────────────────┐
-│  Android APK    │──────────────▶│  Player Browser  │
-│  (Admin Panel)  │  HTTP :8080   │  (Slot Machine)  │
-│                 │               │                  │
-│  ┌───────────┐  │  GET /api/    │  ┌────────────┐  │
-│  │  GameConfig│◀├───────────────┤  │  Slot.js   │  │
-│  │  (SharedPref)│  config       │  │  (Web)     │  │
-│  └───────────┘  │               │  └────────────┘  │
-│       │         │               │                  │
-│  ┌───────────┐  │  POST /api/   │                  │
-│  │ SlotServer │◀├───────────────┤                  │
-│  │ (NanoHTTPd)│  │ config       │                  │
-│  └───────────┘  │               │                  │
-└─────────────────┘               └──────────────────┘
-```
-
-## API Endpoints
-
-| Method | Endpoint       | Description                |
-| ------ | -------------- | -------------------------- |
-| GET    | `/api/config`  | Get all game configuration |
-| POST   | `/api/config`  | Update game configuration  |
-| GET    | `/api/jackpot` | Get current jackpot        |
-| POST   | `/api/jackpot` | Set jackpot value          |
-| GET    | `/api/status`  | Server status info         |
+- **Frontend**: HTML5, CSS3, JavaScript (ES6) — Webpack
+- **Backend**: NanoHTTPD (embedded Java HTTP server)
+- **Android**: Java, SharedPreferences, CardView
+- **Min SDK**: Android 6.0 (API 23)

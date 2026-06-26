@@ -38,21 +38,30 @@
 
       <!-- WIN MESSAGE -->
       <div id="winMsg">
-        <span id="winText">🎰 SPIN TO WIN</span>
+        <span id="winText">🎰 PULL TO WIN</span>
       </div>
 
-      <!-- REELS 5x3 -->
+      <!-- REELS 3x3 -->
       <div id="reels">
-        <div class="reel"></div>
-        <div class="reel"></div>
-        <div class="reel"></div>
-        <div class="reel"></div>
-        <div class="reel"></div>
+        <div class="reel" data-reel="0">
+          <div class="sym"></div>
+          <div class="sym"></div>
+          <div class="sym"></div>
+        </div>
+        <div class="reel" data-reel="1">
+          <div class="sym"></div>
+          <div class="sym"></div>
+          <div class="sym"></div>
+        </div>
+        <div class="reel" data-reel="2">
+          <div class="sym"></div>
+          <div class="sym"></div>
+          <div class="sym"></div>
+        </div>
       </div>
 
       <!-- CONTROL PANEL -->
       <div id="controls">
-        <!-- Bet Controls -->
         <div class="c-row c-top">
           <div class="bet-group">
             <button id="betDown" class="bet-btn">−</button>
@@ -67,8 +76,6 @@
             <span id="totalWinDisplay" class="win-val">—</span>
           </div>
         </div>
-
-        <!-- Main Controls -->
         <div class="c-row c-bottom">
           <div class="ctrl-left">
             <label class="toggle-label">
@@ -82,7 +89,7 @@
           </div>
           <button type="button" id="spinBtn" class="spin-btn">SPIN</button>
           <div class="ctrl-right">
-            <button id="maxBet" class="ctrl-btn">MAX</button>
+            <button id="maxBet" class="ctrl-btn">BET MAX</button>
           </div>
         </div>
       </div>

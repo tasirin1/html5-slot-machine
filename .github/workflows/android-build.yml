@@ -24,16 +24,9 @@ jobs:
 
       - name: Install SDK packages
         run: |
-          yes | sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" 2>/dev/null || true
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
-
-      - name: Verify SDK
-        run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "JAVA_HOME=$JAVA_HOME"
-          ls -la $ANDROID_HOME/platforms/
-          ls -la $ANDROID_HOME/build-tools/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -49,10 +42,6 @@ jobs:
         run: |
           mkdir -p android/app/src/main/assets/www
           cp -r dist/* android/app/src/main/assets/www/
-          curl -sL -o android/app/src/main/assets/www/bootstrap-reboot.min.css \
-            "https://unpkg.com/bootstrap@5.2.3/dist/css/bootstrap-reboot.min.css"
-          sed -i 's|https://unpkg.com/bootstrap@5.2.3/dist/css/bootstrap-reboot.min.css|bootstrap-reboot.min.css|' \
-            android/app/src/main/assets/www/index.html
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
