@@ -1,6 +1,7 @@
 package com.slotmachine;
 
 import android.util.Log;
+import android.content.Context;
 
 import java.io.IOException;
 import java.io.InputStream;
