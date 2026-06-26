@@ -605,51 +605,60 @@ export default class GameManager {
     }
 
     // ===== GUARANTEED LOSS =====
-    // Build a grid where NO payline can match
-    // Strategy: ensure every symbol on every payline is unique
-    for (let attempt = 0; attempt < 10; attempt++) {
-      const grid = [
-        ["", "", ""],
-        ["", "", ""],
-        ["", "", ""],
-      ];
+    // Use 9 completely disjoint symbol pools — no two cells on the same
+    // payline can ever match, guaranteeing zero wins.
+    const DISJOINT_SETS = [
+      [
+        ["BAR_A", "BAR_B", "BAR_C"],
+        ["CHR_A", "CHR_B", "CHR_C"],
+        ["LMN_A", "LMN_B", "LMN_C"],
+      ],
+      [
+        ["ORG_A", "ORG_B", "ORG_C"],
+        ["PLM_A", "PLM_B", "PLM_C"],
+        ["BEL_A", "BEL_B", "BEL_C"],
+      ],
+      [
+        ["SEV_A", "SEV_B", "SEV_C"],
+        ["GRP_A", "GRP_B", "GRP_C"],
+        ["WTM_A", "WTM_B", "WTM_C"],
+      ],
+    ];
 
-      // Fill with symbols, ensuring each payline has mismatching symbols
-      const allPicks = [
-        ["BAR", "CHERRY", "LEMON"],
-        ["ORANGE", "PLUM", "BELL"],
-        ["SEVEN", "GRAPES", "WATERMELON"],
-        ["2BAR", "3BAR", "CHERRY"],
-        ["LEMON", "ORANGE", "PLUM"],
-        ["BELL", "GRAPES", "BAR"],
-        ["WATERMELON", "SEVEN", "2BAR"],
-        ["3BAR", "CHERRY", "LEMON"],
-        ["ORANGE", "PLUM", "BELL"],
-      ];
+    const FAKE_TO_REAL = {
+      "BAR_A": "BAR", "BAR_B": "CHERRY", "BAR_C": "LEMON",
+      "CHR_A": "ORANGE", "CHR_B": "PLUM", "CHR_C": "BELL",
+      "LMN_A": "SEVEN", "LMN_B": "GRAPES", "LMN_C": "WATERMELON",
+      "ORG_A": "2BAR", "ORG_B": "3BAR", "ORG_C": "CHERRY",
+      "PLM_A": "LEMON", "PLM_B": "ORANGE", "PLM_C": "PLUM",
+      "BEL_A": "BELL", "BEL_B": "GRAPES", "BEL_C": "WATERMELON",
+      "SEV_A": "SEVEN", "SEV_B": "2BAR", "SEV_C": "3BAR",
+      "GRP_A": "CHERRY", "GRP_B": "LEMON", "GRP_C": "ORANGE",
+      "WTM_A": "PLUM", "WTM_B": "BELL", "WTM_C": "GRAPES",
+    };
 
-      // Pre-compute row fills to avoid any payline having 3 matching
-      for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 3; c++) {
-          grid[r][c] = allPicks[r * 3 + c][Math.floor(Math.random() * 3)];
-        }
-      }
-
-      // Check if this grid accidentally wins
-      const wins = evaluate(grid, this.state.bet);
-      if (wins.length === 0) {
-        return { grid, wins: [] };
+    const grid = [["", "", ""], ["", "", ""], ["", "", ""]];
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        const fakeSet = DISJOINT_SETS[r][c];
+        const fakeId = fakeSet[Math.floor(Math.random() * fakeSet.length)];
+        grid[r][c] = FAKE_TO_REAL[fakeId] || "BAR";
       }
     }
 
-    // Fallback: deterministic non-winning grid
-    return {
-      grid: [
-        ["BAR", "CHERRY", "LEMON"],
-        ["ORANGE", "PLUM", "BELL"],
-        ["SEVEN", "GRAPES", "WATERMELON"],
-      ],
-      wins: [],
-    };
+    // Verify — should never match with disjoint pools
+    const wins = evaluate(grid, this.state.bet);
+    if (wins.length > 0) {
+      return {
+        grid: [
+          ["BAR", "CHERRY", "LEMON"],
+          ["ORANGE", "PLUM", "BELL"],
+          ["SEVEN", "GRAPES", "WATERMELON"],
+        ],
+        wins: [],
+      };
+    }
+    return { grid, wins: [] };
   }
 
   // ========================================================
