@@ -247,35 +247,52 @@ public class SlotServer extends NanoHTTPD {
         return newFixedLengthResponse(Response.Status.OK, "application/json", json);
     }
 
-    private String readBody(IHTTPSession session) throws Exception {
-        Map<String, String> files = new HashMap<>();
+        private String readBody(IHTTPSession session) throws Exception {
+        // Method 1: Read raw body directly from InputStream (most reliable)
         try {
-            session.parseBody(files);
-        } catch (Exception e) {
-            // parseBody may throw
-        }
-        
-        // Try getParms first (merge of URL + body params after parseBody)
-        Map<String, String> parms = session.getParms();
-        if (parms != null && !parms.isEmpty()) {
-            // Check if we have actual POST params (not just empty defaults)
-            boolean hasContent = false;
-            for (Map.Entry<String, String> e : parms.entrySet()) {
-                if (e.getValue() != null && !e.getValue().isEmpty()) {
-                    hasContent = true;
-                    break;
+            java.io.InputStream is = session.getInputStream();
+            if (is != null) {
+                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                byte[] buf = new byte[4096];
+                int n;
+                while ((n = is.read(buf, 0, buf.length)) != -1) {
+                    baos.write(buf, 0, n);
+                    if (n < buf.length) break;
+                }
+                String raw = baos.toString("UTF-8").trim();
+                if (raw != null && !raw.isEmpty()) {
+                    return buildJsonFromMap(parseUrlEncoded(raw));
                 }
             }
-            if (hasContent) return buildJsonFromMap(parms);
+        } catch (Exception e) {
+            Log.d(TAG, "getInputStream failed: " + e.getMessage());
         }
         
-        // Fallback: raw body from parseBody (URL-encoded string)
-        String rawBody = files.get("postData");
-        if (rawBody != null && !rawBody.isEmpty()) {
-            return buildJsonFromMap(parseUrlEncoded(rawBody));
+        // Method 2: Try parseBody + getParms (fallback)
+        try {
+            Map<String, String> files = new HashMap<>();
+            session.parseBody(files);
+            Map<String, String> params = session.getParms();
+            if (params != null && !params.isEmpty()) {
+                boolean hasContent = false;
+                for (Map.Entry<String, String> e : params.entrySet()) {
+                    if (e.getValue() != null && !e.getValue().isEmpty()) {
+                        hasContent = true;
+                        break;
+                    }
+                }
+                if (hasContent) return buildJsonFromMap(params);
+            }
+            // Fallback: raw body key
+            String rawBody = files.get("postData");
+            if (rawBody != null && !rawBody.isEmpty()) {
+                return buildJsonFromMap(parseUrlEncoded(rawBody));
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "parseBody failed: " + e.getMessage());
         }
         
-        // Fallback: query string
+        // Method 3: Query string as last resort
         String qs = session.getQueryParameterString();
         if (qs != null && !qs.isEmpty()) {
             return buildJsonFromMap(parseUrlEncoded(qs));
