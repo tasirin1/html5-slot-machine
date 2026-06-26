@@ -22,12 +22,6 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install SDK packages
-        run: |
-          yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" 2>/dev/null || true
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -51,8 +45,19 @@ jobs:
           cd android
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "Building APK..."
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle.log
-          echo "BUILD EXIT CODE: ${PIPESTATUS[0]}"
+          # Retry up to 3 times for network issues
+          for i in 1 2 3; do
+            echo "=== Build attempt $i ==="
+            ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle.log
+            STATUS=${PIPESTATUS[0]}
+            if [ $STATUS -eq 0 ]; then
+              echo "BUILD SUCCESS on attempt $i"
+              break
+            fi
+            echo "BUILD FAILED (attempt $i), retrying..."
+            sleep 10
+          done
+          echo "BUILD EXIT CODE: $STATUS"
         shell: bash
 
       - name: Upload APK
