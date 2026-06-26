@@ -1,8 +1,14 @@
 /**
  * GameManager — 3-Reel Classic Slot Machine
  *
- * Orchestrates real reel spinning, RNG, paylines, balance, UI.
- * Receives real-time config updates via RealtimeManager.
+ * Architecture:
+ *   1. Admin panel changes config → SharedPreferences
+ *   2. WebSocket broadcasts config to ALL connected browsers
+ *   3. REST API /api/config returns current config
+ *   4. generateResult() uses live config for RNG
+ *
+ * CRITICAL: Every spin reads config from state (updated via WebSocket).
+ * Win rate, difficulty, and payout MUST come from admin config, never hardcoded.
  */
 
 import ReelEngine from "./ReelEngine.js";
@@ -14,11 +20,14 @@ import RealtimeManager from "./RealtimeManager.js";
 
 window.__SYMBOLS_DATA = SYMBOLS;
 
+const ALL_SYMBOLS = Object.keys(SYMBOLS);
+
 export default class GameManager {
   constructor() {
     this.anim = new AnimationManager();
     this.reels = [];
     this.realtime = null;
+    this.debug = true; // Enable debug logging
 
     this.state = {
       balance: 10000,
@@ -30,7 +39,7 @@ export default class GameManager {
       turbo: false,
       spinCount: 0,
       lossStreak: 0,
-      config: {},
+      config: {}, // Populated from server via JackpotAPI + WebSocket
     };
 
     this.grid = [
@@ -46,16 +55,19 @@ export default class GameManager {
   init() {
     this.cacheDOM();
     this.initReels();
-    this.loadConfig();
-    this.bindEvents();
     this.showGrid();
     this.updateUI();
     this.showMsg("🎰 SPIN TO WIN");
 
-    // Start real-time sync AFTER game is initialized
+    // Load config from server (async)
+    this.loadConfig().then(() => {
+      this.log("[INIT] Config loaded from server");
+    });
+
+    // WebSocket for real-time updates (starts after game loads)
     setTimeout(() => {
       this.realtime = new RealtimeManager(this);
-    }, 100);
+    }, 200);
   }
 
   cacheDOM() {
@@ -91,25 +103,153 @@ export default class GameManager {
     }
   }
 
+  log(...args) {
+    if (this.debug) console.log("[SLOT]", ...args);
+  }
+
+  // ========================================================
+  // CONFIG MANAGEMENT
+  // ========================================================
+
+  /**
+   * Load config from server via REST API.
+   * Called once at startup, and config is kept in sync via WebSocket.
+   */
   async loadConfig() {
     try {
       const cfg = await JackpotAPI.fetchConfig();
-      if (cfg) {
+      if (cfg && Object.keys(cfg).length > 0) {
         this.state.config = cfg;
         if (cfg.betAmount) this.state.bet = cfg.betAmount;
+        this.log("[CONFIG] Loaded from server:", JSON.stringify(cfg));
+      } else {
+        this.log("[CONFIG] Server returned empty config, using defaults");
       }
-    } catch (_) {}
+    } catch (e) {
+      this.log("[CONFIG] Fetch failed:", e.message);
+    }
 
+    // Load saved balance
     const saved = localStorage.getItem("slot777_balance");
     if (saved) {
       this.state.balance = parseInt(saved, 10);
-    } else if (this.state.config?.startingMoney) {
-      this.state.balance = this.state.config.startingMoney;
+    } else {
+      // Use config starting money or default
+      this.state.balance = Math.max(
+        this.state.config?.startingMoney || 10000,
+        1000,
+      );
     }
 
     JackpotAPI.saveMoney(this.state.balance);
     this.updateUI();
   }
+
+  /**
+   * Get current effective config with defaults.
+   * This is called EVERY spin — uses latest config from WebSocket/REST.
+   */
+  getActiveConfig() {
+    const cfg = this.state.config || {};
+    return {
+      winRate:
+        cfg.winRate !== undefined && cfg.winRate !== null ? cfg.winRate : 0.15,
+      payoutMultiplier:
+        cfg.payoutMultiplier !== undefined && cfg.payoutMultiplier !== null
+          ? cfg.payoutMultiplier
+          : 3,
+      minSpinsBeforeWin:
+        cfg.minSpinsBeforeWin !== undefined && cfg.minSpinsBeforeWin !== null
+          ? cfg.minSpinsBeforeWin
+          : 0,
+      jackpotHitRate:
+        cfg.jackpotHitRate !== undefined && cfg.jackpotHitRate !== null
+          ? cfg.jackpotHitRate
+          : 0.005,
+      difficultyId:
+        cfg.difficultyId !== undefined && cfg.difficultyId !== null
+          ? cfg.difficultyId
+          : 2,
+      difficultyLabel: cfg.difficultyLabel || cfg.difficulty || "Medium",
+      jackpot: cfg.jackpot || 5555555,
+      startingMoney: cfg.startingMoney || 10000,
+      betAmount: cfg.betAmount || 100,
+    };
+  }
+
+  // ========================================================
+  // REAL-TIME EVENT HANDLERS (called by RealtimeManager)
+  // ========================================================
+
+  onConfigChanged(config) {
+    if (!config || Object.keys(config).length === 0) return;
+    this.state.config = config;
+    const c = this.getActiveConfig();
+    this.log(
+      "[WS] Config updated — winRate:",
+      c.winRate,
+      "diff:",
+      c.difficultyLabel,
+      "payMult:",
+      c.payoutMultiplier,
+    );
+    this.showMsg(
+      `⚙️ CONFIG: ${c.difficultyLabel} (${(c.winRate * 100).toFixed(1)}%)`,
+      "#D5AD6D",
+    );
+  }
+
+  onJackpotChanged(value) {
+    const jpEl = document.getElementById("jackpotDisplay");
+    if (jpEl) {
+      jpEl.textContent = (value || 0).toLocaleString("id-ID");
+      jpEl.classList.add("win-flash");
+      setTimeout(() => jpEl.classList.remove("win-flash"), 600);
+    }
+  }
+
+  onBalanceChanged(player, balance) {
+    if (balance !== undefined && balance >= 0) {
+      this.state.balance = balance;
+      localStorage.setItem("slot777_balance", this.state.balance);
+      this.updateUI();
+      this.showMsg(`💰 BALANCE: ${this.fmt(balance)}`, "#4CAF50");
+    }
+  }
+
+  onDifficultyChanged(level, winRate, payoutMultiplier) {
+    const c = this.getActiveConfig();
+    if (winRate !== undefined) c.winRate = winRate;
+    if (payoutMultiplier !== undefined) c.payoutMultiplier = payoutMultiplier;
+    this.state.config = {
+      ...this.state.config,
+      winRate: c.winRate,
+      payoutMultiplier: c.payoutMultiplier,
+    };
+    this.log("[WS] Difficulty changed:", level, "winRate:", c.winRate);
+    this.showMsg(`🎯 DIFFICULTY: ${level || "CUSTOM"}`, "#FFD700");
+  }
+
+  onMaintenanceMode(enabled) {
+    if (enabled) {
+      this.showMsg("🛠️ MAINTENANCE", "#FF6B6B");
+      if (this.el.spinBtn) this.el.spinBtn.disabled = true;
+    } else {
+      this.showMsg("✅ READY", "#4CAF50");
+      if (this.el.spinBtn && !this.state.spinning)
+        this.el.spinBtn.disabled = false;
+    }
+  }
+
+  onResetGame() {
+    this.log("[WS] Reset command received");
+    this.resetBalance();
+    this.showMsg("🔄 GAME RESET", "#FFD700");
+  }
+
+  // ========================================================
+  // UI EVENTS
+  // ========================================================
 
   bindEvents() {
     this.el.spinBtn?.addEventListener("click", () => this.spin());
@@ -158,11 +298,13 @@ export default class GameManager {
   }
 
   async resetBalance() {
+    // Re-read config from server
     try {
       const cfg = await JackpotAPI.fetchConfig();
       if (cfg) this.state.config = cfg;
     } catch (_) {}
-    this.state.balance = this.state.config?.startingMoney || 10000;
+    const c = this.getActiveConfig();
+    this.state.balance = c.startingMoney;
     this.state.lossStreak = 0;
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
@@ -171,91 +313,9 @@ export default class GameManager {
     this.showMsg("💰 BALANCE RESET");
   }
 
-  // =====================
-  // REAL-TIME EVENT HANDLERS
-  // Called by RealtimeManager when server pushes changes
-  // =====================
-
-  /**
-   * Config changed — update all game parameters immediately.
-   * These take effect on the NEXT spin (no need to reload).
-   */
-  onConfigChanged(config) {
-    if (!config) return;
-    this.state.config = config;
-    console.log("[Game] Config updated via WebSocket:", config);
-    this.showMsg("⚙️ CONFIG UPDATED", "#D5AD6D");
-    // Config is read on next spin — no reload needed
-  }
-
-  /**
-   * Jackpot changed — update jackpot display immediately.
-   */
-  onJackpotChanged(value) {
-    console.log("[Game] Jackpot updated:", value);
-    // Update jackpot display if we have one
-    const jpEl = document.getElementById("jackpotDisplay");
-    if (jpEl) {
-      const fmt = (value || 0).toLocaleString("id-ID");
-      jpEl.textContent = fmt;
-      jpEl.classList.add("win-flash");
-      setTimeout(() => jpEl.classList.remove("win-flash"), 600);
-    }
-  }
-
-  /**
-   * Balance changed — update from admin panel.
-   */
-  onBalanceChanged(player, balance) {
-    console.log("[Game] Balance update for", player, ":", balance);
-    // Update our local balance to match server
-    if (balance !== undefined && balance >= 0) {
-      this.state.balance = balance;
-      localStorage.setItem("slot777_balance", this.state.balance);
-      this.updateUI();
-      this.showMsg(`💰 BALANCE: ${this.fmt(balance)}`, "#4CAF50");
-    }
-  }
-
-  /**
-   * Difficulty changed — update winRate, payoutMultiplier immediately.
-   */
-  onDifficultyChanged(level, winRate, payoutMultiplier) {
-    console.log("[Game] Difficulty changed:", level, winRate, payoutMultiplier);
-    if (!this.state.config) this.state.config = {};
-    if (winRate !== undefined) this.state.config.winRate = winRate;
-    if (payoutMultiplier !== undefined)
-      this.state.config.payoutMultiplier = payoutMultiplier;
-    this.showMsg(`🎯 DIFFICULTY: ${level || "CUSTOM"}`, "#D5AD6D");
-  }
-
-  /**
-   * Maintenance mode — show/hide overlay.
-   */
-  onMaintenanceMode(enabled) {
-    console.log("[Game] Maintenance mode:", enabled);
-    if (enabled) {
-      this.showMsg("🛠️ MAINTENANCE MODE", "#FF6B6B");
-      if (this.el.spinBtn) this.el.spinBtn.disabled = true;
-    } else {
-      this.showMsg("✅ READY", "#4CAF50");
-      if (this.el.spinBtn && !this.state.spinning)
-        this.el.spinBtn.disabled = false;
-    }
-  }
-
-  /**
-   * Reset game — force reload state from server.
-   */
-  onResetGame() {
-    console.log("[Game] Reset command received");
-    this.resetBalance();
-    this.showMsg("🔄 GAME RESET", "#FFD700");
-  }
-
-  // =====================
-  // SPIN LOGIC
-  // =====================
+  // ========================================================
+  // SPIN — CORE RNG GAME LOGIC
+  // ========================================================
 
   async spin() {
     if (this.state.spinning) return;
@@ -276,25 +336,83 @@ export default class GameManager {
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
 
-    // ---- RNG with LIVE config ----
-    const cfg = this.state.config || {};
-    const wr = cfg.winRate ?? 0.15;
-    const pm = cfg.payoutMultiplier ?? 3;
-    const minSpins = cfg.minSpinsBeforeWin ?? 0;
+    // ===== STEP 1: READ LIVE CONFIG =====
+    const c = this.getActiveConfig();
+    const winRate = c.winRate;
+    const payoutMult = c.payoutMultiplier;
+    const minSpins = c.minSpinsBeforeWin;
 
+    this.log(
+      "[SPIN#" + this.state.spinCount + "] winRate:",
+      winRate,
+      "| payoutMult:",
+      payoutMult,
+      "| difficulty:",
+      c.difficultyLabel,
+      "| minSpins:",
+      minSpins,
+      "| lossStreak:",
+      this.state.lossStreak,
+    );
+
+    // ===== STEP 2: RNG ROLL =====
+    // Critical: THIS is where win/loss is determined, based on config
     this.state.lossStreak = this.state.lossStreak || 0;
-    let forceWin = false;
-    if (minSpins > 0 && this.state.lossStreak >= minSpins) {
-      forceWin = true;
-      this.state.lossStreak = 0;
+
+    // Determine win probability based on config AND loss streak
+    let effectiveWinRate = winRate;
+
+    // Loss streak protection: gradually increase win rate after many losses
+    // This is SUBTLE — never jumps to 100% unless minSpinsBeforeWin is set
+    if (minSpins > 0 && this.state.lossStreak >= minSpins * 3) {
+      // After 3x the minimum spin threshold, start gradually increasing
+      const excess = this.state.lossStreak - minSpins * 3;
+      const boost = Math.min(excess * 0.001, winRate * 2); // Max double the base rate
+      effectiveWinRate = Math.min(winRate + boost, 0.5); // Never exceed 50%
+      this.log(
+        "[SPIN] Loss streak protection: effective rate:",
+        effectiveWinRate,
+      );
     }
 
-    const { grid, wins } = this.generateResult(forceWin ? 1.0 : wr, pm);
+    // THE RNG ROLL
+    const roll = Math.random();
+    const isWin = roll < effectiveWinRate;
+
+    this.log(
+      "[SPIN] RNG roll:",
+      roll.toFixed(6),
+      "| threshold:",
+      effectiveWinRate.toFixed(6),
+      "| result:",
+      isWin ? "WIN" : "LOSE",
+    );
+
+    // ===== STEP 3: Generate grid based on RNG result =====
+    const { grid, wins } = this.generateResult(isWin, payoutMult);
+
     this.grid = grid;
     const total = totalWin(wins);
 
+    this.log("[SPIN] Grid:", JSON.stringify(grid));
+    this.log(
+      "[SPIN] Wins:",
+      total > 0
+        ? JSON.stringify(
+            wins.map((w) => ({
+              sym: w.symbol,
+              count: w.count,
+              mult: w.multiplier,
+              amt: w.amount,
+            })),
+          )
+        : "NONE",
+    );
+    this.log("[SPIN] Payout:", total);
+
+    // ===== STEP 4: Animate reels =====
     const turbo = this.state.turbo;
-    this.showMsg(total > 0 ? "🎰 SPINNING!" : "🎰 SPINNING!");
+    this.showMsg("🎰 SPINNING!");
 
     try {
       const stagger = turbo ? 200 : 280;
@@ -312,14 +430,14 @@ export default class GameManager {
       }
       await Promise.all(promises);
     } catch (e) {
-      console.error("Spin error:", e);
+      console.error("[SPIN] Error:", e);
       this.state.spinning = false;
       if (this.el.spinBtn) this.el.spinBtn.disabled = false;
       this.showMsg("⚠️ ERROR");
       return;
     }
 
-    // ---- WIN EVALUATION ----
+    // ===== STEP 5: Win evaluation =====
     this.state.lastWin = total;
     this.state.totalWins += total;
 
@@ -343,8 +461,16 @@ export default class GameManager {
         const rect = this.el.spinBtn.getBoundingClientRect();
         this.anim.burst(rect.left + rect.width / 2, rect.top);
       }
+
+      this.log("[RESULT] WIN — amount:", total, "balance:", this.state.balance);
     } else {
       this.state.lossStreak++;
+      this.log(
+        "[RESULT] LOSE — lossStreak:",
+        this.state.lossStreak,
+        "balance:",
+        this.state.balance,
+      );
     }
 
     localStorage.setItem("slot777_balance", this.state.balance);
@@ -354,6 +480,7 @@ export default class GameManager {
     if (this.el.spinBtn) this.el.spinBtn.disabled = false;
     this.updateUI();
 
+    // Auto-spin
     if (this.state.autoplay && this.state.balance >= this.state.bet) {
       setTimeout(() => this.spin(), turbo ? 100 : 400);
     } else {
@@ -362,50 +489,171 @@ export default class GameManager {
     }
   }
 
-  generateResult(winChance, pm) {
-    const win = Math.random() < winChance;
-
-    if (win) {
+  /**
+   * Generate a 3×3 reel grid based on RNG result.
+   *
+   * CRITICAL: This function must GUARANTEE:
+   *   - If isWin=true:  at least one winning payline exists
+   *   - If isWin=false: NO winning paylines exist (guaranteed loss)
+   *
+   * This ensures the actual win rate matches the configured winRate exactly.
+   *
+   * @param {boolean} isWin - Whether this spin should win
+   * @param {number} payoutMult - Payout multiplier from config
+   * @returns {{ grid: string[][], wins: Array }}
+   */
+  generateResult(isWin, payoutMult) {
+    if (isWin) {
+      // ===== GUARANTEED WIN =====
+      // Pick a random winning symbol
       const winSym = weightedRandom();
-      const grid = [
-        [weightedRandom(), winSym, weightedRandom()],
-        [weightedRandom(), winSym, weightedRandom()],
-        [weightedRandom(), winSym, weightedRandom()],
+
+      // Pick a random payline to win on
+      const winPaylines = [
+        [0, 1, 2], // Top row: [reel0, reel1, reel2] positions
+        [1, 1, 1], // Middle row (reel position = row index)
+        [2, 1, 2], // Bottom row
+        [0, 0, 2], // Diagonal down-right: reel0.top, reel1.mid, reel2.bot
+        [2, 0, 0], // Diagonal up-right: reel0.bot, reel1.mid, reel2.top
       ];
 
-      let wins = evaluate(grid, this.state.bet);
-      if (pm && pm !== 1) {
-        for (const w of wins) w.amount = Math.floor(w.amount * pm);
+      // Actually, the grid is [reel][row], so paylines map differently
+      // PAYLINES in paylines.js: [[reel,row], ...]
+      // Line 0: [[0,0],[1,0],[2,0]] — top row
+      // Line 1: [[0,1],[1,1],[2,1]] — middle row
+      // Line 2: [[0,2],[1,2],[2,2]] — bottom row
+      // Line 3: [[0,0],[1,1],[2,2]] — diagonal down
+      // Line 4: [[0,2],[1,1],[2,0]] — diagonal up
+
+      const winLineIndex = Math.floor(Math.random() * 5); // 0-4
+      const winLine = [
+        [
+          [0, 0],
+          [1, 0],
+          [2, 0],
+        ], // 0: top
+        [
+          [0, 1],
+          [1, 1],
+          [2, 1],
+        ], // 1: middle
+        [
+          [0, 2],
+          [1, 2],
+          [2, 2],
+        ], // 2: bottom
+        [
+          [0, 0],
+          [1, 1],
+          [2, 2],
+        ], // 3: diagonal down
+        [
+          [0, 2],
+          [1, 1],
+          [2, 0],
+        ], // 4: diagonal up
+      ][winLineIndex];
+
+      // Build grid: fill with random symbols first
+      const grid = [
+        [null, null, null],
+        [null, null, null],
+        [null, null, null],
+      ];
+
+      // Place winning symbol along the chosen payline
+      for (const [reel, row] of winLine) {
+        grid[reel][row] = winSym;
       }
 
+      // Fill remaining cells with DIFFERENT symbols (avoid accidental wins)
+      const usedSymbols = new Set([winSym]);
+      const otherSymbols = ALL_SYMBOLS.filter(
+        (s) => s !== winSym && s !== "DIAMOND",
+      );
+
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          if (grid[r][c] === null) {
+            // Pick a symbol that won't accidentally create a win
+            grid[r][c] =
+              otherSymbols[Math.floor(Math.random() * otherSymbols.length)];
+          }
+        }
+      }
+
+      // Evaluate and apply multiplier
+      let wins = evaluate(grid, this.state.bet);
+      if (payoutMult && payoutMult !== 1) {
+        for (const w of wins) w.amount = Math.floor(w.amount * payoutMult);
+      }
+
+      // Safety: if no winning payline detected (shouldn't happen), add a guaranteed win
       if (wins.length === 0) {
+        // Force middle line ALL winSym
         grid[0][1] = winSym;
         grid[1][1] = winSym;
         grid[2][1] = winSym;
         wins = evaluate(grid, this.state.bet);
-        if (pm && pm !== 1) {
-          for (const w of wins) w.amount = Math.floor(w.amount * pm);
+        if (payoutMult && payoutMult !== 1) {
+          for (const w of wins) w.amount = Math.floor(w.amount * payoutMult);
         }
       }
 
       return { grid, wins };
     }
 
-    let grid;
-    let attempts = 0;
-    do {
-      grid = [
-        [weightedRandom(), weightedRandom(), weightedRandom()],
-        [weightedRandom(), weightedRandom(), weightedRandom()],
-        [weightedRandom(), weightedRandom(), weightedRandom()],
+    // ===== GUARANTEED LOSS =====
+    // Build a grid where NO payline can match
+    // Strategy: ensure every symbol on every payline is unique
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const grid = [
+        ["", "", ""],
+        ["", "", ""],
+        ["", "", ""],
       ];
-      attempts++;
-    } while (evaluate(grid, this.state.bet).length > 0 && attempts < 50);
 
-    return { grid, wins: [] };
+      // Fill with symbols, ensuring each payline has mismatching symbols
+      const allPicks = [
+        ["BAR", "CHERRY", "LEMON"],
+        ["ORANGE", "PLUM", "BELL"],
+        ["SEVEN", "GRAPES", "WATERMELON"],
+        ["2BAR", "3BAR", "CHERRY"],
+        ["LEMON", "ORANGE", "PLUM"],
+        ["BELL", "GRAPES", "BAR"],
+        ["WATERMELON", "SEVEN", "2BAR"],
+        ["3BAR", "CHERRY", "LEMON"],
+        ["ORANGE", "PLUM", "BELL"],
+      ];
+
+      // Pre-compute row fills to avoid any payline having 3 matching
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          grid[r][c] = allPicks[r * 3 + c][Math.floor(Math.random() * 3)];
+        }
+      }
+
+      // Check if this grid accidentally wins
+      const wins = evaluate(grid, this.state.bet);
+      if (wins.length === 0) {
+        return { grid, wins: [] };
+      }
+    }
+
+    // Fallback: deterministic non-winning grid
+    return {
+      grid: [
+        ["BAR", "CHERRY", "LEMON"],
+        ["ORANGE", "PLUM", "BELL"],
+        ["SEVEN", "GRAPES", "WATERMELON"],
+      ],
+      wins: [],
+    };
   }
 
-  // ---- UI ----
+  // ========================================================
+  // UI HELPERS
+  // ========================================================
 
   fmt(n) {
     return (n ?? 0).toLocaleString("id-ID");

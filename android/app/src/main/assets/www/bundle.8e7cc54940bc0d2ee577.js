@@ -1,4 +1,4 @@
-/*! For license information please see bundle.8e8ffb74c4a2c1d3965f.js.LICENSE.txt */
+/*! For license information please see bundle.8e7cc54940bc0d2ee577.js.LICENSE.txt */
 (() => {
   "use strict";
   (() => {
@@ -466,7 +466,7 @@
       var i = Math.min(Math.max(e - 1, 0), r.mult.length - 1);
       return r.mult[i];
     }
-    function p(t, e) {
+    function y(t, e) {
       if (!t || t.length < 3) return [];
       for (var n, r = [], i = 0; i < f.length; i++) {
         var o,
@@ -478,19 +478,19 @@
             return t[r] && void 0 !== t[r][i] ? t[r][i] : "BAR";
           }),
           u = null,
-          p = l(c);
+          y = l(c);
         try {
-          for (p.s(); !(o = p.n()).done; ) {
-            var y = o.value;
-            if ("DIAMOND" !== y && "JACKPOT" !== y) {
-              u = y;
+          for (y.s(); !(o = y.n()).done; ) {
+            var p = o.value;
+            if ("DIAMOND" !== p && "JACKPOT" !== p) {
+              u = p;
               break;
             }
           }
         } catch (t) {
-          p.e(t);
+          y.e(t);
         } finally {
-          p.f();
+          y.f();
         }
         u || (u = "SEVEN"),
           ("DIAMOND" !== u && "JACKPOT" !== u) || (u = "SEVEN");
@@ -528,7 +528,7 @@
       }
       return r;
     }
-    function y(t) {
+    function p(t) {
       return t.reduce(function (t, e) {
         return t + e.amount;
       }, 0);
@@ -842,16 +842,16 @@
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
     }
-    function x(t, e) {
+    function k(t, e) {
       for (var n = 0; n < e.length; n++) {
         var r = e[n];
         (r.enumerable = r.enumerable || !1),
           (r.configurable = !0),
           "value" in r && (r.writable = !0),
-          Object.defineProperty(t, k(r.key), r);
+          Object.defineProperty(t, x(r.key), r);
       }
     }
-    function k(t) {
+    function x(t) {
       var e = (function (t) {
         if ("object" != w(t) || !t) return t;
         var e = t[Symbol.toPrimitive];
@@ -1056,7 +1056,7 @@
             },
           },
         ]),
-        e && x(t.prototype, e),
+        e && k(t.prototype, e),
         Object.defineProperty(t, "prototype", { writable: !1 }),
         t
       );
@@ -1080,7 +1080,7 @@
         M(t)
       );
     }
-    function C(t, e) {
+    function O(t, e) {
       return (
         (function (t) {
           if (Array.isArray(t)) return t;
@@ -1129,7 +1129,7 @@
         })(t, e) ||
         (function (t, e) {
           if (t) {
-            if ("string" == typeof t) return O(t, e);
+            if ("string" == typeof t) return R(t, e);
             var n = {}.toString.call(t).slice(8, -1);
             return (
               "Object" === n && t.constructor && (n = t.constructor.name),
@@ -1137,7 +1137,7 @@
                 ? Array.from(t)
                 : "Arguments" === n ||
                     /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
-                  ? O(t, e)
+                  ? R(t, e)
                   : void 0
             );
           }
@@ -1149,13 +1149,13 @@
         })()
       );
     }
-    function O(t, e) {
+    function R(t, e) {
       (null == e || e > t.length) && (e = t.length);
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
     }
-    function B() {
-      B = function () {
+    function C() {
+      C = function () {
         return e;
       };
       var t,
@@ -1192,7 +1192,7 @@
       function u(t, e, n, r) {
         var o = e && e.prototype instanceof v ? e : v,
           a = Object.create(o.prototype),
-          l = new I(r || []);
+          l = new B(r || []);
         return i(a, "_invoke", { value: L(t, n, l) }), a;
       }
       function f(t, e, n) {
@@ -1204,8 +1204,8 @@
       }
       e.wrap = u;
       var h = "suspendedStart",
-        p = "suspendedYield",
-        y = "executing",
+        y = "suspendedYield",
+        p = "executing",
         d = "completed",
         m = {};
       function v() {}
@@ -1216,17 +1216,17 @@
         return this;
       });
       var S = Object.getPrototypeOf,
-        E = S && S(S(R([])));
+        E = S && S(S(I([])));
       E && E !== n && r.call(E, a) && (w = E);
       var A = (b.prototype = v.prototype = Object.create(w));
-      function x(t) {
+      function k(t) {
         ["next", "throw", "return"].forEach(function (e) {
           c(t, e, function (t) {
             return this._invoke(e, t);
           });
         });
       }
-      function k(t, e) {
+      function x(t, e) {
         function n(i, o, a, l) {
           var s = f(t[i], t, o);
           if ("throw" !== s.type) {
@@ -1267,7 +1267,7 @@
       function L(e, n, r) {
         var i = h;
         return function (o, a) {
-          if (i === y) throw Error("Generator is already running");
+          if (i === p) throw Error("Generator is already running");
           if (i === d) {
             if ("throw" === o) throw a;
             return { value: t, done: !0 };
@@ -1275,7 +1275,7 @@
           for (r.method = o, r.arg = a; ; ) {
             var l = r.delegate;
             if (l) {
-              var s = C(l, r);
+              var s = O(l, r);
               if (s) {
                 if (s === m) continue;
                 return s;
@@ -1286,10 +1286,10 @@
               if (i === h) throw ((i = d), r.arg);
               r.dispatchException(r.arg);
             } else "return" === r.method && r.abrupt("return", r.arg);
-            i = y;
+            i = p;
             var c = f(e, n, r);
             if ("normal" === c.type) {
-              if (((i = r.done ? d : p), c.arg === m)) continue;
+              if (((i = r.done ? d : y), c.arg === m)) continue;
               return { value: c.arg, done: r.done };
             }
             "throw" === c.type &&
@@ -1297,7 +1297,7 @@
           }
         };
       }
-      function C(e, n) {
+      function O(e, n) {
         var r = n.method,
           i = e.iterator[r];
         if (i === t)
@@ -1307,7 +1307,7 @@
               e.iterator.return &&
               ((n.method = "return"),
               (n.arg = t),
-              C(e, n),
+              O(e, n),
               "throw" === n.method)) ||
               ("return" !== r &&
                 ((n.method = "throw"),
@@ -1333,7 +1333,7 @@
             (n.delegate = null),
             m);
       }
-      function O(t) {
+      function R(t) {
         var e = { tryLoc: t[0] };
         1 in t && (e.catchLoc = t[1]),
           2 in t && ((e.finallyLoc = t[2]), (e.afterLoc = t[3])),
@@ -1343,12 +1343,12 @@
         var e = t.completion || {};
         (e.type = "normal"), delete e.arg, (t.completion = e);
       }
-      function I(t) {
+      function B(t) {
         (this.tryEntries = [{ tryLoc: "root" }]),
-          t.forEach(O, this),
+          t.forEach(R, this),
           this.reset(!0);
       }
-      function R(e) {
+      function I(e) {
         if (e || "" === e) {
           var n = e[a];
           if (n) return n.call(e);
@@ -1389,21 +1389,21 @@
         (e.awrap = function (t) {
           return { __await: t };
         }),
-        x(k.prototype),
-        c(k.prototype, l, function () {
+        k(x.prototype),
+        c(x.prototype, l, function () {
           return this;
         }),
-        (e.AsyncIterator = k),
+        (e.AsyncIterator = x),
         (e.async = function (t, n, r, i, o) {
           void 0 === o && (o = Promise);
-          var a = new k(u(t, n, r, i), o);
+          var a = new x(u(t, n, r, i), o);
           return e.isGeneratorFunction(n)
             ? a
             : a.next().then(function (t) {
                 return t.done ? t.value : a.next();
               });
         }),
-        x(A),
+        k(A),
         c(A, s, "Generator"),
         c(A, a, function () {
           return this;
@@ -1426,9 +1426,9 @@
             }
           );
         }),
-        (e.values = R),
-        (I.prototype = {
-          constructor: I,
+        (e.values = I),
+        (B.prototype = {
+          constructor: B,
           reset: function (e) {
             if (
               ((this.prev = 0),
@@ -1546,7 +1546,7 @@
           },
           delegateYield: function (e, n, r) {
             return (
-              (this.delegate = { iterator: R(e), resultName: n, nextLoc: r }),
+              (this.delegate = { iterator: I(e), resultName: n, nextLoc: r }),
               "next" === this.method && (this.arg = t),
               m
             );
@@ -1564,7 +1564,7 @@
       }
       l.done ? e(s) : Promise.resolve(s).then(r, i);
     }
-    function I(t) {
+    function B(t) {
       return function () {
         var e = this,
           n = arguments;
@@ -1580,15 +1580,15 @@
         });
       };
     }
-    var R = window.location.origin;
-    function F(t) {
-      return T.apply(this, arguments);
+    var I = window.location.origin;
+    function N(t) {
+      return P.apply(this, arguments);
     }
-    function T() {
-      return (T = I(
-        B().mark(function t(e) {
+    function P() {
+      return (P = B(
+        C().mark(function t(e) {
           var n;
-          return B().wrap(
+          return C().wrap(
             function (t) {
               for (;;)
                 switch ((t.prev = t.next)) {
@@ -1596,7 +1596,7 @@
                     return (
                       (t.prev = 0),
                       (t.next = 3),
-                      fetch(R + e, {
+                      fetch(I + e, {
                         method: "GET",
                         headers: { Accept: "application/json" },
                       })
@@ -1629,14 +1629,14 @@
         }),
       )).apply(this, arguments);
     }
-    function D(t, e) {
-      return N.apply(this, arguments);
+    function F(t, e) {
+      return T.apply(this, arguments);
     }
-    function N() {
-      return (N = I(
-        B().mark(function t(e, n) {
+    function T() {
+      return (T = B(
+        C().mark(function t(e, n) {
           var r, i, o, a, l, s, c;
-          return B().wrap(
+          return C().wrap(
             function (t) {
               for (;;)
                 switch ((t.prev = t.next)) {
@@ -1649,10 +1649,10 @@
                       i < o.length;
                       i++
                     )
-                      (a = C(o[i], 2)), (l = a[0]), (s = a[1]), r.append(l, s);
+                      (a = O(o[i], 2)), (l = a[0]), (s = a[1]), r.append(l, s);
                     return (
                       (t.next = 5),
-                      fetch(R + e, {
+                      fetch(I + e, {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/x-www-form-urlencoded",
@@ -1688,15 +1688,15 @@
         }),
       )).apply(this, arguments);
     }
-    const _ = function () {
-        return I(
-          B().mark(function t() {
+    const D = function () {
+        return B(
+          C().mark(function t() {
             var e;
-            return B().wrap(function (t) {
+            return C().wrap(function (t) {
               for (;;)
                 switch ((t.prev = t.next)) {
                   case 0:
-                    return (t.next = 2), F("/api/config");
+                    return (t.next = 2), N("/api/config");
                   case 2:
                     if ((e = t.sent)) {
                       t.next = 5;
@@ -1732,16 +1732,16 @@
           }),
         )();
       },
-      P = function (t) {
-        return I(
-          B().mark(function e() {
-            return B().wrap(function (e) {
+      _ = function (t) {
+        return B(
+          C().mark(function e() {
+            return C().wrap(function (e) {
               for (;;)
                 switch ((e.prev = e.next)) {
                   case 0:
                     return e.abrupt(
                       "return",
-                      D("/api/money", { balance: Math.floor(t) }),
+                      F("/api/money", { balance: Math.floor(t) }),
                     );
                   case 1:
                   case "end":
@@ -1769,16 +1769,16 @@
         G(t)
       );
     }
-    function U(t, e) {
+    function W(t, e) {
       for (var n = 0; n < e.length; n++) {
         var r = e[n];
         (r.enumerable = r.enumerable || !1),
           (r.configurable = !0),
           "value" in r && (r.writable = !0),
-          Object.defineProperty(t, W(r.key), r);
+          Object.defineProperty(t, U(r.key), r);
       }
     }
-    function W(t) {
+    function U(t) {
       var e = (function (t) {
         if ("object" != G(t) || !t) return t;
         var e = t[Symbol.toPrimitive];
@@ -1934,7 +1934,7 @@
             },
           },
         ]),
-        e && U(t.prototype, e),
+        e && W(t.prototype, e),
         Object.defineProperty(t, "prototype", { writable: !1 }),
         t
       );
@@ -1958,8 +1958,107 @@
         Y(t)
       );
     }
-    function q() {
-      q = function () {
+    function J(t, e) {
+      return (
+        (function (t) {
+          if (Array.isArray(t)) return t;
+        })(t) ||
+        (function (t, e) {
+          var n =
+            null == t
+              ? null
+              : ("undefined" != typeof Symbol && t[Symbol.iterator]) ||
+                t["@@iterator"];
+          if (null != n) {
+            var r,
+              i,
+              o,
+              a,
+              l = [],
+              s = !0,
+              c = !1;
+            try {
+              if (((o = (n = n.call(t)).next), 0 === e)) {
+                if (Object(n) !== n) return;
+                s = !1;
+              } else
+                for (
+                  ;
+                  !(s = (r = o.call(n)).done) &&
+                  (l.push(r.value), l.length !== e);
+                  s = !0
+                );
+            } catch (t) {
+              (c = !0), (i = t);
+            } finally {
+              try {
+                if (
+                  !s &&
+                  null != n.return &&
+                  ((a = n.return()), Object(a) !== a)
+                )
+                  return;
+              } finally {
+                if (c) throw i;
+              }
+            }
+            return l;
+          }
+        })(t, e) ||
+        Z(t, e) ||
+        (function () {
+          throw new TypeError(
+            "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
+          );
+        })()
+      );
+    }
+    function q(t, e) {
+      var n = Object.keys(t);
+      if (Object.getOwnPropertySymbols) {
+        var r = Object.getOwnPropertySymbols(t);
+        e &&
+          (r = r.filter(function (e) {
+            return Object.getOwnPropertyDescriptor(t, e).enumerable;
+          })),
+          n.push.apply(n, r);
+      }
+      return n;
+    }
+    function V(t) {
+      for (var e = 1; e < arguments.length; e++) {
+        var n = null != arguments[e] ? arguments[e] : {};
+        e % 2
+          ? q(Object(n), !0).forEach(function (e) {
+              z(t, e, n[e]);
+            })
+          : Object.getOwnPropertyDescriptors
+            ? Object.defineProperties(t, Object.getOwnPropertyDescriptors(n))
+            : q(Object(n)).forEach(function (e) {
+                Object.defineProperty(
+                  t,
+                  e,
+                  Object.getOwnPropertyDescriptor(n, e),
+                );
+              });
+      }
+      return t;
+    }
+    function z(t, e, n) {
+      return (
+        (e = nt(e)) in t
+          ? Object.defineProperty(t, e, {
+              value: n,
+              enumerable: !0,
+              configurable: !0,
+              writable: !0,
+            })
+          : (t[e] = n),
+        t
+      );
+    }
+    function $() {
+      $ = function () {
         return e;
       };
       var t,
@@ -1996,7 +2095,7 @@
       function u(t, e, n, r) {
         var o = e && e.prototype instanceof v ? e : v,
           a = Object.create(o.prototype),
-          l = new B(r || []);
+          l = new C(r || []);
         return i(a, "_invoke", { value: L(t, n, l) }), a;
       }
       function f(t, e, n) {
@@ -2008,8 +2107,8 @@
       }
       e.wrap = u;
       var h = "suspendedStart",
-        p = "suspendedYield",
-        y = "executing",
+        y = "suspendedYield",
+        p = "executing",
         d = "completed",
         m = {};
       function v() {}
@@ -2023,14 +2122,14 @@
         E = S && S(S(j([])));
       E && E !== n && r.call(E, a) && (w = E);
       var A = (b.prototype = v.prototype = Object.create(w));
-      function x(t) {
+      function k(t) {
         ["next", "throw", "return"].forEach(function (e) {
           c(t, e, function (t) {
             return this._invoke(e, t);
           });
         });
       }
-      function k(t, e) {
+      function x(t, e) {
         function n(i, o, a, l) {
           var s = f(t[i], t, o);
           if ("throw" !== s.type) {
@@ -2071,7 +2170,7 @@
       function L(e, n, r) {
         var i = h;
         return function (o, a) {
-          if (i === y) throw Error("Generator is already running");
+          if (i === p) throw Error("Generator is already running");
           if (i === d) {
             if ("throw" === o) throw a;
             return { value: t, done: !0 };
@@ -2090,10 +2189,10 @@
               if (i === h) throw ((i = d), r.arg);
               r.dispatchException(r.arg);
             } else "return" === r.method && r.abrupt("return", r.arg);
-            i = y;
+            i = p;
             var c = f(e, n, r);
             if ("normal" === c.type) {
-              if (((i = r.done ? d : p), c.arg === m)) continue;
+              if (((i = r.done ? d : y), c.arg === m)) continue;
               return { value: c.arg, done: r.done };
             }
             "throw" === c.type &&
@@ -2137,19 +2236,19 @@
             (n.delegate = null),
             m);
       }
-      function C(t) {
+      function O(t) {
         var e = { tryLoc: t[0] };
         1 in t && (e.catchLoc = t[1]),
           2 in t && ((e.finallyLoc = t[2]), (e.afterLoc = t[3])),
           this.tryEntries.push(e);
       }
-      function O(t) {
+      function R(t) {
         var e = t.completion || {};
         (e.type = "normal"), delete e.arg, (t.completion = e);
       }
-      function B(t) {
+      function C(t) {
         (this.tryEntries = [{ tryLoc: "root" }]),
-          t.forEach(C, this),
+          t.forEach(O, this),
           this.reset(!0);
       }
       function j(e) {
@@ -2193,21 +2292,21 @@
         (e.awrap = function (t) {
           return { __await: t };
         }),
-        x(k.prototype),
-        c(k.prototype, l, function () {
+        k(x.prototype),
+        c(x.prototype, l, function () {
           return this;
         }),
-        (e.AsyncIterator = k),
+        (e.AsyncIterator = x),
         (e.async = function (t, n, r, i, o) {
           void 0 === o && (o = Promise);
-          var a = new k(u(t, n, r, i), o);
+          var a = new x(u(t, n, r, i), o);
           return e.isGeneratorFunction(n)
             ? a
             : a.next().then(function (t) {
                 return t.done ? t.value : a.next();
               });
         }),
-        x(A),
+        k(A),
         c(A, s, "Generator"),
         c(A, a, function () {
           return this;
@@ -2231,8 +2330,8 @@
           );
         }),
         (e.values = j),
-        (B.prototype = {
-          constructor: B,
+        (C.prototype = {
+          constructor: C,
           reset: function (e) {
             if (
               ((this.prev = 0),
@@ -2242,7 +2341,7 @@
               (this.delegate = null),
               (this.method = "next"),
               (this.arg = t),
-              this.tryEntries.forEach(O),
+              this.tryEntries.forEach(R),
               !e)
             )
               for (var n in this)
@@ -2331,7 +2430,7 @@
             for (var e = this.tryEntries.length - 1; e >= 0; --e) {
               var n = this.tryEntries[e];
               if (n.finallyLoc === t)
-                return this.complete(n.completion, n.afterLoc), O(n), m;
+                return this.complete(n.completion, n.afterLoc), R(n), m;
             }
           },
           catch: function (t) {
@@ -2341,7 +2440,7 @@
                 var r = n.completion;
                 if ("throw" === r.type) {
                   var i = r.arg;
-                  O(n);
+                  R(n);
                 }
                 return i;
               }
@@ -2359,7 +2458,7 @@
         e
       );
     }
-    function J(t, e, n, r, i, o, a) {
+    function K(t, e, n, r, i, o, a) {
       try {
         var l = t[o](a),
           s = l.value;
@@ -2368,43 +2467,29 @@
       }
       l.done ? e(s) : Promise.resolve(s).then(r, i);
     }
-    function z(t) {
+    function Q(t) {
       return function () {
         var e = this,
           n = arguments;
         return new Promise(function (r, i) {
           var o = t.apply(e, n);
           function a(t) {
-            J(o, r, i, a, l, "next", t);
+            K(o, r, i, a, l, "next", t);
           }
           function l(t) {
-            J(o, r, i, a, l, "throw", t);
+            K(o, r, i, a, l, "throw", t);
           }
           a(void 0);
         });
       };
     }
-    function $(t, e) {
+    function X(t, e) {
       var n =
         ("undefined" != typeof Symbol && t[Symbol.iterator]) || t["@@iterator"];
       if (!n) {
         if (
           Array.isArray(t) ||
-          (n = (function (t, e) {
-            if (t) {
-              if ("string" == typeof t) return K(t, e);
-              var n = {}.toString.call(t).slice(8, -1);
-              return (
-                "Object" === n && t.constructor && (n = t.constructor.name),
-                "Map" === n || "Set" === n
-                  ? Array.from(t)
-                  : "Arguments" === n ||
-                      /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
-                    ? K(t, e)
-                    : void 0
-              );
-            }
-          })(t)) ||
+          (n = Z(t)) ||
           (e && t && "number" == typeof t.length)
         ) {
           n && (t = n);
@@ -2448,21 +2533,36 @@
         },
       };
     }
-    function K(t, e) {
+    function Z(t, e) {
+      if (t) {
+        if ("string" == typeof t) return tt(t, e);
+        var n = {}.toString.call(t).slice(8, -1);
+        return (
+          "Object" === n && t.constructor && (n = t.constructor.name),
+          "Map" === n || "Set" === n
+            ? Array.from(t)
+            : "Arguments" === n ||
+                /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
+              ? tt(t, e)
+              : void 0
+        );
+      }
+    }
+    function tt(t, e) {
       (null == e || e > t.length) && (e = t.length);
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
     }
-    function V(t, e) {
+    function et(t, e) {
       for (var n = 0; n < e.length; n++) {
         var r = e[n];
         (r.enumerable = r.enumerable || !1),
           (r.configurable = !0),
           "value" in r && (r.writable = !0),
-          Object.defineProperty(t, Q(r.key), r);
+          Object.defineProperty(t, nt(r.key), r);
       }
     }
-    function Q(t) {
+    function nt(t) {
       var e = (function (t) {
         if ("object" != Y(t) || !t) return t;
         var e = t[Symbol.toPrimitive];
@@ -2476,657 +2576,880 @@
       return "symbol" == Y(e) ? e : e + "";
     }
     window.__SYMBOLS_DATA = m;
-    var X = (function () {
-      return (
-        (t = function t() {
-          !(function (t, e) {
-            if (!(t instanceof e))
-              throw new TypeError("Cannot call a class as a function");
-          })(this, t),
-            (this.anim = new L()),
-            (this.reels = []),
-            (this.realtime = null),
-            (this.state = {
-              balance: 1e4,
-              bet: 100,
-              lastWin: 0,
-              totalWins: 0,
-              spinning: !1,
-              autoplay: !1,
-              turbo: !1,
-              spinCount: 0,
-              lossStreak: 0,
-              config: {},
-            }),
-            (this.grid = [
-              ["BAR", "BAR", "BAR"],
-              ["BAR", "BAR", "BAR"],
-              ["BAR", "BAR", "BAR"],
-            ]),
-            (this.el = {}),
-            this.init();
-        }),
-        (e = [
-          {
-            key: "init",
-            value: function () {
-              var t = this;
-              this.cacheDOM(),
-                this.initReels(),
-                this.loadConfig(),
-                this.bindEvents(),
-                this.showGrid(),
-                this.updateUI(),
-                this.showMsg("🎰 SPIN TO WIN"),
-                setTimeout(function () {
-                  t.realtime = new H(t);
-                }, 100);
+    var rt = Object.keys(m),
+      it = (function () {
+        return (
+          (t = function t() {
+            !(function (t, e) {
+              if (!(t instanceof e))
+                throw new TypeError("Cannot call a class as a function");
+            })(this, t),
+              (this.anim = new L()),
+              (this.reels = []),
+              (this.realtime = null),
+              (this.debug = !0),
+              (this.state = {
+                balance: 1e4,
+                bet: 100,
+                lastWin: 0,
+                totalWins: 0,
+                spinning: !1,
+                autoplay: !1,
+                turbo: !1,
+                spinCount: 0,
+                lossStreak: 0,
+                config: {},
+              }),
+              (this.grid = [
+                ["BAR", "BAR", "BAR"],
+                ["BAR", "BAR", "BAR"],
+                ["BAR", "BAR", "BAR"],
+              ]),
+              (this.el = {}),
+              this.init();
+          }),
+          (e = [
+            {
+              key: "init",
+              value: function () {
+                var t = this;
+                this.cacheDOM(),
+                  this.initReels(),
+                  this.showGrid(),
+                  this.updateUI(),
+                  this.showMsg("🎰 SPIN TO WIN"),
+                  this.loadConfig().then(function () {
+                    t.log("[INIT] Config loaded from server");
+                  }),
+                  setTimeout(function () {
+                    t.realtime = new H(t);
+                  }, 200);
+              },
             },
-          },
-          {
-            key: "cacheDOM",
-            value: function () {
-              for (
-                var t = 0,
-                  e = [
-                    "gameScreen",
-                    "playerMoney",
-                    "betDisplay",
-                    "betDisplay2",
-                    "winText",
-                    "spinBtn",
-                    "autoplay",
-                    "turboMode",
-                    "resetBtn",
-                    "totalWinDisplay",
-                    "betDown",
-                    "betUp",
-                    "maxBet",
-                  ];
-                t < e.length;
-                t++
-              ) {
-                var n = e[t];
-                this.el[n] = document.getElementById(n);
-              }
-            },
-          },
-          {
-            key: "initReels",
-            value: function () {
-              var t = document.querySelectorAll(".reel");
-              if (t) {
-                var e,
-                  n = $(t);
-                try {
-                  for (n.s(); !(e = n.n()).done; ) {
-                    var r = e.value;
-                    this.reels.push(new a(r, b, g));
-                  }
-                } catch (t) {
-                  n.e(t);
-                } finally {
-                  n.f();
+            {
+              key: "cacheDOM",
+              value: function () {
+                for (
+                  var t = 0,
+                    e = [
+                      "gameScreen",
+                      "playerMoney",
+                      "betDisplay",
+                      "betDisplay2",
+                      "winText",
+                      "spinBtn",
+                      "autoplay",
+                      "turboMode",
+                      "resetBtn",
+                      "totalWinDisplay",
+                      "betDown",
+                      "betUp",
+                      "maxBet",
+                    ];
+                  t < e.length;
+                  t++
+                ) {
+                  var n = e[t];
+                  this.el[n] = document.getElementById(n);
                 }
-              }
+              },
             },
-          },
-          {
-            key: "showGrid",
-            value: function () {
-              for (
-                var t = 0;
-                t < this.reels.length && t < this.grid.length;
-                t++
-              )
-                this.reels[t].loadStrip(this.grid[t]);
-            },
-          },
-          {
-            key: "loadConfig",
-            value:
-              ((i = z(
-                q().mark(function t() {
-                  var e, n, r;
-                  return q().wrap(
-                    function (t) {
-                      for (;;)
-                        switch ((t.prev = t.next)) {
-                          case 0:
-                            return (t.prev = 0), (t.next = 3), _();
-                          case 3:
-                            (n = t.sent) &&
-                              ((this.state.config = n),
-                              n.betAmount && (this.state.bet = n.betAmount)),
-                              (t.next = 9);
-                            break;
-                          case 7:
-                            (t.prev = 7), (t.t0 = t.catch(0));
-                          case 9:
-                            (r = localStorage.getItem("slot777_balance"))
-                              ? (this.state.balance = parseInt(r, 10))
-                              : null !== (e = this.state.config) &&
-                                void 0 !== e &&
-                                e.startingMoney &&
-                                (this.state.balance =
-                                  this.state.config.startingMoney),
-                              P(this.state.balance),
-                              this.updateUI();
-                          case 13:
-                          case "end":
-                            return t.stop();
-                        }
-                    },
-                    t,
-                    this,
-                    [[0, 7]],
-                  );
-                }),
-              )),
-              function () {
-                return i.apply(this, arguments);
-              }),
-          },
-          {
-            key: "bindEvents",
-            value: function () {
-              var t,
-                e,
-                n,
-                r,
-                i,
-                o,
-                a,
-                l = this;
-              null === (t = this.el.spinBtn) ||
-                void 0 === t ||
-                t.addEventListener("click", function () {
-                  return l.spin();
-                }),
-                null === (e = this.el.resetBtn) ||
-                  void 0 === e ||
-                  e.addEventListener("click", function () {
-                    return l.resetBalance();
-                  }),
-                null === (n = this.el.betDown) ||
-                  void 0 === n ||
-                  n.addEventListener("click", function () {
-                    return l.adjustBet(-50);
-                  }),
-                null === (r = this.el.betUp) ||
-                  void 0 === r ||
-                  r.addEventListener("click", function () {
-                    return l.adjustBet(50);
-                  }),
-                null === (i = this.el.maxBet) ||
-                  void 0 === i ||
-                  i.addEventListener("click", function () {
-                    return l.maxBet();
-                  }),
-                null === (o = this.el.autoplay) ||
-                  void 0 === o ||
-                  o.addEventListener("change", function () {
-                    (l.state.autoplay = l.el.autoplay.checked),
-                      l.state.autoplay &&
-                        !l.state.spinning &&
-                        l.state.balance >= l.state.bet &&
-                        l.spin();
-                  }),
-                null === (a = this.el.turboMode) ||
-                  void 0 === a ||
-                  a.addEventListener("change", function () {
-                    l.state.turbo = l.el.turboMode.checked;
-                  }),
-                document.addEventListener("keydown", function (t) {
-                  "Space" !== t.code ||
-                    l.state.spinning ||
-                    (t.preventDefault(), l.spin());
-                }),
-                window.addEventListener("resize", function () {
-                  var t,
-                    e = $(l.reels);
+            {
+              key: "initReels",
+              value: function () {
+                var t = document.querySelectorAll(".reel");
+                if (t) {
+                  var e,
+                    n = X(t);
                   try {
-                    for (e.s(); !(t = e.n()).done; ) t.value.updateSize();
+                    for (n.s(); !(e = n.n()).done; ) {
+                      var r = e.value;
+                      this.reels.push(new a(r, b, g));
+                    }
                   } catch (t) {
-                    e.e(t);
+                    n.e(t);
                   } finally {
-                    e.f();
+                    n.f();
                   }
-                });
+                }
+              },
             },
-          },
-          {
-            key: "adjustBet",
-            value: function (t) {
-              var e = Math.min(1e4, this.state.balance);
-              (this.state.bet = Math.max(10, Math.min(e, this.state.bet + t))),
-                this.updateUI();
+            {
+              key: "showGrid",
+              value: function () {
+                for (
+                  var t = 0;
+                  t < this.reels.length && t < this.grid.length;
+                  t++
+                )
+                  this.reels[t].loadStrip(this.grid[t]);
+              },
             },
-          },
-          {
-            key: "maxBet",
-            value: function () {
-              (this.state.bet = Math.min(1e4, this.state.balance)),
-                this.updateUI();
+            {
+              key: "log",
+              value: function () {
+                for (
+                  var t, e = arguments.length, n = new Array(e), r = 0;
+                  r < e;
+                  r++
+                )
+                  n[r] = arguments[r];
+                this.debug && (t = console).log.apply(t, ["[SLOT]"].concat(n));
+              },
             },
-          },
-          {
-            key: "resetBalance",
-            value:
-              ((r = z(
-                q().mark(function t() {
-                  var e, n;
-                  return q().wrap(
-                    function (t) {
-                      for (;;)
-                        switch ((t.prev = t.next)) {
-                          case 0:
-                            return (t.prev = 0), (t.next = 3), _();
-                          case 3:
-                            (n = t.sent) && (this.state.config = n),
-                              (t.next = 9);
-                            break;
-                          case 7:
-                            (t.prev = 7), (t.t0 = t.catch(0));
-                          case 9:
-                            (this.state.balance =
-                              (null === (e = this.state.config) || void 0 === e
-                                ? void 0
-                                : e.startingMoney) || 1e4),
-                              (this.state.lossStreak = 0),
-                              localStorage.setItem(
-                                "slot777_balance",
-                                this.state.balance,
-                              ),
-                              P(this.state.balance),
-                              this.el.spinBtn &&
-                                (this.el.spinBtn.disabled = !1),
-                              this.updateUI(),
-                              this.showMsg("💰 BALANCE RESET");
-                          case 16:
-                          case "end":
-                            return t.stop();
-                        }
-                    },
-                    t,
-                    this,
-                    [[0, 7]],
-                  );
+            {
+              key: "loadConfig",
+              value:
+                ((i = Q(
+                  $().mark(function t() {
+                    var e, n, r;
+                    return $().wrap(
+                      function (t) {
+                        for (;;)
+                          switch ((t.prev = t.next)) {
+                            case 0:
+                              return (t.prev = 0), (t.next = 3), D();
+                            case 3:
+                              (e = t.sent) && Object.keys(e).length > 0
+                                ? ((this.state.config = e),
+                                  e.betAmount && (this.state.bet = e.betAmount),
+                                  this.log(
+                                    "[CONFIG] Loaded from server:",
+                                    JSON.stringify(e),
+                                  ))
+                                : this.log(
+                                    "[CONFIG] Server returned empty config, using defaults",
+                                  ),
+                                (t.next = 10);
+                              break;
+                            case 7:
+                              (t.prev = 7),
+                                (t.t0 = t.catch(0)),
+                                this.log(
+                                  "[CONFIG] Fetch failed:",
+                                  t.t0.message,
+                                );
+                            case 10:
+                              (n = localStorage.getItem("slot777_balance")),
+                                (this.state.balance = n
+                                  ? parseInt(n, 10)
+                                  : Math.max(
+                                      (null === (r = this.state.config) ||
+                                      void 0 === r
+                                        ? void 0
+                                        : r.startingMoney) || 1e4,
+                                      1e3,
+                                    )),
+                                _(this.state.balance),
+                                this.updateUI();
+                            case 14:
+                            case "end":
+                              return t.stop();
+                          }
+                      },
+                      t,
+                      this,
+                      [[0, 7]],
+                    );
+                  }),
+                )),
+                function () {
+                  return i.apply(this, arguments);
                 }),
-              )),
-              function () {
-                return r.apply(this, arguments);
-              }),
-          },
-          {
-            key: "onConfigChanged",
-            value: function (t) {
-              t &&
-                ((this.state.config = t),
-                console.log("[Game] Config updated via WebSocket:", t),
-                this.showMsg("⚙️ CONFIG UPDATED", "#D5AD6D"));
             },
-          },
-          {
-            key: "onJackpotChanged",
-            value: function (t) {
-              console.log("[Game] Jackpot updated:", t);
-              var e = document.getElementById("jackpotDisplay");
-              if (e) {
-                var n = (t || 0).toLocaleString("id-ID");
-                (e.textContent = n),
+            {
+              key: "getActiveConfig",
+              value: function () {
+                var t = this.state.config || {};
+                return {
+                  winRate:
+                    void 0 !== t.winRate && null !== t.winRate
+                      ? t.winRate
+                      : 0.15,
+                  payoutMultiplier:
+                    void 0 !== t.payoutMultiplier && null !== t.payoutMultiplier
+                      ? t.payoutMultiplier
+                      : 3,
+                  minSpinsBeforeWin:
+                    void 0 !== t.minSpinsBeforeWin &&
+                    null !== t.minSpinsBeforeWin
+                      ? t.minSpinsBeforeWin
+                      : 0,
+                  jackpotHitRate:
+                    void 0 !== t.jackpotHitRate && null !== t.jackpotHitRate
+                      ? t.jackpotHitRate
+                      : 0.005,
+                  difficultyId:
+                    void 0 !== t.difficultyId && null !== t.difficultyId
+                      ? t.difficultyId
+                      : 2,
+                  difficultyLabel:
+                    t.difficultyLabel || t.difficulty || "Medium",
+                  jackpot: t.jackpot || 5555555,
+                  startingMoney: t.startingMoney || 1e4,
+                  betAmount: t.betAmount || 100,
+                };
+              },
+            },
+            {
+              key: "onConfigChanged",
+              value: function (t) {
+                if (t && 0 !== Object.keys(t).length) {
+                  this.state.config = t;
+                  var e = this.getActiveConfig();
+                  this.log(
+                    "[WS] Config updated — winRate:",
+                    e.winRate,
+                    "diff:",
+                    e.difficultyLabel,
+                    "payMult:",
+                    e.payoutMultiplier,
+                  ),
+                    this.showMsg(
+                      "⚙️ CONFIG: "
+                        .concat(e.difficultyLabel, " (")
+                        .concat((100 * e.winRate).toFixed(1), "%)"),
+                      "#D5AD6D",
+                    );
+                }
+              },
+            },
+            {
+              key: "onJackpotChanged",
+              value: function (t) {
+                var e = document.getElementById("jackpotDisplay");
+                e &&
+                  ((e.textContent = (t || 0).toLocaleString("id-ID")),
                   e.classList.add("win-flash"),
                   setTimeout(function () {
                     return e.classList.remove("win-flash");
-                  }, 600);
-              }
+                  }, 600));
+              },
             },
-          },
-          {
-            key: "onBalanceChanged",
-            value: function (t, e) {
-              console.log("[Game] Balance update for", t, ":", e),
+            {
+              key: "onBalanceChanged",
+              value: function (t, e) {
                 void 0 !== e &&
                   e >= 0 &&
                   ((this.state.balance = e),
                   localStorage.setItem("slot777_balance", this.state.balance),
                   this.updateUI(),
                   this.showMsg("💰 BALANCE: ".concat(this.fmt(e)), "#4CAF50"));
+              },
             },
-          },
-          {
-            key: "onDifficultyChanged",
-            value: function (t, e, n) {
-              console.log("[Game] Difficulty changed:", t, e, n),
-                this.state.config || (this.state.config = {}),
-                void 0 !== e && (this.state.config.winRate = e),
-                void 0 !== n && (this.state.config.payoutMultiplier = n),
-                this.showMsg(
-                  "🎯 DIFFICULTY: ".concat(t || "CUSTOM"),
-                  "#D5AD6D",
-                );
+            {
+              key: "onDifficultyChanged",
+              value: function (t, e, n) {
+                var r = this.getActiveConfig();
+                void 0 !== e && (r.winRate = e),
+                  void 0 !== n && (r.payoutMultiplier = n),
+                  (this.state.config = V(
+                    V({}, this.state.config),
+                    {},
+                    {
+                      winRate: r.winRate,
+                      payoutMultiplier: r.payoutMultiplier,
+                    },
+                  )),
+                  this.log(
+                    "[WS] Difficulty changed:",
+                    t,
+                    "winRate:",
+                    r.winRate,
+                  ),
+                  this.showMsg(
+                    "🎯 DIFFICULTY: ".concat(t || "CUSTOM"),
+                    "#FFD700",
+                  );
+              },
             },
-          },
-          {
-            key: "onMaintenanceMode",
-            value: function (t) {
-              console.log("[Game] Maintenance mode:", t),
+            {
+              key: "onMaintenanceMode",
+              value: function (t) {
                 t
-                  ? (this.showMsg("🛠️ MAINTENANCE MODE", "#FF6B6B"),
+                  ? (this.showMsg("🛠️ MAINTENANCE", "#FF6B6B"),
                     this.el.spinBtn && (this.el.spinBtn.disabled = !0))
                   : (this.showMsg("✅ READY", "#4CAF50"),
                     this.el.spinBtn &&
                       !this.state.spinning &&
                       (this.el.spinBtn.disabled = !1));
+              },
             },
-          },
-          {
-            key: "onResetGame",
-            value: function () {
-              console.log("[Game] Reset command received"),
-                this.resetBalance(),
-                this.showMsg("🔄 GAME RESET", "#FFD700");
+            {
+              key: "onResetGame",
+              value: function () {
+                this.log("[WS] Reset command received"),
+                  this.resetBalance(),
+                  this.showMsg("🔄 GAME RESET", "#FFD700");
+              },
             },
-          },
-          {
-            key: "spin",
-            value:
-              ((n = z(
-                q().mark(function t() {
-                  var e,
-                    n,
-                    r,
-                    i,
-                    o,
-                    a,
-                    l,
-                    s,
-                    c,
-                    u,
-                    f,
-                    h,
-                    p,
-                    d,
-                    m,
-                    v,
-                    g,
-                    b,
-                    w,
-                    S,
-                    E,
-                    A,
-                    x,
-                    k,
-                    L,
-                    M,
-                    C,
-                    O = this;
-                  return q().wrap(
-                    function (t) {
-                      for (;;)
-                        switch ((t.prev = t.next)) {
-                          case 0:
-                            if (!this.state.spinning) {
-                              t.next = 2;
+            {
+              key: "bindEvents",
+              value: function () {
+                var t,
+                  e,
+                  n,
+                  r,
+                  i,
+                  o,
+                  a,
+                  l = this;
+                null === (t = this.el.spinBtn) ||
+                  void 0 === t ||
+                  t.addEventListener("click", function () {
+                    return l.spin();
+                  }),
+                  null === (e = this.el.resetBtn) ||
+                    void 0 === e ||
+                    e.addEventListener("click", function () {
+                      return l.resetBalance();
+                    }),
+                  null === (n = this.el.betDown) ||
+                    void 0 === n ||
+                    n.addEventListener("click", function () {
+                      return l.adjustBet(-50);
+                    }),
+                  null === (r = this.el.betUp) ||
+                    void 0 === r ||
+                    r.addEventListener("click", function () {
+                      return l.adjustBet(50);
+                    }),
+                  null === (i = this.el.maxBet) ||
+                    void 0 === i ||
+                    i.addEventListener("click", function () {
+                      return l.maxBet();
+                    }),
+                  null === (o = this.el.autoplay) ||
+                    void 0 === o ||
+                    o.addEventListener("change", function () {
+                      (l.state.autoplay = l.el.autoplay.checked),
+                        l.state.autoplay &&
+                          !l.state.spinning &&
+                          l.state.balance >= l.state.bet &&
+                          l.spin();
+                    }),
+                  null === (a = this.el.turboMode) ||
+                    void 0 === a ||
+                    a.addEventListener("change", function () {
+                      l.state.turbo = l.el.turboMode.checked;
+                    }),
+                  document.addEventListener("keydown", function (t) {
+                    "Space" !== t.code ||
+                      l.state.spinning ||
+                      (t.preventDefault(), l.spin());
+                  }),
+                  window.addEventListener("resize", function () {
+                    var t,
+                      e = X(l.reels);
+                    try {
+                      for (e.s(); !(t = e.n()).done; ) t.value.updateSize();
+                    } catch (t) {
+                      e.e(t);
+                    } finally {
+                      e.f();
+                    }
+                  });
+              },
+            },
+            {
+              key: "adjustBet",
+              value: function (t) {
+                var e = Math.min(1e4, this.state.balance);
+                (this.state.bet = Math.max(
+                  10,
+                  Math.min(e, this.state.bet + t),
+                )),
+                  this.updateUI();
+              },
+            },
+            {
+              key: "maxBet",
+              value: function () {
+                (this.state.bet = Math.min(1e4, this.state.balance)),
+                  this.updateUI();
+              },
+            },
+            {
+              key: "resetBalance",
+              value:
+                ((r = Q(
+                  $().mark(function t() {
+                    var e, n;
+                    return $().wrap(
+                      function (t) {
+                        for (;;)
+                          switch ((t.prev = t.next)) {
+                            case 0:
+                              return (t.prev = 0), (t.next = 3), D();
+                            case 3:
+                              (e = t.sent) && (this.state.config = e),
+                                (t.next = 9);
                               break;
-                            }
-                            return t.abrupt("return");
-                          case 2:
-                            if (!(this.state.balance < this.state.bet)) {
-                              t.next = 5;
-                              break;
-                            }
-                            return (
-                              this.showMsg("💸 BALANCE LOW"), t.abrupt("return")
-                            );
-                          case 5:
-                            for (
-                              this.state.spinning = !0,
-                                this.state.balance -= this.state.bet,
-                                this.state.spinCount++,
-                                this.updateUI(),
-                                this.el.spinBtn &&
-                                  (this.el.spinBtn.disabled = !0),
-                                this.anim.clearHighlights(),
-                                this.anim.pulseSpinBtn(this.el.spinBtn),
+                            case 7:
+                              (t.prev = 7), (t.t0 = t.catch(0));
+                            case 9:
+                              (n = this.getActiveConfig()),
+                                (this.state.balance = n.startingMoney),
+                                (this.state.lossStreak = 0),
                                 localStorage.setItem(
                                   "slot777_balance",
                                   this.state.balance,
                                 ),
-                                P(this.state.balance),
-                                i = this.state.config || {},
-                                o =
-                                  null !== (e = i.winRate) && void 0 !== e
-                                    ? e
-                                    : 0.15,
-                                a =
-                                  null !== (n = i.payoutMultiplier) &&
-                                  void 0 !== n
-                                    ? n
-                                    : 3,
-                                l =
-                                  null !== (r = i.minSpinsBeforeWin) &&
-                                  void 0 !== r
-                                    ? r
-                                    : 0,
-                                this.state.lossStreak =
-                                  this.state.lossStreak || 0,
-                                s = !1,
-                                l > 0 &&
-                                  this.state.lossStreak >= l &&
-                                  ((s = !0), (this.state.lossStreak = 0)),
-                                c = this.generateResult(s ? 1 : o, a),
-                                u = c.grid,
-                                f = c.wins,
-                                this.grid = u,
-                                h = y(f),
-                                p = this.state.turbo,
-                                this.showMsg("🎰 SPINNING!"),
-                                t.prev = 26,
-                                v = [
-                                  (m = p ? 800 : 1200),
-                                  m + (d = p ? 200 : 280),
-                                  m + 2 * d,
-                                ],
-                                g = [],
-                                b = 0;
-                              b < 3 && b < this.reels.length;
-                              b++
-                            )
-                              (w = this.grid[b] || ["BAR", "BAR", "BAR"]),
-                                g.push(this.reels[b].spin(w, v[b]));
-                            return (t.next = 34), Promise.all(g);
-                          case 34:
-                            t.next = 43;
-                            break;
-                          case 36:
-                            return (
-                              (t.prev = 36),
-                              (t.t0 = t.catch(26)),
-                              console.error("Spin error:", t.t0),
-                              (this.state.spinning = !1),
-                              this.el.spinBtn &&
-                                (this.el.spinBtn.disabled = !1),
-                              this.showMsg("⚠️ ERROR"),
-                              t.abrupt("return")
-                            );
-                          case 43:
-                            if (
-                              ((this.state.lastWin = h),
-                              (this.state.totalWins += h),
-                              h > 0)
-                            ) {
-                              (this.state.balance += h),
-                                (this.state.lossStreak = 0),
-                                (S = []),
-                                (E = $(f));
-                              try {
-                                for (E.s(); !(A = E.n()).done; ) {
-                                  (x = A.value), (k = $(x.positions));
-                                  try {
-                                    for (k.s(); !(L = k.n()).done; )
-                                      (M = L.value), S.push(M);
-                                  } catch (t) {
-                                    k.e(t);
-                                  } finally {
-                                    k.f();
-                                  }
-                                }
-                              } catch (t) {
-                                E.e(t);
-                              } finally {
-                                E.f();
-                              }
-                              this.anim.highlightWins(S),
-                                this.showMsg(
-                                  "🎉 WIN ".concat(this.fmt(h), "!"),
-                                  "#FF6B6B",
-                                ),
-                                this.el.totalWinDisplay &&
-                                  (this.anim.countUp(
-                                    this.el.totalWinDisplay,
-                                    h,
-                                  ),
-                                  this.anim.flashWin(this.el.totalWinDisplay)),
+                                _(this.state.balance),
                                 this.el.spinBtn &&
-                                  ((C =
-                                    this.el.spinBtn.getBoundingClientRect()),
-                                  this.anim.burst(C.left + C.width / 2, C.top));
-                            } else this.state.lossStreak++;
-                            localStorage.setItem(
-                              "slot777_balance",
-                              this.state.balance,
-                            ),
-                              P(this.state.balance),
-                              (this.state.spinning = !1),
-                              this.el.spinBtn &&
-                                (this.el.spinBtn.disabled = !1),
-                              this.updateUI(),
-                              this.state.autoplay &&
-                              this.state.balance >= this.state.bet
-                                ? setTimeout(
-                                    function () {
-                                      return O.spin();
-                                    },
-                                    p ? 100 : 400,
-                                  )
-                                : (this.el.autoplay &&
-                                    (this.el.autoplay.checked = !1),
-                                  (this.state.autoplay = !1));
-                          case 52:
-                          case "end":
-                            return t.stop();
-                        }
-                    },
-                    t,
-                    this,
-                    [[26, 36]],
-                  );
-                }),
-              )),
-              function () {
-                return n.apply(this, arguments);
-              }),
-          },
-          {
-            key: "generateResult",
-            value: function (t, e) {
-              var n;
-              if (Math.random() < t) {
-                var r = g(),
-                  i = [
-                    [g(), r, g()],
-                    [g(), r, g()],
-                    [g(), r, g()],
-                  ],
-                  o = p(i, this.state.bet);
-                if (e && 1 !== e) {
-                  var a,
-                    l = $(o);
-                  try {
-                    for (l.s(); !(a = l.n()).done; ) {
-                      var s = a.value;
-                      s.amount = Math.floor(s.amount * e);
-                    }
-                  } catch (t) {
-                    l.e(t);
-                  } finally {
-                    l.f();
-                  }
-                }
-                if (
-                  0 === o.length &&
-                  ((i[0][1] = r),
-                  (i[1][1] = r),
-                  (i[2][1] = r),
-                  (o = p(i, this.state.bet)),
-                  e && 1 !== e)
-                ) {
-                  var c,
-                    u = $(o);
-                  try {
-                    for (u.s(); !(c = u.n()).done; ) {
-                      var f = c.value;
-                      f.amount = Math.floor(f.amount * e);
-                    }
-                  } catch (t) {
-                    u.e(t);
-                  } finally {
-                    u.f();
-                  }
-                }
-                return { grid: i, wins: o };
-              }
-              var h = 0;
-              do {
-                (n = [
-                  [g(), g(), g()],
-                  [g(), g(), g()],
-                  [g(), g(), g()],
-                ]),
-                  h++;
-              } while (p(n, this.state.bet).length > 0 && h < 50);
-              return { grid: n, wins: [] };
-            },
-          },
-          {
-            key: "fmt",
-            value: function (t) {
-              return (null != t ? t : 0).toLocaleString("id-ID");
-            },
-          },
-          {
-            key: "updateUI",
-            value: function () {
-              this.el.playerMoney &&
-                (this.el.playerMoney.textContent = this.fmt(
-                  this.state.balance,
+                                  (this.el.spinBtn.disabled = !1),
+                                this.updateUI(),
+                                this.showMsg("💰 BALANCE RESET");
+                            case 17:
+                            case "end":
+                              return t.stop();
+                          }
+                      },
+                      t,
+                      this,
+                      [[0, 7]],
+                    );
+                  }),
                 )),
-                this.el.betDisplay &&
-                  (this.el.betDisplay.textContent = this.fmt(this.state.bet)),
-                this.el.betDisplay2 &&
-                  (this.el.betDisplay2.textContent = this.fmt(this.state.bet));
+                function () {
+                  return r.apply(this, arguments);
+                }),
             },
-          },
-          {
-            key: "showMsg",
-            value: function (t, e) {
-              this.el.winText &&
-                ((this.el.winText.textContent = t || ""),
-                (this.el.winText.style.color = e || "#D5AD6D"));
+            {
+              key: "spin",
+              value:
+                ((n = Q(
+                  $().mark(function t() {
+                    var e,
+                      n,
+                      r,
+                      i,
+                      o,
+                      a,
+                      l,
+                      s,
+                      c,
+                      u,
+                      f,
+                      h,
+                      y,
+                      d,
+                      m,
+                      v,
+                      g,
+                      b,
+                      w,
+                      S,
+                      E,
+                      A,
+                      k,
+                      x,
+                      L,
+                      M,
+                      O,
+                      R,
+                      C = this;
+                    return $().wrap(
+                      function (t) {
+                        for (;;)
+                          switch ((t.prev = t.next)) {
+                            case 0:
+                              if (!this.state.spinning) {
+                                t.next = 2;
+                                break;
+                              }
+                              return t.abrupt("return");
+                            case 2:
+                              if (!(this.state.balance < this.state.bet)) {
+                                t.next = 5;
+                                break;
+                              }
+                              return (
+                                this.showMsg("💸 BALANCE LOW"),
+                                t.abrupt("return")
+                              );
+                            case 5:
+                              for (
+                                this.state.spinning = !0,
+                                  this.state.balance -= this.state.bet,
+                                  this.state.spinCount++,
+                                  this.updateUI(),
+                                  this.el.spinBtn &&
+                                    (this.el.spinBtn.disabled = !0),
+                                  this.anim.clearHighlights(),
+                                  this.anim.pulseSpinBtn(this.el.spinBtn),
+                                  localStorage.setItem(
+                                    "slot777_balance",
+                                    this.state.balance,
+                                  ),
+                                  _(this.state.balance),
+                                  e = this.getActiveConfig(),
+                                  n = e.winRate,
+                                  r = e.payoutMultiplier,
+                                  i = e.minSpinsBeforeWin,
+                                  this.log(
+                                    "[SPIN#" +
+                                      this.state.spinCount +
+                                      "] winRate:",
+                                    n,
+                                    "| payoutMult:",
+                                    r,
+                                    "| difficulty:",
+                                    e.difficultyLabel,
+                                    "| minSpins:",
+                                    i,
+                                    "| lossStreak:",
+                                    this.state.lossStreak,
+                                  ),
+                                  this.state.lossStreak =
+                                    this.state.lossStreak || 0,
+                                  o = n,
+                                  i > 0 &&
+                                    this.state.lossStreak >= 3 * i &&
+                                    ((a = this.state.lossStreak - 3 * i),
+                                    (l = Math.min(0.001 * a, 2 * n)),
+                                    (o = Math.min(n + l, 0.5)),
+                                    this.log(
+                                      "[SPIN] Loss streak protection: effective rate:",
+                                      o,
+                                    )),
+                                  s = Math.random(),
+                                  c = s < o,
+                                  this.log(
+                                    "[SPIN] RNG roll:",
+                                    s.toFixed(6),
+                                    "| threshold:",
+                                    o.toFixed(6),
+                                    "| result:",
+                                    c ? "WIN" : "LOSE",
+                                  ),
+                                  u = this.generateResult(c, r),
+                                  f = u.grid,
+                                  h = u.wins,
+                                  this.grid = f,
+                                  y = p(h),
+                                  this.log("[SPIN] Grid:", JSON.stringify(f)),
+                                  this.log(
+                                    "[SPIN] Wins:",
+                                    y > 0
+                                      ? JSON.stringify(
+                                          h.map(function (t) {
+                                            return {
+                                              sym: t.symbol,
+                                              count: t.count,
+                                              mult: t.multiplier,
+                                              amt: t.amount,
+                                            };
+                                          }),
+                                        )
+                                      : "NONE",
+                                  ),
+                                  this.log("[SPIN] Payout:", y),
+                                  d = this.state.turbo,
+                                  this.showMsg("🎰 SPINNING!"),
+                                  t.prev = 33,
+                                  g = [
+                                    (v = d ? 800 : 1200),
+                                    v + (m = d ? 200 : 280),
+                                    v + 2 * m,
+                                  ],
+                                  b = [],
+                                  w = 0;
+                                w < 3 && w < this.reels.length;
+                                w++
+                              )
+                                (S = this.grid[w] || ["BAR", "BAR", "BAR"]),
+                                  b.push(this.reels[w].spin(S, g[w]));
+                              return (t.next = 41), Promise.all(b);
+                            case 41:
+                              t.next = 50;
+                              break;
+                            case 43:
+                              return (
+                                (t.prev = 43),
+                                (t.t0 = t.catch(33)),
+                                console.error("[SPIN] Error:", t.t0),
+                                (this.state.spinning = !1),
+                                this.el.spinBtn &&
+                                  (this.el.spinBtn.disabled = !1),
+                                this.showMsg("⚠️ ERROR"),
+                                t.abrupt("return")
+                              );
+                            case 50:
+                              if (
+                                ((this.state.lastWin = y),
+                                (this.state.totalWins += y),
+                                y > 0)
+                              ) {
+                                (this.state.balance += y),
+                                  (this.state.lossStreak = 0),
+                                  (E = []),
+                                  (A = X(h));
+                                try {
+                                  for (A.s(); !(k = A.n()).done; ) {
+                                    (x = k.value), (L = X(x.positions));
+                                    try {
+                                      for (L.s(); !(M = L.n()).done; )
+                                        (O = M.value), E.push(O);
+                                    } catch (t) {
+                                      L.e(t);
+                                    } finally {
+                                      L.f();
+                                    }
+                                  }
+                                } catch (t) {
+                                  A.e(t);
+                                } finally {
+                                  A.f();
+                                }
+                                this.anim.highlightWins(E),
+                                  this.showMsg(
+                                    "🎉 WIN ".concat(this.fmt(y), "!"),
+                                    "#FF6B6B",
+                                  ),
+                                  this.el.totalWinDisplay &&
+                                    (this.anim.countUp(
+                                      this.el.totalWinDisplay,
+                                      y,
+                                    ),
+                                    this.anim.flashWin(
+                                      this.el.totalWinDisplay,
+                                    )),
+                                  this.el.spinBtn &&
+                                    ((R =
+                                      this.el.spinBtn.getBoundingClientRect()),
+                                    this.anim.burst(
+                                      R.left + R.width / 2,
+                                      R.top,
+                                    )),
+                                  this.log(
+                                    "[RESULT] WIN — amount:",
+                                    y,
+                                    "balance:",
+                                    this.state.balance,
+                                  );
+                              } else
+                                this.state.lossStreak++,
+                                  this.log(
+                                    "[RESULT] LOSE — lossStreak:",
+                                    this.state.lossStreak,
+                                    "balance:",
+                                    this.state.balance,
+                                  );
+                              localStorage.setItem(
+                                "slot777_balance",
+                                this.state.balance,
+                              ),
+                                _(this.state.balance),
+                                (this.state.spinning = !1),
+                                this.el.spinBtn &&
+                                  (this.el.spinBtn.disabled = !1),
+                                this.updateUI(),
+                                this.state.autoplay &&
+                                this.state.balance >= this.state.bet
+                                  ? setTimeout(
+                                      function () {
+                                        return C.spin();
+                                      },
+                                      d ? 100 : 400,
+                                    )
+                                  : (this.el.autoplay &&
+                                      (this.el.autoplay.checked = !1),
+                                    (this.state.autoplay = !1));
+                            case 59:
+                            case "end":
+                              return t.stop();
+                          }
+                      },
+                      t,
+                      this,
+                      [[33, 43]],
+                    );
+                  }),
+                )),
+                function () {
+                  return n.apply(this, arguments);
+                }),
             },
-          },
-        ]),
-        e && V(t.prototype, e),
-        Object.defineProperty(t, "prototype", { writable: !1 }),
-        t
-      );
-      var t, e, n, r, i;
-    })();
+            {
+              key: "generateResult",
+              value: function (t, e) {
+                if (t) {
+                  var n,
+                    r = g(),
+                    i = [
+                      [null, null, null],
+                      [null, null, null],
+                      [null, null, null],
+                    ],
+                    o = X(
+                      [
+                        [
+                          [0, 0],
+                          [1, 0],
+                          [2, 0],
+                        ],
+                        [
+                          [0, 1],
+                          [1, 1],
+                          [2, 1],
+                        ],
+                        [
+                          [0, 2],
+                          [1, 2],
+                          [2, 2],
+                        ],
+                        [
+                          [0, 0],
+                          [1, 1],
+                          [2, 2],
+                        ],
+                        [
+                          [0, 2],
+                          [1, 1],
+                          [2, 0],
+                        ],
+                      ][Math.floor(5 * Math.random())],
+                    );
+                  try {
+                    for (o.s(); !(n = o.n()).done; ) {
+                      var a = J(n.value, 2),
+                        l = a[0],
+                        s = a[1];
+                      i[l][s] = r;
+                    }
+                  } catch (t) {
+                    o.e(t);
+                  } finally {
+                    o.f();
+                  }
+                  new Set([r]);
+                  for (
+                    var c = rt.filter(function (t) {
+                        return t !== r && "DIAMOND" !== t;
+                      }),
+                      u = 0;
+                    u < 3;
+                    u++
+                  )
+                    for (var f = 0; f < 3; f++)
+                      null === i[u][f] &&
+                        (i[u][f] = c[Math.floor(Math.random() * c.length)]);
+                  var h = y(i, this.state.bet);
+                  if (e && 1 !== e) {
+                    var p,
+                      d = X(h);
+                    try {
+                      for (d.s(); !(p = d.n()).done; ) {
+                        var m = p.value;
+                        m.amount = Math.floor(m.amount * e);
+                      }
+                    } catch (t) {
+                      d.e(t);
+                    } finally {
+                      d.f();
+                    }
+                  }
+                  if (
+                    0 === h.length &&
+                    ((i[0][1] = r),
+                    (i[1][1] = r),
+                    (i[2][1] = r),
+                    (h = y(i, this.state.bet)),
+                    e && 1 !== e)
+                  ) {
+                    var v,
+                      b = X(h);
+                    try {
+                      for (b.s(); !(v = b.n()).done; ) {
+                        var w = v.value;
+                        w.amount = Math.floor(w.amount * e);
+                      }
+                    } catch (t) {
+                      b.e(t);
+                    } finally {
+                      b.f();
+                    }
+                  }
+                  return { grid: i, wins: h };
+                }
+                for (var S = 0; S < 10; S++) {
+                  for (
+                    var E = [
+                        ["", "", ""],
+                        ["", "", ""],
+                        ["", "", ""],
+                      ],
+                      A = [
+                        ["BAR", "CHERRY", "LEMON"],
+                        ["ORANGE", "PLUM", "BELL"],
+                        ["SEVEN", "GRAPES", "WATERMELON"],
+                        ["2BAR", "3BAR", "CHERRY"],
+                        ["LEMON", "ORANGE", "PLUM"],
+                        ["BELL", "GRAPES", "BAR"],
+                        ["WATERMELON", "SEVEN", "2BAR"],
+                        ["3BAR", "CHERRY", "LEMON"],
+                        ["ORANGE", "PLUM", "BELL"],
+                      ],
+                      k = 0;
+                    k < 3;
+                    k++
+                  )
+                    for (var x = 0; x < 3; x++)
+                      E[k][x] = A[3 * k + x][Math.floor(3 * Math.random())];
+                  if (0 === y(E, this.state.bet).length)
+                    return { grid: E, wins: [] };
+                }
+                return {
+                  grid: [
+                    ["BAR", "CHERRY", "LEMON"],
+                    ["ORANGE", "PLUM", "BELL"],
+                    ["SEVEN", "GRAPES", "WATERMELON"],
+                  ],
+                  wins: [],
+                };
+              },
+            },
+            {
+              key: "fmt",
+              value: function (t) {
+                return (null != t ? t : 0).toLocaleString("id-ID");
+              },
+            },
+            {
+              key: "updateUI",
+              value: function () {
+                this.el.playerMoney &&
+                  (this.el.playerMoney.textContent = this.fmt(
+                    this.state.balance,
+                  )),
+                  this.el.betDisplay &&
+                    (this.el.betDisplay.textContent = this.fmt(this.state.bet)),
+                  this.el.betDisplay2 &&
+                    (this.el.betDisplay2.textContent = this.fmt(
+                      this.state.bet,
+                    ));
+              },
+            },
+            {
+              key: "showMsg",
+              value: function (t, e) {
+                this.el.winText &&
+                  ((this.el.winText.textContent = t || ""),
+                  (this.el.winText.style.color = e || "#D5AD6D"));
+              },
+            },
+          ]),
+          e && et(t.prototype, e),
+          Object.defineProperty(t, "prototype", { writable: !1 }),
+          t
+        );
+        var t, e, n, r, i;
+      })();
     "loading" === document.readyState
       ? document.addEventListener("DOMContentLoaded", function () {
-          return new X();
+          return new it();
         })
-      : new X();
+      : new it();
   })();
 })();
