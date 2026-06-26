@@ -1,4 +1,4 @@
-/*! For license information please see bundle.4031acee4d8243b30b32.js.LICENSE.txt */
+/*! For license information please see bundle.ac0997261bfb2e83080d.js.LICENSE.txt */
 (() => {
   "use strict";
   (() => {
@@ -123,11 +123,12 @@
             (this.renderFn = n),
             (this.randomFn = r),
             (this.stripEl = null),
-            (this.symbolHeight = 0),
+            (this.symbolHeight = 50),
             (this.currentOffset = 0),
-            (this.isSpinning = !1),
             (this.totalSymbols = 0),
-            this._build();
+            (this.isSpinning = !1),
+            this._build(),
+            this._calcSymbolHeight();
         }),
         (o = [
           {
@@ -137,16 +138,15 @@
                 (this.stripEl = document.createElement("div")),
                 (this.stripEl.className = "reel-strip"),
                 (this.stripEl.style.cssText =
-                  "\n      position: absolute;\n      left: 0;\n      right: 0;\n      top: 0;\n      will-change: transform;\n      backface-visibility: hidden;\n    "),
-                this.reelEl.appendChild(this.stripEl),
-                this._calcSymbolHeight();
+                  "position:absolute;left:0;right:0;top:0;will-change:transform;backface-visibility:hidden;"),
+                this.reelEl.appendChild(this.stripEl);
             },
           },
           {
             key: "_calcSymbolHeight",
             value: function () {
               var t = this.reelEl.clientHeight;
-              this.symbolHeight = t > 0 ? t / 3 : 50;
+              t > 0 && (this.symbolHeight = t / 3);
             },
           },
           {
@@ -154,27 +154,33 @@
             value: function (t) {
               (this.totalSymbols = t.length), (this.stripEl.innerHTML = "");
               var n,
-                r = e(t);
+                r = Math.max(16, Math.min(40, 0.5 * this.symbolHeight)),
+                i = e(t);
               try {
-                for (r.s(); !(n = r.n()).done; ) {
-                  var i = n.value,
-                    o = document.createElement("div");
-                  o.className = "sym";
-                  var a = this.renderFn(i);
-                  (o.textContent = a.icon),
-                    (o.style.cssText = "\n        background: "
-                      .concat(a.bg, ";\n        color: ")
-                      .concat(a.color, ";\n        height: ")
-                      .concat(
-                        this.symbolHeight,
-                        "px;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        font-weight: 800;\n        font-size: clamp(18px, 5vw, 40px);\n        text-shadow: 0 2px 4px rgba(0,0,0,0.5);\n        border-bottom: 1px solid rgba(255,255,255,0.03);\n      ",
-                      )),
-                    this.stripEl.appendChild(o);
+                for (i.s(); !(n = i.n()).done; ) {
+                  var o = n.value,
+                    a = this.renderFn(o),
+                    l = document.createElement("div");
+                  (l.className = "sym"),
+                    (l.textContent = a.icon),
+                    (l.style.cssText = [
+                      "height:".concat(this.symbolHeight, "px"),
+                      "font-size:".concat(r, "px"),
+                      "background:".concat(a.bg),
+                      "color:".concat(a.color),
+                      "display:flex",
+                      "align-items:center",
+                      "justify-content:center",
+                      "font-weight:800",
+                      "text-shadow:0 2px 6px rgba(0,0,0,0.5)",
+                      "border-bottom:1px solid rgba(255,255,255,0.03)",
+                    ].join(";")),
+                    this.stripEl.appendChild(l);
                 }
               } catch (t) {
-                r.e(t);
+                i.e(t);
               } finally {
-                r.f();
+                i.f();
               }
               (this.stripEl.style.height =
                 this.totalSymbols * this.symbolHeight + "px"),
@@ -189,7 +195,7 @@
                 var e =
                     arguments.length > 1 && void 0 !== arguments[1]
                       ? arguments[1]
-                      : 15,
+                      : 25,
                   i = [],
                   o = 0;
                 o < e;
@@ -227,62 +233,44 @@
           },
           {
             key: "spin",
-            value: function (t) {
-              var e = this,
-                n =
-                  arguments.length > 1 && void 0 !== arguments[1]
-                    ? arguments[1]
-                    : 800,
-                r =
-                  arguments.length > 2 && void 0 !== arguments[2]
-                    ? arguments[2]
-                    : 0;
-              return new Promise(function (i) {
-                e.stripEl && 0 !== e.totalSymbols
-                  ? setTimeout(function () {
-                      e.isSpinning = !0;
-                      var r = e.buildSpinStrip(t);
-                      e.loadStrip(r);
-                      var o = -(e.totalSymbols - 2 - 1) * e.symbolHeight,
-                        a = (e.totalSymbols - 3) * e.symbolHeight,
-                        l = (Math.abs(o - 0), -3 * a);
-                      (e.currentOffset = l),
-                        (e.stripEl.style.transform = "translateY(".concat(
-                          l,
-                          "px)",
-                        ));
-                      var u = performance.now(),
-                        s = function (t) {
-                          var r = t - u,
-                            a = Math.min(r / n, 1),
-                            c = 1 - Math.pow(1 - a, 3),
-                            f = l + (o - l) * c;
-                          (e.currentOffset = f),
-                            (e.stripEl.style.transform = "translateY(".concat(
-                              f,
-                              "px)",
-                            )),
-                            a < 1
-                              ? requestAnimationFrame(s)
-                              : ((e.currentOffset = o),
-                                (e.stripEl.style.transform =
-                                  "translateY(".concat(o, "px)")),
-                                (e.isSpinning = !1),
-                                i());
-                        };
-                      requestAnimationFrame(s);
-                    }, r)
-                  : i();
+            value: function (t, e) {
+              var n = this;
+              return new Promise(function (r) {
+                if (n.stripEl) {
+                  var i = n.buildSpinStrip(t);
+                  n.loadStrip(i);
+                  var o = -(n.totalSymbols - 3) * n.symbolHeight,
+                    a = performance.now();
+                  n.isSpinning = !0;
+                  var l = function (t) {
+                    var i,
+                      u = t - a,
+                      s = Math.min(u / e, 1);
+                    if (s < 0.55) i = (s / 0.55) * 0.88;
+                    else {
+                      var c = (s - 0.55) / 0.45;
+                      i = 0.88 + 0.12 * (1 - Math.pow(1 - c, 4));
+                    }
+                    i = Math.min(i, 1);
+                    var f = 0 + (o - 0) * i;
+                    (n.currentOffset = f),
+                      (n.stripEl.style.transform = "translateY(".concat(
+                        f,
+                        "px)",
+                      )),
+                      s < 1
+                        ? requestAnimationFrame(l)
+                        : ((n.currentOffset = o),
+                          (n.stripEl.style.transform = "translateY(".concat(
+                            o,
+                            "px)",
+                          )),
+                          (n.isSpinning = !1),
+                          r());
+                  };
+                  requestAnimationFrame(l);
+                } else r();
               });
-            },
-          },
-          {
-            key: "reset",
-            value: function () {
-              this.stripEl &&
-                ((this.currentOffset = 0),
-                (this.stripEl.style.transform = "translateY(0px)")),
-                (this.isSpinning = !1);
             },
           },
           {
@@ -295,19 +283,19 @@
                 this.stripEl.style.height =
                   this.totalSymbols * this.symbolHeight + "px";
                 var t,
-                  n = e(this.stripEl.querySelectorAll(".sym"));
+                  n = Math.max(16, Math.min(40, 0.5 * this.symbolHeight)),
+                  r = e(this.stripEl.querySelectorAll(".sym"));
                 try {
-                  for (n.s(); !(t = n.n()).done; )
-                    t.value.style.height = this.symbolHeight + "px";
+                  for (r.s(); !(t = r.n()).done; ) {
+                    var i = t.value;
+                    (i.style.height = this.symbolHeight + "px"),
+                      (i.style.fontSize = n + "px");
+                  }
                 } catch (t) {
-                  n.e(t);
+                  r.e(t);
                 } finally {
-                  n.f();
+                  r.f();
                 }
-                this.stripEl.style.transform = "translateY(".concat(
-                  this.currentOffset,
-                  "px)",
-                );
               }
             },
           },
@@ -474,9 +462,9 @@
       var n,
         r =
           null === (n = window.__SYMBOLS_DATA) || void 0 === n ? void 0 : n[t];
-      if (!r || !r.mult) return 0;
-      var i = r.mult;
-      return i[Math.min(Math.max(e - 1, 0), i.length - 1)];
+      if (null == r || !r.mult) return 0;
+      var i = Math.min(Math.max(e - 1, 0), r.mult.length - 1);
+      return r.mult[i];
     }
     function p(t, e) {
       if (!t || t.length < 3) return [];
@@ -1074,9 +1062,9 @@
       );
       var t, e;
     })();
-    function O(t) {
+    function M(t) {
       return (
-        (O =
+        (M =
           "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             ? function (t) {
                 return typeof t;
@@ -1089,10 +1077,10 @@
                   ? "symbol"
                   : typeof t;
               }),
-        O(t)
+        M(t)
       );
     }
-    function M(t, e) {
+    function O(t, e) {
       return (
         (function (t) {
           if (Array.isArray(t)) return t;
@@ -1228,7 +1216,7 @@
         return this;
       });
       var S = Object.getPrototypeOf,
-        E = S && S(S(T([])));
+        E = S && S(S(C([])));
       E && E !== n && r.call(E, a) && (w = E);
       var x = (b.prototype = m.prototype = Object.create(w));
       function A(t) {
@@ -1244,7 +1232,7 @@
           if ("throw" !== u.type) {
             var s = u.arg,
               c = s.value;
-            return c && "object" == O(c) && r.call(c, "__await")
+            return c && "object" == M(c) && r.call(c, "__await")
               ? e.resolve(c.__await).then(
                   function (t) {
                     n("next", t, a, l);
@@ -1287,7 +1275,7 @@
           for (r.method = o, r.arg = a; ; ) {
             var l = r.delegate;
             if (l) {
-              var u = M(l, r);
+              var u = O(l, r);
               if (u) {
                 if (u === v) continue;
                 return u;
@@ -1309,7 +1297,7 @@
           }
         };
       }
-      function M(e, n) {
+      function O(e, n) {
         var r = n.method,
           i = e.iterator[r];
         if (i === t)
@@ -1319,7 +1307,7 @@
               e.iterator.return &&
               ((n.method = "return"),
               (n.arg = t),
-              M(e, n),
+              O(e, n),
               "throw" === n.method)) ||
               ("return" !== r &&
                 ((n.method = "throw"),
@@ -1360,7 +1348,7 @@
           t.forEach(j, this),
           this.reset(!0);
       }
-      function T(e) {
+      function C(e) {
         if (e || "" === e) {
           var n = e[a];
           if (n) return n.call(e);
@@ -1375,7 +1363,7 @@
             return (o.next = o);
           }
         }
-        throw new TypeError(O(e) + " is not iterable");
+        throw new TypeError(M(e) + " is not iterable");
       }
       return (
         (g.prototype = b),
@@ -1438,7 +1426,7 @@
             }
           );
         }),
-        (e.values = T),
+        (e.values = C),
         (F.prototype = {
           constructor: F,
           reset: function (e) {
@@ -1558,7 +1546,7 @@
           },
           delegateYield: function (e, n, r) {
             return (
-              (this.delegate = { iterator: T(e), resultName: n, nextLoc: r }),
+              (this.delegate = { iterator: C(e), resultName: n, nextLoc: r }),
               "next" === this.method && (this.arg = t),
               v
             );
@@ -1592,8 +1580,8 @@
         });
       };
     }
-    var T = window.location.origin;
-    function C(t) {
+    var C = window.location.origin;
+    function T(t) {
       return R.apply(this, arguments);
     }
     function R() {
@@ -1608,7 +1596,7 @@
                     return (
                       (t.prev = 0),
                       (t.next = 3),
-                      fetch(T + e, {
+                      fetch(C + e, {
                         method: "GET",
                         headers: { Accept: "application/json" },
                       })
@@ -1661,10 +1649,10 @@
                       i < o.length;
                       i++
                     )
-                      (a = M(o[i], 2)), (l = a[0]), (u = a[1]), r.append(l, u);
+                      (a = O(o[i], 2)), (l = a[0]), (u = a[1]), r.append(l, u);
                     return (
                       (t.next = 5),
-                      fetch(T + e, {
+                      fetch(C + e, {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/x-www-form-urlencoded",
@@ -1708,7 +1696,7 @@
               for (;;)
                 switch ((t.prev = t.next)) {
                   case 0:
-                    return (t.next = 2), C("/api/config");
+                    return (t.next = 2), T("/api/config");
                   case 2:
                     if ((e = t.sent)) {
                       t.next = 5;
@@ -1902,7 +1890,7 @@
           for (r.method = o, r.arg = a; ; ) {
             var l = r.delegate;
             if (l) {
-              var u = O(l, r);
+              var u = M(l, r);
               if (u) {
                 if (u === v) continue;
                 return u;
@@ -1924,7 +1912,7 @@
           }
         };
       }
-      function O(e, n) {
+      function M(e, n) {
         var r = n.method,
           i = e.iterator[r];
         if (i === t)
@@ -1934,7 +1922,7 @@
               e.iterator.return &&
               ((n.method = "return"),
               (n.arg = t),
-              O(e, n),
+              M(e, n),
               "throw" === n.method)) ||
               ("return" !== r &&
                 ((n.method = "throw"),
@@ -1960,7 +1948,7 @@
             (n.delegate = null),
             v);
       }
-      function M(t) {
+      function O(t) {
         var e = { tryLoc: t[0] };
         1 in t && (e.catchLoc = t[1]),
           2 in t && ((e.finallyLoc = t[2]), (e.afterLoc = t[3])),
@@ -1972,7 +1960,7 @@
       }
       function B(t) {
         (this.tryEntries = [{ tryLoc: "root" }]),
-          t.forEach(M, this),
+          t.forEach(O, this),
           this.reset(!0);
       }
       function I(e) {
@@ -2207,33 +2195,27 @@
         });
       };
     }
-    function Y(t) {
-      return (
-        (function (t) {
-          if (Array.isArray(t)) return $(t);
-        })(t) ||
-        (function (t) {
-          if (
-            ("undefined" != typeof Symbol && null != t[Symbol.iterator]) ||
-            null != t["@@iterator"]
-          )
-            return Array.from(t);
-        })(t) ||
-        z(t) ||
-        (function () {
-          throw new TypeError(
-            "Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
-          );
-        })()
-      );
-    }
-    function q(t, e) {
+    function Y(t, e) {
       var n =
         ("undefined" != typeof Symbol && t[Symbol.iterator]) || t["@@iterator"];
       if (!n) {
         if (
           Array.isArray(t) ||
-          (n = z(t)) ||
+          (n = (function (t, e) {
+            if (t) {
+              if ("string" == typeof t) return q(t, e);
+              var n = {}.toString.call(t).slice(8, -1);
+              return (
+                "Object" === n && t.constructor && (n = t.constructor.name),
+                "Map" === n || "Set" === n
+                  ? Array.from(t)
+                  : "Arguments" === n ||
+                      /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
+                    ? q(t, e)
+                    : void 0
+              );
+            }
+          })(t)) ||
           (e && t && "number" == typeof t.length)
         ) {
           n && (t = n);
@@ -2277,36 +2259,21 @@
         },
       };
     }
-    function z(t, e) {
-      if (t) {
-        if ("string" == typeof t) return $(t, e);
-        var n = {}.toString.call(t).slice(8, -1);
-        return (
-          "Object" === n && t.constructor && (n = t.constructor.name),
-          "Map" === n || "Set" === n
-            ? Array.from(t)
-            : "Arguments" === n ||
-                /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
-              ? $(t, e)
-              : void 0
-        );
-      }
-    }
-    function $(t, e) {
+    function q(t, e) {
       (null == e || e > t.length) && (e = t.length);
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
     }
-    function J(t, e) {
+    function z(t, e) {
       for (var n = 0; n < e.length; n++) {
         var r = e[n];
         (r.enumerable = r.enumerable || !1),
           (r.configurable = !0),
           "value" in r && (r.writable = !0),
-          Object.defineProperty(t, K(r.key), r);
+          Object.defineProperty(t, $(r.key), r);
       }
     }
-    function K(t) {
+    function $(t) {
       var e = (function (t) {
         if ("object" != G(t) || !t) return t;
         var e = t[Symbol.toPrimitive];
@@ -2320,7 +2287,7 @@
       return "symbol" == G(e) ? e : e + "";
     }
     window.__SYMBOLS_DATA = v;
-    var V = (function () {
+    var J = (function () {
       return (
         (t = function t() {
           !(function (t, e) {
@@ -2330,7 +2297,7 @@
             (this.anim = new k()),
             (this.reels = []),
             (this.state = {
-              balance: 1e3,
+              balance: 1e4,
               bet: 100,
               lastWin: 0,
               totalWins: 0,
@@ -2357,7 +2324,7 @@
                 this.initReels(),
                 this.loadConfig(),
                 this.bindEvents(),
-                this.renderInitial(),
+                this.showGrid(),
                 this.updateUI(),
                 this.showMsg("🎰 SPIN TO WIN");
             },
@@ -2394,14 +2361,13 @@
             key: "initReels",
             value: function () {
               var t = document.querySelectorAll(".reel");
-              if (t && 0 !== t.length) {
+              if (t) {
                 var e,
-                  n = q(t);
+                  n = Y(t);
                 try {
                   for (n.s(); !(e = n.n()).done; ) {
-                    var r = e.value,
-                      i = new a(r, b, g);
-                    this.reels.push(i);
+                    var r = e.value;
+                    this.reels.push(new a(r, b, g));
                   }
                 } catch (t) {
                   n.e(t);
@@ -2412,16 +2378,14 @@
             },
           },
           {
-            key: "renderInitial",
+            key: "showGrid",
             value: function () {
               for (
                 var t = 0;
                 t < this.reels.length && t < this.grid.length;
                 t++
-              ) {
-                var e = Y(this.grid[t]);
-                this.reels[t].loadStrip(e);
-              }
+              )
+                this.reels[t].loadStrip(this.grid[t]);
             },
           },
           {
@@ -2429,7 +2393,7 @@
             value:
               ((i = W(
                 H().mark(function t() {
-                  var e, n;
+                  var e, n, r;
                   return H().wrap(
                     function (t) {
                       for (;;)
@@ -2437,20 +2401,21 @@
                           case 0:
                             return (t.prev = 0), (t.next = 3), N();
                           case 3:
-                            (e = t.sent),
-                              (this.state.config = e),
-                              e &&
-                                e.betAmount &&
-                                (this.state.bet = e.betAmount),
+                            (n = t.sent),
+                              (this.state.config = n),
+                              null != n &&
+                                n.betAmount &&
+                                (this.state.bet = n.betAmount),
                               (t.next = 10);
                             break;
                           case 8:
                             (t.prev = 8), (t.t0 = t.catch(0));
                           case 10:
-                            (n = localStorage.getItem("slot777_balance"))
-                              ? (this.state.balance = parseInt(n, 10))
-                              : this.state.config &&
-                                this.state.config.startingMoney &&
+                            (r = localStorage.getItem("slot777_balance"))
+                              ? (this.state.balance = parseInt(r, 10))
+                              : null !== (e = this.state.config) &&
+                                void 0 !== e &&
+                                e.startingMoney &&
                                 (this.state.balance =
                                   this.state.config.startingMoney),
                               D(this.state.balance),
@@ -2527,7 +2492,7 @@
                 }),
                 window.addEventListener("resize", function () {
                   var t,
-                    e = q(l.reels);
+                    e = Y(l.reels);
                   try {
                     for (e.s(); !(t = e.n()).done; ) t.value.updateSize();
                   } catch (t) {
@@ -2574,7 +2539,7 @@
                             (this.state.balance =
                               (null === (e = this.state.config) || void 0 === e
                                 ? void 0
-                                : e.startingMoney) || 1e3),
+                                : e.startingMoney) || 1e4),
                               (this.state.lossStreak = 0),
                               localStorage.setItem(
                                 "slot777_balance",
@@ -2630,8 +2595,9 @@
                     A,
                     L,
                     k,
+                    M,
                     O,
-                    M = this;
+                    j = this;
                   return H().wrap(
                     function (t) {
                       for (;;)
@@ -2651,80 +2617,69 @@
                               this.showMsg("💸 BALANCE LOW"), t.abrupt("return")
                             );
                           case 5:
-                            if (
-                              ((this.state.spinning = !0),
-                              (this.state.balance -= this.state.bet),
-                              this.state.spinCount++,
-                              this.updateUI(),
-                              this.el.spinBtn &&
-                                (this.el.spinBtn.disabled = !0),
-                              this.anim.clearHighlights(),
-                              this.anim.pulseSpinBtn(this.el.spinBtn),
-                              localStorage.setItem(
-                                "slot777_balance",
-                                this.state.balance,
-                              ),
-                              D(this.state.balance),
-                              (i = this.state.config || {}),
-                              (o =
-                                null !== (e = i.winRate) && void 0 !== e
-                                  ? e
-                                  : 0.15),
-                              (a =
-                                null !== (n = i.payoutMultiplier) &&
-                                void 0 !== n
-                                  ? n
-                                  : 3),
-                              (l =
-                                null !== (r = i.minSpinsBeforeWin) &&
-                                void 0 !== r
-                                  ? r
-                                  : 0),
-                              (this.state.lossStreak =
-                                this.state.lossStreak || 0),
-                              (u = !1),
-                              l > 0 &&
-                                this.state.lossStreak >= l &&
-                                ((u = !0), (this.state.lossStreak = 0)),
-                              (s = this.generateResult(u ? 1 : o, a)),
-                              (c = s.grid),
-                              (f = s.wins),
-                              (this.grid = c),
-                              (h = y(f)),
-                              (p = this.state.turbo),
-                              (d = p ? 500 : 1e3),
-                              (v = p ? 120 : 250),
-                              this.showMsg("🎰 SPINNING!"),
-                              (t.prev = 28),
-                              !(this.reels.length < 3))
-                            ) {
-                              t.next = 31;
-                              break;
-                            }
-                            throw new Error("Reels not initialized");
-                          case 31:
-                            m = 0;
-                          case 32:
-                            if (!(m < 3 && m < this.reels.length)) {
-                              t.next = 40;
-                              break;
-                            }
-                            return (
-                              (g = this.grid[m] || ["BAR", "BAR", "BAR"]),
-                              (b = d + 200 * m),
-                              (t.next = 37),
-                              this.reels[m].spin(g, b, 0 === m ? 0 : v)
-                            );
-                          case 37:
-                            m++, (t.next = 32);
+                            for (
+                              this.state.spinning = !0,
+                                this.state.balance -= this.state.bet,
+                                this.state.spinCount++,
+                                this.updateUI(),
+                                this.el.spinBtn &&
+                                  (this.el.spinBtn.disabled = !0),
+                                this.anim.clearHighlights(),
+                                this.anim.pulseSpinBtn(this.el.spinBtn),
+                                localStorage.setItem(
+                                  "slot777_balance",
+                                  this.state.balance,
+                                ),
+                                D(this.state.balance),
+                                i = this.state.config || {},
+                                o =
+                                  null !== (e = i.winRate) && void 0 !== e
+                                    ? e
+                                    : 0.15,
+                                a =
+                                  null !== (n = i.payoutMultiplier) &&
+                                  void 0 !== n
+                                    ? n
+                                    : 3,
+                                l =
+                                  null !== (r = i.minSpinsBeforeWin) &&
+                                  void 0 !== r
+                                    ? r
+                                    : 0,
+                                this.state.lossStreak =
+                                  this.state.lossStreak || 0,
+                                u = !1,
+                                l > 0 &&
+                                  this.state.lossStreak >= l &&
+                                  ((u = !0), (this.state.lossStreak = 0)),
+                                s = this.generateResult(u ? 1 : o, a),
+                                c = s.grid,
+                                f = s.wins,
+                                this.grid = c,
+                                h = y(f),
+                                p = this.state.turbo,
+                                this.showMsg("🎰 SPINNING!"),
+                                t.prev = 26,
+                                m = [
+                                  (v = p ? 800 : 1200),
+                                  v + (d = p ? 200 : 280),
+                                  v + 2 * d,
+                                ],
+                                g = [],
+                                b = 0;
+                              b < 3 && b < this.reels.length;
+                              b++
+                            )
+                              (w = this.grid[b] || ["BAR", "BAR", "BAR"]),
+                                g.push(this.reels[b].spin(w, m[b]));
+                            return (t.next = 34), Promise.all(g);
+                          case 34:
+                            t.next = 43;
                             break;
-                          case 40:
-                            t.next = 49;
-                            break;
-                          case 42:
+                          case 36:
                             return (
-                              (t.prev = 42),
-                              (t.t0 = t.catch(28)),
+                              (t.prev = 36),
+                              (t.t0 = t.catch(26)),
                               console.error("Spin error:", t.t0),
                               (this.state.spinning = !1),
                               this.el.spinBtn &&
@@ -2732,7 +2687,7 @@
                               this.showMsg("⚠️ ERROR"),
                               t.abrupt("return")
                             );
-                          case 49:
+                          case 43:
                             if (
                               ((this.state.lastWin = h),
                               (this.state.totalWins += h),
@@ -2740,26 +2695,26 @@
                             ) {
                               (this.state.balance += h),
                                 (this.state.lossStreak = 0),
-                                (w = []),
-                                (S = q(f));
+                                (S = []),
+                                (E = Y(f));
                               try {
-                                for (S.s(); !(E = S.n()).done; ) {
-                                  (x = E.value), (A = q(x.positions));
+                                for (E.s(); !(x = E.n()).done; ) {
+                                  (A = x.value), (L = Y(A.positions));
                                   try {
-                                    for (A.s(); !(L = A.n()).done; )
-                                      (k = L.value), w.push(k);
+                                    for (L.s(); !(k = L.n()).done; )
+                                      (M = k.value), S.push(M);
                                   } catch (t) {
-                                    A.e(t);
+                                    L.e(t);
                                   } finally {
-                                    A.f();
+                                    L.f();
                                   }
                                 }
                               } catch (t) {
-                                S.e(t);
+                                E.e(t);
                               } finally {
-                                S.f();
+                                E.f();
                               }
-                              this.anim.highlightWins(w),
+                              this.anim.highlightWins(S),
                                 this.showMsg(
                                   "🎉 WIN ".concat(this.fmt(h), "!"),
                                   "#FF6B6B",
@@ -2788,21 +2743,21 @@
                               this.state.balance >= this.state.bet
                                 ? setTimeout(
                                     function () {
-                                      return M.spin();
+                                      return j.spin();
                                     },
                                     p ? 100 : 400,
                                   )
                                 : (this.el.autoplay &&
                                     (this.el.autoplay.checked = !1),
                                   (this.state.autoplay = !1));
-                          case 58:
+                          case 52:
                           case "end":
                             return t.stop();
                         }
                     },
                     t,
                     this,
-                    [[28, 42]],
+                    [[26, 36]],
                   );
                 }),
               )),
@@ -2824,7 +2779,7 @@
                   o = p(i, this.state.bet);
                 if (e && 1 !== e) {
                   var a,
-                    l = q(o);
+                    l = Y(o);
                   try {
                     for (l.s(); !(a = l.n()).done; ) {
                       var u = a.value;
@@ -2845,7 +2800,7 @@
                   e && 1 !== e)
                 ) {
                   var s,
-                    c = q(o);
+                    c = Y(o);
                   try {
                     for (c.s(); !(s = c.n()).done; ) {
                       var f = s.value;
@@ -2899,7 +2854,7 @@
             },
           },
         ]),
-        e && J(t.prototype, e),
+        e && z(t.prototype, e),
         Object.defineProperty(t, "prototype", { writable: !1 }),
         t
       );
@@ -2907,8 +2862,8 @@
     })();
     "loading" === document.readyState
       ? document.addEventListener("DOMContentLoaded", function () {
-          return new V();
+          return new J();
         })
-      : new V();
+      : new J();
   })();
 })();

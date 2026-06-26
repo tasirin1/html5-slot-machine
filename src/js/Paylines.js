@@ -1,6 +1,10 @@
 /**
  * Paylines — 3-reel classic slot payline evaluation
  * 5 paylines: 3 horizontal + 2 diagonal
+ *
+ * Grid format: grid[reelIdx][rowIdx]
+ *   reelIdx: 0=left, 1=middle, 2=right
+ *   rowIdx:  0=top, 1=middle, 2=bottom
  */
 
 export const PAYLINES = [
@@ -13,7 +17,7 @@ export const PAYLINES = [
     [0, 1],
     [1, 1],
     [2, 1],
-  ], // Middle row (main)
+  ], // Middle row
   [
     [0, 2],
     [1, 2],
@@ -31,53 +35,30 @@ export const PAYLINES = [
   ], // Diagonal up-right
 ];
 
-/**
- * Get payout multiplier for a symbol and count
- */
 function getPayout(symbolId, count) {
   const sym = window.__SYMBOLS_DATA?.[symbolId];
-  if (!sym || !sym.mult) return 0;
-  const arr = sym.mult;
-  const idx = Math.min(Math.max(count - 1, 0), arr.length - 1);
-  return arr[idx];
+  if (!sym?.mult) return 0;
+  const idx = Math.min(Math.max(count - 1, 0), sym.mult.length - 1);
+  return sym.mult[idx];
 }
 
-/**
- * Minimum matching count required for a win
- * Fruits (CHERRY, LEMON, ORANGE) pay on 2 matching
- * Everything else needs 3+
- */
 function minCount(symbolId) {
   return symbolId === "CHERRY" || symbolId === "LEMON" || symbolId === "ORANGE"
     ? 2
     : 3;
 }
 
-/**
- * Evaluate wins on a 3-reel grid
- * Grid format: grid[reelIndex][rowIndex] = symbolId
- *   reelIndex: 0=left, 1=middle, 2=right
- *   rowIndex: 0=top, 1=middle, 2=bottom
- *
- * @param {string[][]} grid - 3x3 grid of symbol IDs
- * @param {number} bet - Current bet amount
- * @returns {Array} Array of win objects
- */
 export function evaluate(grid, bet) {
   if (!grid || grid.length < 3) return [];
-
   const wins = [];
 
   for (let pi = 0; pi < PAYLINES.length; pi++) {
     const line = PAYLINES[pi];
+    const syms = line.map(([r, c]) =>
+      grid[r] && grid[r][c] !== undefined ? grid[r][c] : "BAR",
+    );
 
-    // Get symbols along this payline
-    const syms = line.map(([r, c]) => {
-      if (grid[r] && grid[r][c] !== undefined) return grid[r][c];
-      return "BAR";
-    });
-
-    // Find first non-wild symbol (DIAMOND is wild)
+    // Find first non-wild symbol
     let first = null;
     for (const s of syms) {
       if (s !== "DIAMOND" && s !== "JACKPOT") {
@@ -88,7 +69,7 @@ export function evaluate(grid, bet) {
     if (!first) first = "SEVEN";
     if (first === "DIAMOND" || first === "JACKPOT") first = "SEVEN";
 
-    // Count consecutive matching from left (wild acts as any)
+    // Count consecutive from left (wild acts as any)
     let count = 0;
     for (const s of syms) {
       if (s === first || s === "DIAMOND") count++;
@@ -96,7 +77,6 @@ export function evaluate(grid, bet) {
     }
 
     if (count < minCount(first)) continue;
-
     const mult = getPayout(first, count);
     if (mult <= 0) continue;
 
@@ -113,9 +93,6 @@ export function evaluate(grid, bet) {
   return wins;
 }
 
-/**
- * Get total win amount from win results
- */
 export function totalWin(wins) {
   return wins.reduce((sum, w) => sum + w.amount, 0);
 }

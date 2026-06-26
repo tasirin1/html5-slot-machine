@@ -1,16 +1,14 @@
 /**
  * GameManager — 3-Reel Classic Slot Machine
- * Orchestrates real mechanical reel spinning, RNG, paylines, balance, UI
+ *
+ * All 3 reels start spinning SIMULTANEOUSLY.
+ * Each reel stops at a different time (staggered) with smooth deceleration.
+ * RNG determines the result BEFORE any animation begins.
  */
 
 import ReelEngine from "./ReelEngine.js";
 import { evaluate, totalWin } from "./Paylines.js";
-import {
-  weightedRandom,
-  buildReelStrips,
-  getRenderData,
-  SYMBOLS,
-} from "./Symbols.js";
+import { weightedRandom, getRenderData, SYMBOLS } from "./Symbols.js";
 import AnimationManager from "./AnimationManager.js";
 import JackpotAPI from "./JackpotAPI.js";
 
@@ -24,7 +22,7 @@ export default class GameManager {
 
     // State
     this.state = {
-      balance: 1000,
+      balance: 10000,
       bet: 100,
       lastWin: 0,
       totalWins: 0,
@@ -54,7 +52,7 @@ export default class GameManager {
     this.initReels();
     this.loadConfig();
     this.bindEvents();
-    this.renderInitial();
+    this.showGrid();
     this.updateUI();
     this.showMsg("🎰 SPIN TO WIN");
   }
@@ -75,30 +73,21 @@ export default class GameManager {
       "betUp",
       "maxBet",
     ];
-    for (const id of ids) {
-      this.el[id] = document.getElementById(id);
-    }
+    for (const id of ids) this.el[id] = document.getElementById(id);
   }
 
   initReels() {
     const reelEls = document.querySelectorAll(".reel");
-    if (!reelEls || reelEls.length === 0) return;
-
+    if (!reelEls) return;
     for (const reelEl of reelEls) {
-      const engine = new ReelEngine(reelEl, getRenderData, weightedRandom);
-      this.reels.push(engine);
+      this.reels.push(new ReelEngine(reelEl, getRenderData, weightedRandom));
     }
   }
 
-  /**
-   * Show initial symbols on all reels
-   */
-  renderInitial() {
+  /** Show initial symbols on all reels */
+  showGrid() {
     for (let r = 0; r < this.reels.length && r < this.grid.length; r++) {
-      const col = this.grid[r];
-      // First spin will populate properly; for now build a strip
-      const strip = [...col]; // just the 3 result symbols
-      this.reels[r].loadStrip(strip);
+      this.reels[r].loadStrip(this.grid[r]);
     }
   }
 
@@ -106,13 +95,13 @@ export default class GameManager {
     try {
       const cfg = await JackpotAPI.fetchConfig();
       this.state.config = cfg;
-      if (cfg && cfg.betAmount) this.state.bet = cfg.betAmount;
+      if (cfg?.betAmount) this.state.bet = cfg.betAmount;
     } catch (_) {}
 
     const saved = localStorage.getItem("slot777_balance");
     if (saved) {
       this.state.balance = parseInt(saved, 10);
-    } else if (this.state.config && this.state.config.startingMoney) {
+    } else if (this.state.config?.startingMoney) {
       this.state.balance = this.state.config.startingMoney;
     }
 
@@ -149,17 +138,14 @@ export default class GameManager {
       }
     });
 
-    // Handle resize
     window.addEventListener("resize", () => {
-      for (const reel of this.reels) {
-        reel.updateSize();
-      }
+      for (const reel of this.reels) reel.updateSize();
     });
   }
 
   adjustBet(delta) {
-    const min = 10;
-    const max = Math.min(10000, this.state.balance);
+    const min = 10,
+      max = Math.min(10000, this.state.balance);
     this.state.bet = Math.max(min, Math.min(max, this.state.bet + delta));
     this.updateUI();
   }
@@ -174,7 +160,7 @@ export default class GameManager {
       const cfg = await JackpotAPI.fetchConfig();
       this.state.config = cfg;
     } catch (_) {}
-    this.state.balance = this.state.config?.startingMoney || 1000;
+    this.state.balance = this.state.config?.startingMoney || 10000;
     this.state.lossStreak = 0;
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
@@ -183,7 +169,7 @@ export default class GameManager {
     this.showMsg("💰 BALANCE RESET");
   }
 
-  // ---- SPIN LOGIC ----
+  // ===================== SPIN =====================
 
   async spin() {
     if (this.state.spinning) return;
@@ -196,15 +182,15 @@ export default class GameManager {
     this.state.balance -= this.state.bet;
     this.state.spinCount++;
     this.updateUI();
-
     if (this.el.spinBtn) this.el.spinBtn.disabled = true;
+
     this.anim.clearHighlights();
     this.anim.pulseSpinBtn(this.el.spinBtn);
 
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
 
-    // RNG: determine result BEFORE animation
+    // ---- RNG: determine result BEFORE animation ----
     const cfg = this.state.config || {};
     const wr = cfg.winRate ?? 0.15;
     const pm = cfg.payoutMultiplier ?? 3;
@@ -219,28 +205,33 @@ export default class GameManager {
 
     const { grid, wins } = this.generateResult(forceWin ? 1.0 : wr, pm);
     this.grid = grid;
-
     const total = totalWin(wins);
+
     const turbo = this.state.turbo;
-
-    // Spin parameters
-    const baseDuration = turbo ? 500 : 1000;
-    const stagger = turbo ? 120 : 250;
-
     this.showMsg(total > 0 ? "🎰 SPINNING!" : "🎰 SPINNING!");
 
     try {
-      // Ensure reels are ready
-      if (this.reels.length < 3) {
-        throw new Error("Reels not initialized");
-      }
+      // All reels start SPINNING SIMULTANEOUSLY
+      // Each has a different duration so they stop at staggered times:
+      //   Left:    shortest duration (stops first)
+      //   Middle:  medium duration   (stops second)
+      //   Right:   longest duration  (stops last)
+      const stagger = turbo ? 200 : 280; // ms between reel stops
+      const baseDuration = turbo ? 800 : 1200;
+      const durations = [
+        baseDuration,
+        baseDuration + stagger,
+        baseDuration + stagger * 2,
+      ];
 
-      // Spin each reel sequentially: left → middle → right
+      const promises = [];
       for (let r = 0; r < 3 && r < this.reels.length; r++) {
         const resultCol = this.grid[r] || ["BAR", "BAR", "BAR"];
-        const duration = baseDuration + r * 200; // each subsequent reel spins slightly longer
-        await this.reels[r].spin(resultCol, duration, r === 0 ? 0 : stagger);
+        promises.push(this.reels[r].spin(resultCol, durations[r]));
       }
+
+      // Wait for all reels to finish (they finish in order: left, middle, right)
+      await Promise.all(promises);
     } catch (e) {
       console.error("Spin error:", e);
       this.state.spinning = false;
@@ -257,7 +248,6 @@ export default class GameManager {
       this.state.balance += total;
       this.state.lossStreak = 0;
 
-      // Highlight wins
       const allPos = [];
       for (const w of wins) {
         for (const pos of w.positions) allPos.push(pos);
@@ -271,7 +261,6 @@ export default class GameManager {
         this.anim.flashWin(this.el.totalWinDisplay);
       }
 
-      // Particles
       if (this.el.spinBtn) {
         const rect = this.el.spinBtn.getBoundingClientRect();
         this.anim.burst(rect.left + rect.width / 2, rect.top);
@@ -280,7 +269,6 @@ export default class GameManager {
       this.state.lossStreak++;
     }
 
-    // Save balance
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
 
@@ -298,13 +286,12 @@ export default class GameManager {
   }
 
   /**
-   * Generate RNG result for 3 reels x 3 rows
+   * Generate RNG result for 3 reels × 3 rows
    */
   generateResult(winChance, pm) {
     const win = Math.random() < winChance;
 
     if (win) {
-      // Force at least one winning payline
       const winSym = weightedRandom();
       const grid = [
         [weightedRandom(), winSym, weightedRandom()],
@@ -318,7 +305,6 @@ export default class GameManager {
       }
 
       if (wins.length === 0) {
-        // Force middle line win
         grid[0][1] = winSym;
         grid[1][1] = winSym;
         grid[2][1] = winSym;
@@ -331,7 +317,6 @@ export default class GameManager {
       return { grid, wins };
     }
 
-    // No win — generate non-winning grid
     let grid;
     let attempts = 0;
     do {
