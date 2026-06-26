@@ -58,6 +58,7 @@ export default class GameManager {
     this.showGrid();
     this.updateUI();
     this.showMsg("🎰 SPIN TO WIN");
+    this.bindEvents();
 
     // Load config from server (async)
     this.loadConfig().then(() => {

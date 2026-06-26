@@ -1,4 +1,4 @@
-/*! For license information please see bundle.8e7cc54940bc0d2ee577.js.LICENSE.txt */
+/*! For license information please see bundle.28666d8b133d44bbf69d.js.LICENSE.txt */
 (() => {
   "use strict";
   (() => {
@@ -2618,6 +2618,7 @@
                   this.showGrid(),
                   this.updateUI(),
                   this.showMsg("🎰 SPIN TO WIN"),
+                  this.bindEvents(),
                   this.loadConfig().then(function () {
                     t.log("[INIT] Config loaded from server");
                   }),
