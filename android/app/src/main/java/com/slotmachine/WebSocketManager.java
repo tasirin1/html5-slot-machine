@@ -1,51 +1,45 @@
 package com.slotmachine;
 
-import android.content.Context;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URLDecoder;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import fi.iki.elonen.NanoHTTPD;
-import fi.iki.elonen.websocket.WebSocket;
-import fi.iki.elonen.websocket.WebSocketServer;
+import java.util.concurrent.Executors;
 
 /**
- * WebSocketManager — Singleton managing all WebSocket connections.
+ * WebSocketManager — Manages WebSocket connections for real-time sync.
  *
- * Runs a WebSocket server on port 9090 (separate from HTTP server on 8080).
- * All connected browser clients receive real-time events when config changes.
+ * Implements WebSocket protocol (RFC 6455) directly using Java ServerSocket.
+ * No external dependencies required.
  *
- * Events:
- *   configChanged    → full config object
- *   jackpotChanged   → new jackpot value
- *   balanceChanged   → player balance update
- *   difficultyChanged → new difficulty level
- *   resetGame        → force game reset on all clients
+ * Runs on port 9090. Broadcasts config/jackpot/balance changes to all
+ * connected browser clients instantly.
  */
 public class WebSocketManager {
 
     private static final String TAG = "WSManager";
     private static final int WS_PORT = 9090;
+    private static final String WS_GUID = "258EAFA5-E914-47DA-95CA-5AB5A05F69B8";
 
     private static WebSocketManager instance;
 
-    private final List<GameWebSocket> clients = new CopyOnWriteArrayList<>();
-    private final WsServer wsServer;
+    private final List<WsClient> clients = new CopyOnWriteArrayList<>();
+    private ServerSocket serverSocket;
+    private Thread serverThread;
     private GameConfig gameConfig;
-    private boolean running = false;
+    private volatile boolean running = false;
 
-    // ===== Singleton =====
-
-    private WebSocketManager() {
-        wsServer = new WsServer(WS_PORT);
-    }
+    private WebSocketManager() {}
 
     public static synchronized WebSocketManager getInstance() {
-        if (instance == null) {
-            instance = new WebSocketManager();
-        }
+        if (instance == null) instance = new WebSocketManager();
         return instance;
     }
 
@@ -63,26 +57,38 @@ public class WebSocketManager {
 
     public void start() {
         if (running) return;
-        try {
-            wsServer.start(5000, false);
-            running = true;
-            Log.d(TAG, "WebSocket server running on port " + WS_PORT);
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to start WebSocket server", e);
-        }
+        running = true;
+
+        serverThread = new Thread(() -> {
+            try {
+                serverSocket = new ServerSocket(WS_PORT);
+                Log.d(TAG, "WebSocket server running on port " + WS_PORT);
+
+                while (running) {
+                    try {
+                        Socket client = serverSocket.accept();
+                        Executors.newSingleThreadExecutor().execute(() -> handleClient(client));
+                    } catch (IOException e) {
+                        if (running) Log.e(TAG, "Accept error", e);
+                    }
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to start WebSocket server", e);
+                running = false;
+            }
+        }, "WS-Accept");
+
+        serverThread.setDaemon(true);
+        serverThread.start();
     }
 
     public void stop() {
-        if (!running) return;
         running = false;
-        // Close all client connections
-        for (GameWebSocket ws : clients) {
-            try {
-                ws.close(WebSocketFrame.CloseCode.Normal, "Server shutting down", false);
-            } catch (Exception ignored) {}
+        for (WsClient c : clients) {
+            try { c.close(); } catch (Exception ignored) {}
         }
         clients.clear();
-        wsServer.stop();
+        try { if (serverSocket != null) serverSocket.close(); } catch (Exception ignored) {}
         Log.d(TAG, "WebSocket server stopped");
     }
 
@@ -91,27 +97,151 @@ public class WebSocketManager {
 
     // ===== Client Management =====
 
-    public void addClient(GameWebSocket ws) {
-        if (!clients.contains(ws)) {
-            clients.add(ws);
-            Log.d(TAG, "Client connected. Total: " + clients.size());
-        }
+    private void addClient(WsClient ws) {
+        clients.add(ws);
+        Log.d(TAG, "Client connected. Total: " + clients.size());
     }
 
-    public void removeClient(GameWebSocket ws) {
+    private void removeClient(WsClient ws) {
         clients.remove(ws);
         Log.d(TAG, "Client disconnected. Total: " + clients.size());
     }
 
+    // ===== WebSocket Handshake =====
+
+    private void handleClient(Socket socket) {
+        try {
+            InputStream in = socket.getInputStream();
+            OutputStream out = socket.getOutputStream();
+
+            // Read HTTP upgrade request
+            byte[] buffer = new byte[4096];
+            int read = in.read(buffer);
+            if (read <= 0) { socket.close(); return; }
+
+            String request = new String(buffer, 0, read, "UTF-8");
+            if (!request.contains("Upgrade: websocket") && !request.contains("upgrade: websocket")) {
+                socket.close();
+                return;
+            }
+
+            // Extract WebSocket key
+            String key = null;
+            for (String line : request.split("\r\n")) {
+                if (line.toLowerCase().startsWith("sec-websocket-key:")) {
+                    key = line.substring(line.indexOf(':') + 1).trim();
+                    break;
+                }
+            }
+            if (key == null) { socket.close(); return; }
+
+            // Compute accept key
+            String accept = computeAcceptKey(key);
+
+            // Send upgrade response
+            String response = "HTTP/1.1 101 Switching Protocols\r\n" +
+                "Upgrade: websocket\r\n" +
+                "Connection: Upgrade\r\n" +
+                "Sec-WebSocket-Accept: " + accept + "\r\n" +
+                "Access-Control-Allow-Origin: *\r\n\r\n";
+            out.write(response.getBytes("UTF-8"));
+            out.flush();
+
+            // Create client handler
+            WsClient ws = new WsClient(socket, in, out);
+            addClient(ws);
+
+            // Send initial config
+            sendToClient(ws, buildFullStateMessage());
+
+            // Read frames
+            ws.readLoop();
+
+        } catch (Exception e) {
+            Log.d(TAG, "Client connection error: " + e.getMessage());
+        } finally {
+            try { socket.close(); } catch (Exception ignored) {}
+        }
+    }
+
+    private String computeAcceptKey(String key) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.update((key + WS_GUID).getBytes("UTF-8"));
+            return java.util.Base64.getEncoder().encodeToString(md.digest());
+        } catch (Exception e) {
+            return key;
+        }
+    }
+
+    // ===== WebSocket Frame I/O =====
+
+    private void sendToClient(WsClient client, String message) {
+        try {
+            byte[] payload = message.getBytes("UTF-8");
+            OutputStream out = client.output;
+
+            // Frame: FIN=1, Opcode=Text(1), Mask=0
+            out.write(0x81); // FIN + Text
+            if (payload.length < 126) {
+                out.write(payload.length);
+            } else if (payload.length < 65536) {
+                out.write(126);
+                out.write((payload.length >> 8) & 0xFF);
+                out.write(payload.length & 0xFF);
+            } else {
+                out.write(127);
+                for (int i = 7; i >= 0; i--)
+                    out.write((int)(payload.length >> (i * 8)) & 0xFF);
+            }
+            out.write(payload);
+            out.flush();
+        } catch (IOException e) {
+            removeClient(client);
+            try { client.close(); } catch (Exception ignored) {}
+        }
+    }
+
+    private String readFrame(InputStream in) {
+        try {
+            int b1 = in.read();
+            if (b1 == -1) return null;
+            int b2 = in.read();
+            if (b2 == -1) return null;
+
+            boolean masked = (b2 & 0x80) != 0;
+            int length = b2 & 0x7F;
+            if (length == 126) {
+                length = (in.read() << 8) | in.read();
+            } else if (length == 127) {
+                length = 0;
+                for (int i = 0; i < 8; i++) length = (length << 8) | in.read();
+            }
+
+            byte[] maskKey = new byte[4];
+            if (masked) in.read(maskKey);
+
+            byte[] payload = new byte[length];
+            in.read(payload);
+
+            if (masked) {
+                for (int i = 0; i < length; i++) payload[i] ^= maskKey[i % 4];
+            }
+
+            int opcode = b1 & 0x0F;
+            if (opcode == 0x8) return null; // Close
+            if (opcode == 0x9) return null; // Ping (we don't respond)
+            return new String(payload, "UTF-8");
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     // ===== Broadcasting =====
 
-    /**
-     * Build the full state message (sent to new connections)
-     */
     public String buildFullStateMessage() {
-        if (gameConfig == null) {
+        if (gameConfig == null)
             return "{\"type\":\"configChanged\",\"config\":{}}";
-        }
         try {
             return "{\"type\":\"configChanged\",\"config\":" + gameConfig.toJson() + "}";
         } catch (Exception e) {
@@ -119,108 +249,65 @@ public class WebSocketManager {
         }
     }
 
-    /**
-     * Broadcast full config change to all connected clients
-     */
+    private void broadcast(String message) {
+        for (WsClient c : clients) {
+            sendToClient(c, message);
+        }
+    }
+
     public void broadcastConfig() {
         if (!running || clients.isEmpty()) return;
-        String json = buildFullStateMessage();
-        broadcast(json);
+        broadcast(buildFullStateMessage());
     }
 
-    /**
-     * Broadcast jackpot update
-     */
     public void broadcastJackpot(long value) {
         if (!running || clients.isEmpty()) return;
-        String msg = "{\"type\":\"jackpotChanged\",\"value\":" + value + "}";
-        broadcast(msg);
+        broadcast("{\"type\":\"jackpotChanged\",\"value\":" + value + "}");
     }
 
-    /**
-     * Broadcast balance update for a specific player
-     */
     public void broadcastBalance(String playerName, long balance) {
         if (!running || clients.isEmpty()) return;
-        String msg = "{\"type\":\"balanceChanged\",\"player\":\"" +
+        broadcast("{\"type\":\"balanceChanged\",\"player\":\"" +
             escapeJson(playerName != null ? playerName : "guest") +
-            "\",\"balance\":" + balance + "}";
-        broadcast(msg);
+            "\",\"balance\":" + balance + "}");
     }
 
-    /**
-     * Broadcast difficulty change
-     */
     public void broadcastDifficulty(String level, float winRate, float payoutMultiplier) {
         if (!running || clients.isEmpty()) return;
-        String msg = "{\"type\":\"difficultyChanged\",\"level\":\"" +
-            escapeJson(level) +
-            "\",\"winRate\":" + winRate +
-            ",\"payoutMultiplier\":" + payoutMultiplier + "}";
-        broadcast(msg);
+        broadcast("{\"type\":\"difficultyChanged\",\"level\":\"" + escapeJson(level) +
+            "\",\"winRate\":" + winRate + ",\"payoutMultiplier\":" + payoutMultiplier + "}");
     }
 
-    /**
-     * Broadcast maintenance mode
-     */
-    public void broadcastMaintenance(boolean enabled) {
-        if (!running || clients.isEmpty()) return;
-        String msg = "{\"type\":\"maintenanceMode\",\"enabled\":" + enabled + "}";
-        broadcast(msg);
-    }
-
-    /**
-     * Broadcast reset game command
-     */
     public void broadcastReset() {
-        String msg = "{\"type\":\"resetGame\"}";
-        broadcast(msg);
-    }
-
-    // ===== Internal =====
-
-    private void broadcast(String message) {
-        if (clients.isEmpty()) return;
-        for (GameWebSocket ws : clients) {
-            try {
-                ws.sendMessage(message);
-            } catch (IOException e) {
-                Log.w(TAG, "Failed to send to client, removing", e);
-                clients.remove(ws);
-            } catch (Exception e) {
-                Log.w(TAG, "Unexpected send error", e);
-                clients.remove(ws);
-            }
-        }
+        broadcast("{\"type\":\"resetGame\"}");
     }
 
     private String escapeJson(String s) {
         if (s == null) return "";
-        return s.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
+        return s.replace("\\", "\\\\").replace("\"", "\\\"")
+                .replace("\n", "\\n").replace("\r", "\\r");
     }
 
-    // ===== WebSocket Server =====
+    // ===== Client Wrapper =====
 
-    private class WsServer extends WebSocketServer {
-        public WsServer(int port) {
-            super(port);
+    private class WsClient {
+        final Socket socket;
+        final InputStream input;
+        final OutputStream output;
+
+        WsClient(Socket s, InputStream in, OutputStream out) {
+            this.socket = s; this.input = in; this.output = out;
         }
 
-        @Override
-        public WebSocket openWebSocket(IHTTPSession handshake) {
-            GameWebSocket ws = new GameWebSocket(handshake);
-            addClient(ws);
-            return ws;
+        void readLoop() {
+            while (running) {
+                String msg = readFrame(input);
+                if (msg == null) break;
+            }
+            removeClient(this);
+            try { socket.close(); } catch (Exception ignored) {}
         }
 
-        @Override
-        public void serve(IHTTPSession session, Response r) {
-            // Pass through to default WebSocket handling
-            super.serve(session, r);
-        }
+        void close() throws IOException { socket.close(); }
     }
 }
