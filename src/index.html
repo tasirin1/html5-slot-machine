@@ -16,45 +16,74 @@
   </head>
   <body>
     <div id="gameScreen">
-      <!-- ===== TOP STATS ===== -->
-      <div id="topBar">
-        <div class="stat">
-          <span class="stat-label">BALANCE</span>
-          <span id="playerMoney" class="stat-value">0</span>
+      <!-- HEADER -->
+      <header id="topBar">
+        <div class="h-left">
+          <div class="h-item">
+            <span class="h-lbl">BALANCE</span>
+            <span id="playerMoney" class="h-val">0</span>
+          </div>
         </div>
-        <div class="stat">
-          <span class="stat-label">BET</span>
-          <span id="betDisplay" class="stat-value gold">100</span>
+        <div class="h-center">
+          <span class="h-title">777</span>
         </div>
-        <div class="stat win-stat">
-          <span class="stat-label">WIN</span>
-          <span class="stat-value win-amount">—</span>
+        <div class="h-right">
+          <div class="h-item">
+            <span class="h-lbl">BET</span>
+            <span id="betDisplay" class="h-val gold">100</span>
+          </div>
+          <button id="resetBtn" class="h-reset" title="Reset">↻</button>
         </div>
-        <button id="resetBtn" class="reset-btn" title="Reset">↻</button>
+      </header>
+
+      <!-- WIN MESSAGE -->
+      <div id="winMsg">
+        <span id="winText">🎰 SPIN TO WIN</span>
       </div>
 
-      <!-- ===== WIN MESSAGE BAR ===== -->
-      <div id="winMsg"><span id="winText">🎰 SPIN TO WIN</span></div>
-
-      <!-- ===== REELS ===== -->
+      <!-- REELS 5x3 -->
       <div id="reels">
         <div class="reel"></div>
         <div class="reel"></div>
         <div class="reel"></div>
+        <div class="reel"></div>
+        <div class="reel"></div>
       </div>
 
-      <!-- ===== BOTTOM CONTROLS ===== -->
+      <!-- CONTROL PANEL -->
       <div id="controls">
-        <div class="ctrl-group">
-          <div class="bet-info">
-            <span class="ctrl-label">BET</span>
-            <span id="betDisplay2" class="ctrl-bet">100</span>
+        <!-- Bet Controls -->
+        <div class="c-row c-top">
+          <div class="bet-group">
+            <button id="betDown" class="bet-btn">−</button>
+            <div class="bet-display">
+              <span class="bet-lbl">BET</span>
+              <span id="betDisplay2" class="bet-val">100</span>
+            </div>
+            <button id="betUp" class="bet-btn">+</button>
           </div>
-          <button type="button" id="spinBtn">🎰 SPIN</button>
-          <label class="auto-label">
-            <input type="checkbox" id="autoplay" />
-            <span>AUTO</span>
-          </label>
+          <div class="win-group">
+            <span class="win-lbl">WIN</span>
+            <span id="totalWinDisplay" class="win-val">—</span>
+          </div>
+        </div>
+
+        <!-- Main Controls -->
+        <div class="c-row c-bottom">
+          <div class="ctrl-left">
+            <label class="toggle-label">
+              <input type="checkbox" id="autoplay" />
+              <span>AUTO</span>
+            </label>
+            <label class="toggle-label">
+              <input type="checkbox" id="turboMode" />
+              <span>TURBO</span>
+            </label>
+          </div>
+          <button type="button" id="spinBtn" class="spin-btn">SPIN</button>
+          <div class="ctrl-right">
+            <button id="maxBet" class="ctrl-btn">MAX</button>
+          </div>
         </div>
       </div>
     </div>

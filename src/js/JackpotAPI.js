@@ -30,18 +30,15 @@ const JackpotAPI = {
   async fetchConfig() {
     return apiGet("/api/config");
   },
-
   async saveMoney(balance) {
     return apiPost("/api/money", { balance });
   },
-
   async fetchMoney() {
     const d = await apiGet("/api/money");
     return d || { balance: 1000 };
   },
-
   formatNumber(num) {
-    return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return (num || 0).toLocaleString("id-ID");
   },
 };
 

@@ -13,42 +13,64 @@
     <meta http-equiv="pragma" content="no-cache" />
     <meta http-equiv="expires" content="0" />
     <title>777 SLOT</title>
-    <script defer="defer" src="bundle.a57bd845ca60429e96d0.js"></script>
-    <link href="main.6c351d4f7535a8b0eea4.css" rel="stylesheet" />
+    <script defer="defer" src="bundle.958eac0a2203267e606a.js"></script>
+    <link href="main.abb290e07f150185e76f.css" rel="stylesheet" />
   </head>
   <body>
     <div id="gameScreen">
-      <div id="topBar">
-        <div class="stat">
-          <span class="stat-label">BALANCE</span>
-          <span id="playerMoney" class="stat-value">0</span>
+      <header id="topBar">
+        <div class="h-left">
+          <div class="h-item">
+            <span class="h-lbl">BALANCE</span>
+            <span id="playerMoney" class="h-val">0</span>
+          </div>
         </div>
-        <div class="stat">
-          <span class="stat-label">BET</span>
-          <span id="betDisplay" class="stat-value gold">100</span>
+        <div class="h-center"><span class="h-title">777</span></div>
+        <div class="h-right">
+          <div class="h-item">
+            <span class="h-lbl">BET</span>
+            <span id="betDisplay" class="h-val gold">100</span>
+          </div>
+          <button id="resetBtn" class="h-reset" title="Reset">↻</button>
         </div>
-        <div class="stat win-stat">
-          <span class="stat-label">WIN</span>
-          <span class="stat-value win-amount">—</span>
-        </div>
-        <button id="resetBtn" class="reset-btn" title="Reset">↻</button>
-      </div>
+      </header>
       <div id="winMsg"><span id="winText">🎰 SPIN TO WIN</span></div>
       <div id="reels">
         <div class="reel"></div>
         <div class="reel"></div>
         <div class="reel"></div>
+        <div class="reel"></div>
+        <div class="reel"></div>
       </div>
       <div id="controls">
-        <div class="ctrl-group">
-          <div class="bet-info">
-            <span class="ctrl-label">BET</span>
-            <span id="betDisplay2" class="ctrl-bet">100</span>
+        <div class="c-row c-top">
+          <div class="bet-group">
+            <button id="betDown" class="bet-btn">−</button>
+            <div class="bet-display">
+              <span class="bet-lbl">BET</span>
+              <span id="betDisplay2" class="bet-val">100</span>
+            </div>
+            <button id="betUp" class="bet-btn">+</button>
           </div>
-          <button type="button" id="spinBtn">🎰 SPIN</button>
-          <label class="auto-label"
-            ><input type="checkbox" id="autoplay" /> <span>AUTO</span></label
-          >
+          <div class="win-group">
+            <span class="win-lbl">WIN</span>
+            <span id="totalWinDisplay" class="win-val">—</span>
+          </div>
+        </div>
+        <div class="c-row c-bottom">
+          <div class="ctrl-left">
+            <label class="toggle-label"
+              ><input type="checkbox" id="autoplay" /> <span>AUTO</span></label
+            >
+            <label class="toggle-label"
+              ><input type="checkbox" id="turboMode" />
+              <span>TURBO</span></label
+            >
+          </div>
+          <button type="button" id="spinBtn" class="spin-btn">SPIN</button>
+          <div class="ctrl-right">
+            <button id="maxBet" class="ctrl-btn">MAX</button>
+          </div>
         </div>
       </div>
     </div>
