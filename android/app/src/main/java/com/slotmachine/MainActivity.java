@@ -11,6 +11,7 @@ public class MainActivity extends AppCompatActivity {
     private SlotServer server;
     private GameConfig gameConfig;
     private AccountManager accountManager;
+    private WebSocketManager wsManager;
 
     // Views
     private TextView serverUrlText, statusText, currentJackpotText;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private void initApp() {
         gameConfig = GameConfig.getInstance(this);
         accountManager = AccountManager.getInstance(this);
+        wsManager = WebSocketManager.getInstance(this);
 
         // Init views
         serverUrlText = findViewById(R.id.serverUrlText);
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         totalMoneyText = findViewById(R.id.totalMoneyText);
         accountListLayout = findViewById(R.id.accountListLayout);
 
-        // Start server on background thread
+        // Start servers on background thread
         startServerAsync();
 
         setupDifficulty();
@@ -76,8 +78,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    // Start HTTP server
                     server = new SlotServer(MainActivity.this);
                     server.startServer();
+
+                    // Start WebSocket server for real-time sync
+                    wsManager.start();
+
                     final String url = server.getServerUrl();
                     runOnUiThread(new Runnable() {
                         @Override
@@ -92,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             if (serverUrlText != null)
-                                serverUrlText.setText("Server error: " + 
+                                serverUrlText.setText("Server error: " +
                                     (e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()));
                         }
                     });
@@ -112,10 +119,16 @@ public class MainActivity extends AppCompatActivity {
         difficultySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
                 if (pos < 6) {
-                    gameConfig.setDifficulty(GameConfig.Difficulty.fromId(pos));
+                    GameConfig.Difficulty diff = GameConfig.Difficulty.fromId(pos);
+                    gameConfig.setDifficulty(diff);
                     updateDisplay();
-                    Toast.makeText(MainActivity.this, "Difficulty: " +
-                        GameConfig.Difficulty.fromId(pos).label, Toast.LENGTH_SHORT).show();
+
+                    // BROADCAST: difficulty + config change
+                    wsManager.broadcastDifficulty(diff.label,
+                        gameConfig.getWinRate(), gameConfig.getPayoutMultiplier());
+                    wsManager.broadcastConfig();
+
+                    Toast.makeText(MainActivity.this, "Difficulty: " + diff.label, Toast.LENGTH_SHORT).show();
                 }
             }
             @Override public void onNothingSelected(AdapterView<?> p) {}
@@ -134,6 +147,9 @@ public class MainActivity extends AppCompatActivity {
                 gameConfig.setCustomConfig(rate/100f, gameConfig.getPayoutMultiplier(),
                     gameConfig.getMinSpinsBeforeWin(), gameConfig.getJackpotHitRate());
                 difficultySpinner.setSelection(6);
+
+                // BROADCAST: full config
+                wsManager.broadcastConfig();
                 updateDisplay();
             }
         });
@@ -145,10 +161,13 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override public void onStartTrackingTouch(SeekBar s) {}
             @Override public void onStopTrackingTouch(SeekBar s) {
-                float mult = 1f + s.getProgress();
-                gameConfig.setCustomConfig(gameConfig.getWinRate(), mult,
+                float payout = 1f + s.getProgress();
+                gameConfig.setCustomConfig(gameConfig.getWinRate(), payout,
                     gameConfig.getMinSpinsBeforeWin(), gameConfig.getJackpotHitRate());
                 difficultySpinner.setSelection(6);
+
+                // BROADCAST: full config
+                wsManager.broadcastConfig();
                 updateDisplay();
             }
         });
@@ -164,6 +183,10 @@ public class MainActivity extends AppCompatActivity {
                 if (val < 0) { Toast.makeText(this, "Invalid", Toast.LENGTH_SHORT).show(); return; }
                 gameConfig.setJackpot(val);
                 updateDisplay();
+
+                // BROADCAST: jackpot changed
+                wsManager.broadcastJackpot(val);
+
                 Toast.makeText(this, "Jackpot: " + gameConfig.getFormattedJackpot(), Toast.LENGTH_SHORT).show();
             } catch (Exception e) { Toast.makeText(this, "Invalid number", Toast.LENGTH_SHORT).show(); }
         });
@@ -184,6 +207,10 @@ public class MainActivity extends AppCompatActivity {
                 gameConfig.setStartingMoney(sm);
                 gameConfig.setBetAmount(bet);
                 updateDisplay();
+
+                // BROADCAST: config changed (includes starting money, bet amount)
+                wsManager.broadcastConfig();
+
                 Toast.makeText(this, "Money settings saved", Toast.LENGTH_SHORT).show();
             } catch (Exception e) { Toast.makeText(this, "Invalid", Toast.LENGTH_SHORT).show(); }
         });
@@ -200,6 +227,11 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Reset", (d, w) -> {
                     accountManager.resetAllBalances(gameConfig.getStartingMoney());
                     refreshAccountList();
+
+                    // BROADCAST: reset game + config
+                    wsManager.broadcastReset();
+                    wsManager.broadcastConfig();
+
                     Toast.makeText(this, "All accounts reset", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)
@@ -210,7 +242,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshAccountList() {
         if (accountListLayout == null) return;
-        // Remove all existing account rows safely
         while (accountListLayout.getChildCount() > 0) {
             accountListLayout.removeViewAt(0);
         }
@@ -299,6 +330,10 @@ public class MainActivity extends AppCompatActivity {
                 long bal = Long.parseLong(balanceInput.getText().toString().replaceAll("[^0-9]", ""));
                 if (!pin.isEmpty()) accountManager.createAccount(username, pin, bal);
                 refreshAccountList();
+
+                // BROADCAST: balance changed for this player
+                wsManager.broadcastBalance(username, bal);
+
                 Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
             })
             .setNegativeButton("Cancel", null)
@@ -323,7 +358,8 @@ public class MainActivity extends AppCompatActivity {
                     "Difficulty: " + gameConfig.getDifficulty().label
                     + " | Win: " + String.format("%.1f%%", gameConfig.getWinRate() * 100)
                     + " | Pay: " + String.format("%.0fx", gameConfig.getPayoutMultiplier())
-                    + (server != null ? "\nServer: " + server.getServerUrl() : ""));
+                    + (server != null ? "\nServer: " + server.getServerUrl() : "")
+                    + (wsManager != null && wsManager.isRunning() ? " | WS: 9090" : ""));
             if (winRateSeekBar != null) {
                 int wrp = Math.round((gameConfig.getWinRate() * 100 - 0.5f) / 0.5f);
                 winRateSeekBar.setProgress(Math.max(0, Math.min(149, wrp)));
@@ -356,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (wsManager != null) wsManager.stop();
         if (server != null) server.stop();
     }
 }

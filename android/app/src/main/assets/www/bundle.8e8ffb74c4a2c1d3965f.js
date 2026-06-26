@@ -1,4 +1,4 @@
-/*! For license information please see bundle.ac0997261bfb2e83080d.js.LICENSE.txt */
+/*! For license information please see bundle.8e8ffb74c4a2c1d3965f.js.LICENSE.txt */
 (() => {
   "use strict";
   (() => {
@@ -49,7 +49,7 @@
       }
       var a,
         l = !0,
-        u = !1;
+        s = !1;
       return {
         s: function () {
           r = r.call(t);
@@ -59,13 +59,13 @@
           return (l = t.done), t;
         },
         e: function (t) {
-          (u = !0), (a = t);
+          (s = !0), (a = t);
         },
         f: function () {
           try {
             l || null == r.return || r.return();
           } finally {
-            if (u) throw a;
+            if (s) throw a;
           }
         },
       };
@@ -244,12 +244,12 @@
                   n.isSpinning = !0;
                   var l = function (t) {
                     var i,
-                      u = t - a,
-                      s = Math.min(u / e, 1);
-                    if (s < 0.55) i = (s / 0.55) * 0.88;
+                      s = t - a,
+                      c = Math.min(s / e, 1);
+                    if (c < 0.55) i = (c / 0.55) * 0.88;
                     else {
-                      var c = (s - 0.55) / 0.45;
-                      i = 0.88 + 0.12 * (1 - Math.pow(1 - c, 4));
+                      var u = (c - 0.55) / 0.45;
+                      i = 0.88 + 0.12 * (1 - Math.pow(1 - u, 4));
                     }
                     i = Math.min(i, 1);
                     var f = 0 + (o - 0) * i;
@@ -258,7 +258,7 @@
                         f,
                         "px)",
                       )),
-                      s < 1
+                      c < 1
                         ? requestAnimationFrame(l)
                         : ((n.currentOffset = o),
                           (n.stripEl.style.transform = "translateY(".concat(
@@ -312,7 +312,7 @@
       if (!n) {
         if (
           Array.isArray(t) ||
-          (n = s(t)) ||
+          (n = c(t)) ||
           (e && t && "number" == typeof t.length)
         ) {
           n && (t = n);
@@ -356,7 +356,7 @@
         },
       };
     }
-    function u(t, e) {
+    function s(t, e) {
       return (
         (function (t) {
           if (Array.isArray(t)) return t;
@@ -373,37 +373,37 @@
               o,
               a,
               l = [],
-              u = !0,
-              s = !1;
+              s = !0,
+              c = !1;
             try {
               if (((o = (n = n.call(t)).next), 0 === e)) {
                 if (Object(n) !== n) return;
-                u = !1;
+                s = !1;
               } else
                 for (
                   ;
-                  !(u = (r = o.call(n)).done) &&
+                  !(s = (r = o.call(n)).done) &&
                   (l.push(r.value), l.length !== e);
-                  u = !0
+                  s = !0
                 );
             } catch (t) {
-              (s = !0), (i = t);
+              (c = !0), (i = t);
             } finally {
               try {
                 if (
-                  !u &&
+                  !s &&
                   null != n.return &&
                   ((a = n.return()), Object(a) !== a)
                 )
                   return;
               } finally {
-                if (s) throw i;
+                if (c) throw i;
               }
             }
             return l;
           }
         })(t, e) ||
-        s(t, e) ||
+        c(t, e) ||
         (function () {
           throw new TypeError(
             "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.",
@@ -411,9 +411,9 @@
         })()
       );
     }
-    function s(t, e) {
+    function c(t, e) {
       if (t) {
-        if ("string" == typeof t) return c(t, e);
+        if ("string" == typeof t) return u(t, e);
         var n = {}.toString.call(t).slice(8, -1);
         return (
           "Object" === n && t.constructor && (n = t.constructor.name),
@@ -421,12 +421,12 @@
             ? Array.from(t)
             : "Arguments" === n ||
                 /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
-              ? c(t, e)
+              ? u(t, e)
               : void 0
         );
       }
     }
-    function c(t, e) {
+    function u(t, e) {
       (null == e || e > t.length) && (e = t.length);
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
@@ -471,19 +471,19 @@
       for (var n, r = [], i = 0; i < f.length; i++) {
         var o,
           a = f[i],
-          s = a.map(function (e) {
-            var n = u(e, 2),
+          c = a.map(function (e) {
+            var n = s(e, 2),
               r = n[0],
               i = n[1];
             return t[r] && void 0 !== t[r][i] ? t[r][i] : "BAR";
           }),
-          c = null,
-          p = l(s);
+          u = null,
+          p = l(c);
         try {
           for (p.s(); !(o = p.n()).done; ) {
             var y = o.value;
             if ("DIAMOND" !== y && "JACKPOT" !== y) {
-              c = y;
+              u = y;
               break;
             }
           }
@@ -492,37 +492,37 @@
         } finally {
           p.f();
         }
-        c || (c = "SEVEN"),
-          ("DIAMOND" !== c && "JACKPOT" !== c) || (c = "SEVEN");
+        u || (u = "SEVEN"),
+          ("DIAMOND" !== u && "JACKPOT" !== u) || (u = "SEVEN");
         var d,
-          v = 0,
-          m = l(s);
+          m = 0,
+          v = l(c);
         try {
-          for (m.s(); !(d = m.n()).done; ) {
+          for (v.s(); !(d = v.n()).done; ) {
             var g = d.value;
-            if (g !== c && "DIAMOND" !== g) break;
-            v++;
+            if (g !== u && "DIAMOND" !== g) break;
+            m++;
           }
         } catch (t) {
-          m.e(t);
+          v.e(t);
         } finally {
-          m.f();
+          v.f();
         }
         if (
           !(
-            v <
-            ((n = c), "CHERRY" === n || "LEMON" === n || "ORANGE" === n ? 2 : 3)
+            m <
+            ((n = u), "CHERRY" === n || "LEMON" === n || "ORANGE" === n ? 2 : 3)
           )
         ) {
-          var b = h(c, v);
+          var b = h(u, m);
           b <= 0 ||
             r.push({
               payline: i,
-              symbol: c,
-              count: v,
+              symbol: u,
+              count: m,
               multiplier: b,
               amount: Math.floor(e * b),
-              positions: a.slice(0, v),
+              positions: a.slice(0, m),
             });
         }
       }
@@ -538,7 +538,7 @@
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
     }
-    var v = {
+    var m = {
         JACKPOT: {
           id: "JACKPOT",
           name: "Jackpot",
@@ -657,7 +657,7 @@
           weight: 10,
         },
       },
-      m = Object.keys(v);
+      v = Object.keys(m);
     function g() {
       var t,
         e = [],
@@ -727,10 +727,10 @@
               }
             },
           };
-        })(m);
+        })(v);
       try {
         for (n.s(); !(t = n.n()).done; )
-          for (var r = t.value, i = v[r], o = 0; o < i.weight; o++)
+          for (var r = t.value, i = m[r], o = 0; o < i.weight; o++)
             e.push(i.id);
       } catch (t) {
         n.e(t);
@@ -740,7 +740,7 @@
       return e[Math.floor(Math.random() * e.length)];
     }
     function b(t) {
-      var e = v[t];
+      var e = m[t];
       return e
         ? { icon: e.icon, bg: e.bg, color: e.color }
         : {
@@ -784,31 +784,31 @@
               o,
               a,
               l = [],
-              u = !0,
-              s = !1;
+              s = !0,
+              c = !1;
             try {
               if (((o = (n = n.call(t)).next), 0 === e)) {
                 if (Object(n) !== n) return;
-                u = !1;
+                s = !1;
               } else
                 for (
                   ;
-                  !(u = (r = o.call(n)).done) &&
+                  !(s = (r = o.call(n)).done) &&
                   (l.push(r.value), l.length !== e);
-                  u = !0
+                  s = !0
                 );
             } catch (t) {
-              (s = !0), (i = t);
+              (c = !0), (i = t);
             } finally {
               try {
                 if (
-                  !u &&
+                  !s &&
                   null != n.return &&
                   ((a = n.return()), Object(a) !== a)
                 )
                   return;
               } finally {
-                if (s) throw i;
+                if (c) throw i;
               }
             }
             return l;
@@ -824,7 +824,7 @@
     }
     function E(t, e) {
       if (t) {
-        if ("string" == typeof t) return x(t, e);
+        if ("string" == typeof t) return A(t, e);
         var n = {}.toString.call(t).slice(8, -1);
         return (
           "Object" === n && t.constructor && (n = t.constructor.name),
@@ -832,26 +832,26 @@
             ? Array.from(t)
             : "Arguments" === n ||
                 /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
-              ? x(t, e)
+              ? A(t, e)
               : void 0
         );
       }
     }
-    function x(t, e) {
+    function A(t, e) {
       (null == e || e > t.length) && (e = t.length);
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
     }
-    function A(t, e) {
+    function x(t, e) {
       for (var n = 0; n < e.length; n++) {
         var r = e[n];
         (r.enumerable = r.enumerable || !1),
           (r.configurable = !0),
           "value" in r && (r.writable = !0),
-          Object.defineProperty(t, L(r.key), r);
+          Object.defineProperty(t, k(r.key), r);
       }
     }
-    function L(t) {
+    function k(t) {
       var e = (function (t) {
         if ("object" != w(t) || !t) return t;
         var e = t[Symbol.toPrimitive];
@@ -864,7 +864,7 @@
       })(t);
       return "symbol" == w(e) ? e : e + "";
     }
-    var k = (function () {
+    var L = (function () {
       return (
         (t = function t() {
           !(function (t, e) {
@@ -938,8 +938,8 @@
                   if (a) {
                     var l = a.querySelector(".reel-strip");
                     if (l) {
-                      var u = l.querySelectorAll(".sym")[o];
-                      u && u.classList.add("highlight");
+                      var s = l.querySelectorAll(".sym")[o];
+                      s && s.classList.add("highlight");
                     }
                   }
                 }
@@ -970,9 +970,9 @@
                   i = parseInt(t.textContent.replace(/[^0-9]/g, "")) || 0,
                   o = function (a) {
                     var l = Math.min((a - r) / n, 1),
-                      u = 1 - Math.pow(1 - l, 3),
-                      s = Math.floor(i + (e - i) * u);
-                    (t.textContent = s.toLocaleString("id-ID")),
+                      s = 1 - Math.pow(1 - l, 3),
+                      c = Math.floor(i + (e - i) * s);
+                    (t.textContent = c.toLocaleString("id-ID")),
                       l < 1 && requestAnimationFrame(o);
                   };
                 requestAnimationFrame(o);
@@ -1028,15 +1028,15 @@
                         r.appendChild(i);
                       var a = (o / 20) * Math.PI * 2 + 0.3 * Math.random(),
                         l = 30 + 100 * Math.random(),
-                        u = Math.cos(a) * l,
-                        s = Math.sin(a) * l;
+                        s = Math.cos(a) * l,
+                        c = Math.sin(a) * l;
                       i.animate(
                         [
                           { transform: "translate(0,0) scale(1)", opacity: 1 },
                           {
                             transform: "translate("
-                              .concat(u, "px,")
-                              .concat(s, "px) scale(0)"),
+                              .concat(s, "px,")
+                              .concat(c, "px) scale(0)"),
                             opacity: 0,
                           },
                         ],
@@ -1056,7 +1056,7 @@
             },
           },
         ]),
-        e && A(t.prototype, e),
+        e && x(t.prototype, e),
         Object.defineProperty(t, "prototype", { writable: !1 }),
         t
       );
@@ -1080,7 +1080,7 @@
         M(t)
       );
     }
-    function O(t, e) {
+    function C(t, e) {
       return (
         (function (t) {
           if (Array.isArray(t)) return t;
@@ -1097,31 +1097,31 @@
               o,
               a,
               l = [],
-              u = !0,
-              s = !1;
+              s = !0,
+              c = !1;
             try {
               if (((o = (n = n.call(t)).next), 0 === e)) {
                 if (Object(n) !== n) return;
-                u = !1;
+                s = !1;
               } else
                 for (
                   ;
-                  !(u = (r = o.call(n)).done) &&
+                  !(s = (r = o.call(n)).done) &&
                   (l.push(r.value), l.length !== e);
-                  u = !0
+                  s = !0
                 );
             } catch (t) {
-              (s = !0), (i = t);
+              (c = !0), (i = t);
             } finally {
               try {
                 if (
-                  !u &&
+                  !s &&
                   null != n.return &&
                   ((a = n.return()), Object(a) !== a)
                 )
                   return;
               } finally {
-                if (s) throw i;
+                if (c) throw i;
               }
             }
             return l;
@@ -1129,7 +1129,7 @@
         })(t, e) ||
         (function (t, e) {
           if (t) {
-            if ("string" == typeof t) return j(t, e);
+            if ("string" == typeof t) return O(t, e);
             var n = {}.toString.call(t).slice(8, -1);
             return (
               "Object" === n && t.constructor && (n = t.constructor.name),
@@ -1137,7 +1137,7 @@
                 ? Array.from(t)
                 : "Arguments" === n ||
                     /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
-                  ? j(t, e)
+                  ? O(t, e)
                   : void 0
             );
           }
@@ -1149,7 +1149,7 @@
         })()
       );
     }
-    function j(t, e) {
+    function O(t, e) {
       (null == e || e > t.length) && (e = t.length);
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
@@ -1170,8 +1170,8 @@
         o = "function" == typeof Symbol ? Symbol : {},
         a = o.iterator || "@@iterator",
         l = o.asyncIterator || "@@asyncIterator",
-        u = o.toStringTag || "@@toStringTag";
-      function s(t, e, n) {
+        s = o.toStringTag || "@@toStringTag";
+      function c(t, e, n) {
         return (
           Object.defineProperty(t, e, {
             value: n,
@@ -1183,17 +1183,17 @@
         );
       }
       try {
-        s({}, "");
+        c({}, "");
       } catch (t) {
-        s = function (t, e, n) {
+        c = function (t, e, n) {
           return (t[e] = n);
         };
       }
-      function c(t, e, n, r) {
-        var o = e && e.prototype instanceof m ? e : m,
+      function u(t, e, n, r) {
+        var o = e && e.prototype instanceof v ? e : v,
           a = Object.create(o.prototype),
-          l = new F(r || []);
-        return i(a, "_invoke", { value: k(t, n, l) }), a;
+          l = new I(r || []);
+        return i(a, "_invoke", { value: L(t, n, l) }), a;
       }
       function f(t, e, n) {
         try {
@@ -1202,38 +1202,38 @@
           return { type: "throw", arg: t };
         }
       }
-      e.wrap = c;
+      e.wrap = u;
       var h = "suspendedStart",
         p = "suspendedYield",
         y = "executing",
         d = "completed",
-        v = {};
-      function m() {}
+        m = {};
+      function v() {}
       function g() {}
       function b() {}
       var w = {};
-      s(w, a, function () {
+      c(w, a, function () {
         return this;
       });
       var S = Object.getPrototypeOf,
-        E = S && S(S(C([])));
+        E = S && S(S(R([])));
       E && E !== n && r.call(E, a) && (w = E);
-      var x = (b.prototype = m.prototype = Object.create(w));
-      function A(t) {
+      var A = (b.prototype = v.prototype = Object.create(w));
+      function x(t) {
         ["next", "throw", "return"].forEach(function (e) {
-          s(t, e, function (t) {
+          c(t, e, function (t) {
             return this._invoke(e, t);
           });
         });
       }
-      function L(t, e) {
+      function k(t, e) {
         function n(i, o, a, l) {
-          var u = f(t[i], t, o);
-          if ("throw" !== u.type) {
-            var s = u.arg,
-              c = s.value;
-            return c && "object" == M(c) && r.call(c, "__await")
-              ? e.resolve(c.__await).then(
+          var s = f(t[i], t, o);
+          if ("throw" !== s.type) {
+            var c = s.arg,
+              u = c.value;
+            return u && "object" == M(u) && r.call(u, "__await")
+              ? e.resolve(u.__await).then(
                   function (t) {
                     n("next", t, a, l);
                   },
@@ -1241,16 +1241,16 @@
                     n("throw", t, a, l);
                   },
                 )
-              : e.resolve(c).then(
+              : e.resolve(u).then(
                   function (t) {
-                    (s.value = t), a(s);
+                    (c.value = t), a(c);
                   },
                   function (t) {
                     return n("throw", t, a, l);
                   },
                 );
           }
-          l(u.arg);
+          l(s.arg);
         }
         var o;
         i(this, "_invoke", {
@@ -1264,7 +1264,7 @@
           },
         });
       }
-      function k(e, n, r) {
+      function L(e, n, r) {
         var i = h;
         return function (o, a) {
           if (i === y) throw Error("Generator is already running");
@@ -1275,10 +1275,10 @@
           for (r.method = o, r.arg = a; ; ) {
             var l = r.delegate;
             if (l) {
-              var u = O(l, r);
-              if (u) {
-                if (u === v) continue;
-                return u;
+              var s = C(l, r);
+              if (s) {
+                if (s === m) continue;
+                return s;
               }
             }
             if ("next" === r.method) r.sent = r._sent = r.arg;
@@ -1287,17 +1287,17 @@
               r.dispatchException(r.arg);
             } else "return" === r.method && r.abrupt("return", r.arg);
             i = y;
-            var s = f(e, n, r);
-            if ("normal" === s.type) {
-              if (((i = r.done ? d : p), s.arg === v)) continue;
-              return { value: s.arg, done: r.done };
+            var c = f(e, n, r);
+            if ("normal" === c.type) {
+              if (((i = r.done ? d : p), c.arg === m)) continue;
+              return { value: c.arg, done: r.done };
             }
-            "throw" === s.type &&
-              ((i = d), (r.method = "throw"), (r.arg = s.arg));
+            "throw" === c.type &&
+              ((i = d), (r.method = "throw"), (r.arg = c.arg));
           }
         };
       }
-      function O(e, n) {
+      function C(e, n) {
         var r = n.method,
           i = e.iterator[r];
         if (i === t)
@@ -1307,18 +1307,18 @@
               e.iterator.return &&
               ((n.method = "return"),
               (n.arg = t),
-              O(e, n),
+              C(e, n),
               "throw" === n.method)) ||
               ("return" !== r &&
                 ((n.method = "throw"),
                 (n.arg = new TypeError(
                   "The iterator does not provide a '" + r + "' method",
                 )))),
-            v
+            m
           );
         var o = f(i, e.iterator, n.arg);
         if ("throw" === o.type)
-          return (n.method = "throw"), (n.arg = o.arg), (n.delegate = null), v;
+          return (n.method = "throw"), (n.arg = o.arg), (n.delegate = null), m;
         var a = o.arg;
         return a
           ? a.done
@@ -1326,29 +1326,29 @@
               (n.next = e.nextLoc),
               "return" !== n.method && ((n.method = "next"), (n.arg = t)),
               (n.delegate = null),
-              v)
+              m)
             : a
           : ((n.method = "throw"),
             (n.arg = new TypeError("iterator result is not an object")),
             (n.delegate = null),
-            v);
+            m);
       }
-      function j(t) {
+      function O(t) {
         var e = { tryLoc: t[0] };
         1 in t && (e.catchLoc = t[1]),
           2 in t && ((e.finallyLoc = t[2]), (e.afterLoc = t[3])),
           this.tryEntries.push(e);
       }
-      function I(t) {
+      function j(t) {
         var e = t.completion || {};
         (e.type = "normal"), delete e.arg, (t.completion = e);
       }
-      function F(t) {
+      function I(t) {
         (this.tryEntries = [{ tryLoc: "root" }]),
-          t.forEach(j, this),
+          t.forEach(O, this),
           this.reset(!0);
       }
-      function C(e) {
+      function R(e) {
         if (e || "" === e) {
           var n = e[a];
           if (n) return n.call(e);
@@ -1367,9 +1367,9 @@
       }
       return (
         (g.prototype = b),
-        i(x, "constructor", { value: b, configurable: !0 }),
+        i(A, "constructor", { value: b, configurable: !0 }),
         i(b, "constructor", { value: g, configurable: !0 }),
-        (g.displayName = s(b, u, "GeneratorFunction")),
+        (g.displayName = c(b, s, "GeneratorFunction")),
         (e.isGeneratorFunction = function (t) {
           var e = "function" == typeof t && t.constructor;
           return (
@@ -1381,34 +1381,34 @@
           return (
             Object.setPrototypeOf
               ? Object.setPrototypeOf(t, b)
-              : ((t.__proto__ = b), s(t, u, "GeneratorFunction")),
-            (t.prototype = Object.create(x)),
+              : ((t.__proto__ = b), c(t, s, "GeneratorFunction")),
+            (t.prototype = Object.create(A)),
             t
           );
         }),
         (e.awrap = function (t) {
           return { __await: t };
         }),
-        A(L.prototype),
-        s(L.prototype, l, function () {
+        x(k.prototype),
+        c(k.prototype, l, function () {
           return this;
         }),
-        (e.AsyncIterator = L),
+        (e.AsyncIterator = k),
         (e.async = function (t, n, r, i, o) {
           void 0 === o && (o = Promise);
-          var a = new L(c(t, n, r, i), o);
+          var a = new k(u(t, n, r, i), o);
           return e.isGeneratorFunction(n)
             ? a
             : a.next().then(function (t) {
                 return t.done ? t.value : a.next();
               });
         }),
-        A(x),
-        s(x, u, "Generator"),
-        s(x, a, function () {
+        x(A),
+        c(A, s, "Generator"),
+        c(A, a, function () {
           return this;
         }),
-        s(x, "toString", function () {
+        c(A, "toString", function () {
           return "[object Generator]";
         }),
         (e.keys = function (t) {
@@ -1426,624 +1426,9 @@
             }
           );
         }),
-        (e.values = C),
-        (F.prototype = {
-          constructor: F,
-          reset: function (e) {
-            if (
-              ((this.prev = 0),
-              (this.next = 0),
-              (this.sent = this._sent = t),
-              (this.done = !1),
-              (this.delegate = null),
-              (this.method = "next"),
-              (this.arg = t),
-              this.tryEntries.forEach(I),
-              !e)
-            )
-              for (var n in this)
-                "t" === n.charAt(0) &&
-                  r.call(this, n) &&
-                  !isNaN(+n.slice(1)) &&
-                  (this[n] = t);
-          },
-          stop: function () {
-            this.done = !0;
-            var t = this.tryEntries[0].completion;
-            if ("throw" === t.type) throw t.arg;
-            return this.rval;
-          },
-          dispatchException: function (e) {
-            if (this.done) throw e;
-            var n = this;
-            function i(r, i) {
-              return (
-                (l.type = "throw"),
-                (l.arg = e),
-                (n.next = r),
-                i && ((n.method = "next"), (n.arg = t)),
-                !!i
-              );
-            }
-            for (var o = this.tryEntries.length - 1; o >= 0; --o) {
-              var a = this.tryEntries[o],
-                l = a.completion;
-              if ("root" === a.tryLoc) return i("end");
-              if (a.tryLoc <= this.prev) {
-                var u = r.call(a, "catchLoc"),
-                  s = r.call(a, "finallyLoc");
-                if (u && s) {
-                  if (this.prev < a.catchLoc) return i(a.catchLoc, !0);
-                  if (this.prev < a.finallyLoc) return i(a.finallyLoc);
-                } else if (u) {
-                  if (this.prev < a.catchLoc) return i(a.catchLoc, !0);
-                } else {
-                  if (!s) throw Error("try statement without catch or finally");
-                  if (this.prev < a.finallyLoc) return i(a.finallyLoc);
-                }
-              }
-            }
-          },
-          abrupt: function (t, e) {
-            for (var n = this.tryEntries.length - 1; n >= 0; --n) {
-              var i = this.tryEntries[n];
-              if (
-                i.tryLoc <= this.prev &&
-                r.call(i, "finallyLoc") &&
-                this.prev < i.finallyLoc
-              ) {
-                var o = i;
-                break;
-              }
-            }
-            o &&
-              ("break" === t || "continue" === t) &&
-              o.tryLoc <= e &&
-              e <= o.finallyLoc &&
-              (o = null);
-            var a = o ? o.completion : {};
-            return (
-              (a.type = t),
-              (a.arg = e),
-              o
-                ? ((this.method = "next"), (this.next = o.finallyLoc), v)
-                : this.complete(a)
-            );
-          },
-          complete: function (t, e) {
-            if ("throw" === t.type) throw t.arg;
-            return (
-              "break" === t.type || "continue" === t.type
-                ? (this.next = t.arg)
-                : "return" === t.type
-                  ? ((this.rval = this.arg = t.arg),
-                    (this.method = "return"),
-                    (this.next = "end"))
-                  : "normal" === t.type && e && (this.next = e),
-              v
-            );
-          },
-          finish: function (t) {
-            for (var e = this.tryEntries.length - 1; e >= 0; --e) {
-              var n = this.tryEntries[e];
-              if (n.finallyLoc === t)
-                return this.complete(n.completion, n.afterLoc), I(n), v;
-            }
-          },
-          catch: function (t) {
-            for (var e = this.tryEntries.length - 1; e >= 0; --e) {
-              var n = this.tryEntries[e];
-              if (n.tryLoc === t) {
-                var r = n.completion;
-                if ("throw" === r.type) {
-                  var i = r.arg;
-                  I(n);
-                }
-                return i;
-              }
-            }
-            throw Error("illegal catch attempt");
-          },
-          delegateYield: function (e, n, r) {
-            return (
-              (this.delegate = { iterator: C(e), resultName: n, nextLoc: r }),
-              "next" === this.method && (this.arg = t),
-              v
-            );
-          },
-        }),
-        e
-      );
-    }
-    function I(t, e, n, r, i, o, a) {
-      try {
-        var l = t[o](a),
-          u = l.value;
-      } catch (t) {
-        return void n(t);
-      }
-      l.done ? e(u) : Promise.resolve(u).then(r, i);
-    }
-    function F(t) {
-      return function () {
-        var e = this,
-          n = arguments;
-        return new Promise(function (r, i) {
-          var o = t.apply(e, n);
-          function a(t) {
-            I(o, r, i, a, l, "next", t);
-          }
-          function l(t) {
-            I(o, r, i, a, l, "throw", t);
-          }
-          a(void 0);
-        });
-      };
-    }
-    var C = window.location.origin;
-    function T(t) {
-      return R.apply(this, arguments);
-    }
-    function R() {
-      return (R = F(
-        B().mark(function t(e) {
-          var n;
-          return B().wrap(
-            function (t) {
-              for (;;)
-                switch ((t.prev = t.next)) {
-                  case 0:
-                    return (
-                      (t.prev = 0),
-                      (t.next = 3),
-                      fetch(C + e, {
-                        method: "GET",
-                        headers: { Accept: "application/json" },
-                      })
-                    );
-                  case 3:
-                    if ((n = t.sent).ok) {
-                      t.next = 6;
-                      break;
-                    }
-                    return t.abrupt("return", null);
-                  case 6:
-                    return (t.next = 8), n.json();
-                  case 8:
-                    return t.abrupt("return", t.sent);
-                  case 11:
-                    return (
-                      (t.prev = 11),
-                      (t.t0 = t.catch(0)),
-                      t.abrupt("return", null)
-                    );
-                  case 14:
-                  case "end":
-                    return t.stop();
-                }
-            },
-            t,
-            null,
-            [[0, 11]],
-          );
-        }),
-      )).apply(this, arguments);
-    }
-    function P(t, e) {
-      return _.apply(this, arguments);
-    }
-    function _() {
-      return (_ = F(
-        B().mark(function t(e, n) {
-          var r, i, o, a, l, u, s;
-          return B().wrap(
-            function (t) {
-              for (;;)
-                switch ((t.prev = t.next)) {
-                  case 0:
-                    for (
-                      t.prev = 0,
-                        r = new URLSearchParams(),
-                        i = 0,
-                        o = Object.entries(n);
-                      i < o.length;
-                      i++
-                    )
-                      (a = O(o[i], 2)), (l = a[0]), (u = a[1]), r.append(l, u);
-                    return (
-                      (t.next = 5),
-                      fetch(C + e, {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/x-www-form-urlencoded",
-                        },
-                        body: r.toString(),
-                      })
-                    );
-                  case 5:
-                    if ((s = t.sent).ok) {
-                      t.next = 8;
-                      break;
-                    }
-                    return t.abrupt("return", { success: !1 });
-                  case 8:
-                    return (t.next = 10), s.json();
-                  case 10:
-                    return t.abrupt("return", t.sent);
-                  case 13:
-                    return (
-                      (t.prev = 13),
-                      (t.t0 = t.catch(0)),
-                      t.abrupt("return", { success: !1 })
-                    );
-                  case 16:
-                  case "end":
-                    return t.stop();
-                }
-            },
-            t,
-            null,
-            [[0, 13]],
-          );
-        }),
-      )).apply(this, arguments);
-    }
-    const N = function () {
-        return F(
-          B().mark(function t() {
-            var e;
-            return B().wrap(function (t) {
-              for (;;)
-                switch ((t.prev = t.next)) {
-                  case 0:
-                    return (t.next = 2), T("/api/config");
-                  case 2:
-                    if ((e = t.sent)) {
-                      t.next = 5;
-                      break;
-                    }
-                    return t.abrupt("return", null);
-                  case 5:
-                    return t.abrupt("return", {
-                      winRate: void 0 !== e.winRate ? e.winRate : null,
-                      payoutMultiplier:
-                        void 0 !== e.payoutMultiplier
-                          ? e.payoutMultiplier
-                          : null,
-                      minSpinsBeforeWin:
-                        void 0 !== e.minSpinsBeforeWin
-                          ? e.minSpinsBeforeWin
-                          : null,
-                      jackpotHitRate:
-                        void 0 !== e.jackpotHitRate ? e.jackpotHitRate : null,
-                      startingMoney:
-                        void 0 !== e.startingMoney ? e.startingMoney : null,
-                      betAmount: void 0 !== e.betAmount ? e.betAmount : null,
-                      jackpot: void 0 !== e.jackpot ? e.jackpot : null,
-                      difficultyId:
-                        void 0 !== e.difficultyId ? e.difficultyId : null,
-                      difficultyLabel: e.difficultyLabel || null,
-                    });
-                  case 6:
-                  case "end":
-                    return t.stop();
-                }
-            }, t);
-          }),
-        )();
-      },
-      D = function (t) {
-        return F(
-          B().mark(function e() {
-            return B().wrap(function (e) {
-              for (;;)
-                switch ((e.prev = e.next)) {
-                  case 0:
-                    return e.abrupt(
-                      "return",
-                      P("/api/money", { balance: Math.floor(t) }),
-                    );
-                  case 1:
-                  case "end":
-                    return e.stop();
-                }
-            }, e);
-          }),
-        )();
-      };
-    function G(t) {
-      return (
-        (G =
-          "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
-            ? function (t) {
-                return typeof t;
-              }
-            : function (t) {
-                return t &&
-                  "function" == typeof Symbol &&
-                  t.constructor === Symbol &&
-                  t !== Symbol.prototype
-                  ? "symbol"
-                  : typeof t;
-              }),
-        G(t)
-      );
-    }
-    function H() {
-      H = function () {
-        return e;
-      };
-      var t,
-        e = {},
-        n = Object.prototype,
-        r = n.hasOwnProperty,
-        i =
-          Object.defineProperty ||
-          function (t, e, n) {
-            t[e] = n.value;
-          },
-        o = "function" == typeof Symbol ? Symbol : {},
-        a = o.iterator || "@@iterator",
-        l = o.asyncIterator || "@@asyncIterator",
-        u = o.toStringTag || "@@toStringTag";
-      function s(t, e, n) {
-        return (
-          Object.defineProperty(t, e, {
-            value: n,
-            enumerable: !0,
-            configurable: !0,
-            writable: !0,
-          }),
-          t[e]
-        );
-      }
-      try {
-        s({}, "");
-      } catch (t) {
-        s = function (t, e, n) {
-          return (t[e] = n);
-        };
-      }
-      function c(t, e, n, r) {
-        var o = e && e.prototype instanceof m ? e : m,
-          a = Object.create(o.prototype),
-          l = new B(r || []);
-        return i(a, "_invoke", { value: k(t, n, l) }), a;
-      }
-      function f(t, e, n) {
-        try {
-          return { type: "normal", arg: t.call(e, n) };
-        } catch (t) {
-          return { type: "throw", arg: t };
-        }
-      }
-      e.wrap = c;
-      var h = "suspendedStart",
-        p = "suspendedYield",
-        y = "executing",
-        d = "completed",
-        v = {};
-      function m() {}
-      function g() {}
-      function b() {}
-      var w = {};
-      s(w, a, function () {
-        return this;
-      });
-      var S = Object.getPrototypeOf,
-        E = S && S(S(I([])));
-      E && E !== n && r.call(E, a) && (w = E);
-      var x = (b.prototype = m.prototype = Object.create(w));
-      function A(t) {
-        ["next", "throw", "return"].forEach(function (e) {
-          s(t, e, function (t) {
-            return this._invoke(e, t);
-          });
-        });
-      }
-      function L(t, e) {
-        function n(i, o, a, l) {
-          var u = f(t[i], t, o);
-          if ("throw" !== u.type) {
-            var s = u.arg,
-              c = s.value;
-            return c && "object" == G(c) && r.call(c, "__await")
-              ? e.resolve(c.__await).then(
-                  function (t) {
-                    n("next", t, a, l);
-                  },
-                  function (t) {
-                    n("throw", t, a, l);
-                  },
-                )
-              : e.resolve(c).then(
-                  function (t) {
-                    (s.value = t), a(s);
-                  },
-                  function (t) {
-                    return n("throw", t, a, l);
-                  },
-                );
-          }
-          l(u.arg);
-        }
-        var o;
-        i(this, "_invoke", {
-          value: function (t, r) {
-            function i() {
-              return new e(function (e, i) {
-                n(t, r, e, i);
-              });
-            }
-            return (o = o ? o.then(i, i) : i());
-          },
-        });
-      }
-      function k(e, n, r) {
-        var i = h;
-        return function (o, a) {
-          if (i === y) throw Error("Generator is already running");
-          if (i === d) {
-            if ("throw" === o) throw a;
-            return { value: t, done: !0 };
-          }
-          for (r.method = o, r.arg = a; ; ) {
-            var l = r.delegate;
-            if (l) {
-              var u = M(l, r);
-              if (u) {
-                if (u === v) continue;
-                return u;
-              }
-            }
-            if ("next" === r.method) r.sent = r._sent = r.arg;
-            else if ("throw" === r.method) {
-              if (i === h) throw ((i = d), r.arg);
-              r.dispatchException(r.arg);
-            } else "return" === r.method && r.abrupt("return", r.arg);
-            i = y;
-            var s = f(e, n, r);
-            if ("normal" === s.type) {
-              if (((i = r.done ? d : p), s.arg === v)) continue;
-              return { value: s.arg, done: r.done };
-            }
-            "throw" === s.type &&
-              ((i = d), (r.method = "throw"), (r.arg = s.arg));
-          }
-        };
-      }
-      function M(e, n) {
-        var r = n.method,
-          i = e.iterator[r];
-        if (i === t)
-          return (
-            (n.delegate = null),
-            ("throw" === r &&
-              e.iterator.return &&
-              ((n.method = "return"),
-              (n.arg = t),
-              M(e, n),
-              "throw" === n.method)) ||
-              ("return" !== r &&
-                ((n.method = "throw"),
-                (n.arg = new TypeError(
-                  "The iterator does not provide a '" + r + "' method",
-                )))),
-            v
-          );
-        var o = f(i, e.iterator, n.arg);
-        if ("throw" === o.type)
-          return (n.method = "throw"), (n.arg = o.arg), (n.delegate = null), v;
-        var a = o.arg;
-        return a
-          ? a.done
-            ? ((n[e.resultName] = a.value),
-              (n.next = e.nextLoc),
-              "return" !== n.method && ((n.method = "next"), (n.arg = t)),
-              (n.delegate = null),
-              v)
-            : a
-          : ((n.method = "throw"),
-            (n.arg = new TypeError("iterator result is not an object")),
-            (n.delegate = null),
-            v);
-      }
-      function O(t) {
-        var e = { tryLoc: t[0] };
-        1 in t && (e.catchLoc = t[1]),
-          2 in t && ((e.finallyLoc = t[2]), (e.afterLoc = t[3])),
-          this.tryEntries.push(e);
-      }
-      function j(t) {
-        var e = t.completion || {};
-        (e.type = "normal"), delete e.arg, (t.completion = e);
-      }
-      function B(t) {
-        (this.tryEntries = [{ tryLoc: "root" }]),
-          t.forEach(O, this),
-          this.reset(!0);
-      }
-      function I(e) {
-        if (e || "" === e) {
-          var n = e[a];
-          if (n) return n.call(e);
-          if ("function" == typeof e.next) return e;
-          if (!isNaN(e.length)) {
-            var i = -1,
-              o = function n() {
-                for (; ++i < e.length; )
-                  if (r.call(e, i)) return (n.value = e[i]), (n.done = !1), n;
-                return (n.value = t), (n.done = !0), n;
-              };
-            return (o.next = o);
-          }
-        }
-        throw new TypeError(G(e) + " is not iterable");
-      }
-      return (
-        (g.prototype = b),
-        i(x, "constructor", { value: b, configurable: !0 }),
-        i(b, "constructor", { value: g, configurable: !0 }),
-        (g.displayName = s(b, u, "GeneratorFunction")),
-        (e.isGeneratorFunction = function (t) {
-          var e = "function" == typeof t && t.constructor;
-          return (
-            !!e &&
-            (e === g || "GeneratorFunction" === (e.displayName || e.name))
-          );
-        }),
-        (e.mark = function (t) {
-          return (
-            Object.setPrototypeOf
-              ? Object.setPrototypeOf(t, b)
-              : ((t.__proto__ = b), s(t, u, "GeneratorFunction")),
-            (t.prototype = Object.create(x)),
-            t
-          );
-        }),
-        (e.awrap = function (t) {
-          return { __await: t };
-        }),
-        A(L.prototype),
-        s(L.prototype, l, function () {
-          return this;
-        }),
-        (e.AsyncIterator = L),
-        (e.async = function (t, n, r, i, o) {
-          void 0 === o && (o = Promise);
-          var a = new L(c(t, n, r, i), o);
-          return e.isGeneratorFunction(n)
-            ? a
-            : a.next().then(function (t) {
-                return t.done ? t.value : a.next();
-              });
-        }),
-        A(x),
-        s(x, u, "Generator"),
-        s(x, a, function () {
-          return this;
-        }),
-        s(x, "toString", function () {
-          return "[object Generator]";
-        }),
-        (e.keys = function (t) {
-          var e = Object(t),
-            n = [];
-          for (var r in e) n.push(r);
-          return (
-            n.reverse(),
-            function t() {
-              for (; n.length; ) {
-                var r = n.pop();
-                if (r in e) return (t.value = r), (t.done = !1), t;
-              }
-              return (t.done = !0), t;
-            }
-          );
-        }),
-        (e.values = I),
-        (B.prototype = {
-          constructor: B,
+        (e.values = R),
+        (I.prototype = {
+          constructor: I,
           reset: function (e) {
             if (
               ((this.prev = 0),
@@ -2085,15 +1470,15 @@
                 l = a.completion;
               if ("root" === a.tryLoc) return i("end");
               if (a.tryLoc <= this.prev) {
-                var u = r.call(a, "catchLoc"),
-                  s = r.call(a, "finallyLoc");
-                if (u && s) {
+                var s = r.call(a, "catchLoc"),
+                  c = r.call(a, "finallyLoc");
+                if (s && c) {
                   if (this.prev < a.catchLoc) return i(a.catchLoc, !0);
                   if (this.prev < a.finallyLoc) return i(a.finallyLoc);
-                } else if (u) {
+                } else if (s) {
                   if (this.prev < a.catchLoc) return i(a.catchLoc, !0);
                 } else {
-                  if (!s) throw Error("try statement without catch or finally");
+                  if (!c) throw Error("try statement without catch or finally");
                   if (this.prev < a.finallyLoc) return i(a.finallyLoc);
                 }
               }
@@ -2121,7 +1506,7 @@
               (a.type = t),
               (a.arg = e),
               o
-                ? ((this.method = "next"), (this.next = o.finallyLoc), v)
+                ? ((this.method = "next"), (this.next = o.finallyLoc), m)
                 : this.complete(a)
             );
           },
@@ -2135,14 +1520,14 @@
                     (this.method = "return"),
                     (this.next = "end"))
                   : "normal" === t.type && e && (this.next = e),
-              v
+              m
             );
           },
           finish: function (t) {
             for (var e = this.tryEntries.length - 1; e >= 0; --e) {
               var n = this.tryEntries[e];
               if (n.finallyLoc === t)
-                return this.complete(n.completion, n.afterLoc), j(n), v;
+                return this.complete(n.completion, n.afterLoc), j(n), m;
             }
           },
           catch: function (t) {
@@ -2161,41 +1546,845 @@
           },
           delegateYield: function (e, n, r) {
             return (
-              (this.delegate = { iterator: I(e), resultName: n, nextLoc: r }),
+              (this.delegate = { iterator: R(e), resultName: n, nextLoc: r }),
               "next" === this.method && (this.arg = t),
-              v
+              m
             );
           },
         }),
         e
       );
     }
-    function U(t, e, n, r, i, o, a) {
+    function j(t, e, n, r, i, o, a) {
       try {
         var l = t[o](a),
-          u = l.value;
+          s = l.value;
       } catch (t) {
         return void n(t);
       }
-      l.done ? e(u) : Promise.resolve(u).then(r, i);
+      l.done ? e(s) : Promise.resolve(s).then(r, i);
     }
-    function W(t) {
+    function I(t) {
       return function () {
         var e = this,
           n = arguments;
         return new Promise(function (r, i) {
           var o = t.apply(e, n);
           function a(t) {
-            U(o, r, i, a, l, "next", t);
+            j(o, r, i, a, l, "next", t);
           }
           function l(t) {
-            U(o, r, i, a, l, "throw", t);
+            j(o, r, i, a, l, "throw", t);
           }
           a(void 0);
         });
       };
     }
-    function Y(t, e) {
+    var R = window.location.origin;
+    function F(t) {
+      return T.apply(this, arguments);
+    }
+    function T() {
+      return (T = I(
+        B().mark(function t(e) {
+          var n;
+          return B().wrap(
+            function (t) {
+              for (;;)
+                switch ((t.prev = t.next)) {
+                  case 0:
+                    return (
+                      (t.prev = 0),
+                      (t.next = 3),
+                      fetch(R + e, {
+                        method: "GET",
+                        headers: { Accept: "application/json" },
+                      })
+                    );
+                  case 3:
+                    if ((n = t.sent).ok) {
+                      t.next = 6;
+                      break;
+                    }
+                    return t.abrupt("return", null);
+                  case 6:
+                    return (t.next = 8), n.json();
+                  case 8:
+                    return t.abrupt("return", t.sent);
+                  case 11:
+                    return (
+                      (t.prev = 11),
+                      (t.t0 = t.catch(0)),
+                      t.abrupt("return", null)
+                    );
+                  case 14:
+                  case "end":
+                    return t.stop();
+                }
+            },
+            t,
+            null,
+            [[0, 11]],
+          );
+        }),
+      )).apply(this, arguments);
+    }
+    function D(t, e) {
+      return N.apply(this, arguments);
+    }
+    function N() {
+      return (N = I(
+        B().mark(function t(e, n) {
+          var r, i, o, a, l, s, c;
+          return B().wrap(
+            function (t) {
+              for (;;)
+                switch ((t.prev = t.next)) {
+                  case 0:
+                    for (
+                      t.prev = 0,
+                        r = new URLSearchParams(),
+                        i = 0,
+                        o = Object.entries(n);
+                      i < o.length;
+                      i++
+                    )
+                      (a = C(o[i], 2)), (l = a[0]), (s = a[1]), r.append(l, s);
+                    return (
+                      (t.next = 5),
+                      fetch(R + e, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: r.toString(),
+                      })
+                    );
+                  case 5:
+                    if ((c = t.sent).ok) {
+                      t.next = 8;
+                      break;
+                    }
+                    return t.abrupt("return", { success: !1 });
+                  case 8:
+                    return (t.next = 10), c.json();
+                  case 10:
+                    return t.abrupt("return", t.sent);
+                  case 13:
+                    return (
+                      (t.prev = 13),
+                      (t.t0 = t.catch(0)),
+                      t.abrupt("return", { success: !1 })
+                    );
+                  case 16:
+                  case "end":
+                    return t.stop();
+                }
+            },
+            t,
+            null,
+            [[0, 13]],
+          );
+        }),
+      )).apply(this, arguments);
+    }
+    const _ = function () {
+        return I(
+          B().mark(function t() {
+            var e;
+            return B().wrap(function (t) {
+              for (;;)
+                switch ((t.prev = t.next)) {
+                  case 0:
+                    return (t.next = 2), F("/api/config");
+                  case 2:
+                    if ((e = t.sent)) {
+                      t.next = 5;
+                      break;
+                    }
+                    return t.abrupt("return", null);
+                  case 5:
+                    return t.abrupt("return", {
+                      winRate: void 0 !== e.winRate ? e.winRate : null,
+                      payoutMultiplier:
+                        void 0 !== e.payoutMultiplier
+                          ? e.payoutMultiplier
+                          : null,
+                      minSpinsBeforeWin:
+                        void 0 !== e.minSpinsBeforeWin
+                          ? e.minSpinsBeforeWin
+                          : null,
+                      jackpotHitRate:
+                        void 0 !== e.jackpotHitRate ? e.jackpotHitRate : null,
+                      startingMoney:
+                        void 0 !== e.startingMoney ? e.startingMoney : null,
+                      betAmount: void 0 !== e.betAmount ? e.betAmount : null,
+                      jackpot: void 0 !== e.jackpot ? e.jackpot : null,
+                      difficultyId:
+                        void 0 !== e.difficultyId ? e.difficultyId : null,
+                      difficultyLabel: e.difficultyLabel || null,
+                    });
+                  case 6:
+                  case "end":
+                    return t.stop();
+                }
+            }, t);
+          }),
+        )();
+      },
+      P = function (t) {
+        return I(
+          B().mark(function e() {
+            return B().wrap(function (e) {
+              for (;;)
+                switch ((e.prev = e.next)) {
+                  case 0:
+                    return e.abrupt(
+                      "return",
+                      D("/api/money", { balance: Math.floor(t) }),
+                    );
+                  case 1:
+                  case "end":
+                    return e.stop();
+                }
+            }, e);
+          }),
+        )();
+      };
+    function G(t) {
+      return (
+        (G =
+          "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
+            ? function (t) {
+                return typeof t;
+              }
+            : function (t) {
+                return t &&
+                  "function" == typeof Symbol &&
+                  t.constructor === Symbol &&
+                  t !== Symbol.prototype
+                  ? "symbol"
+                  : typeof t;
+              }),
+        G(t)
+      );
+    }
+    function U(t, e) {
+      for (var n = 0; n < e.length; n++) {
+        var r = e[n];
+        (r.enumerable = r.enumerable || !1),
+          (r.configurable = !0),
+          "value" in r && (r.writable = !0),
+          Object.defineProperty(t, W(r.key), r);
+      }
+    }
+    function W(t) {
+      var e = (function (t) {
+        if ("object" != G(t) || !t) return t;
+        var e = t[Symbol.toPrimitive];
+        if (void 0 !== e) {
+          var n = e.call(t, "string");
+          if ("object" != G(n)) return n;
+          throw new TypeError("@@toPrimitive must return a primitive value.");
+        }
+        return String(t);
+      })(t);
+      return "symbol" == G(e) ? e : e + "";
+    }
+    var H = (function () {
+      return (
+        (t = function t(e) {
+          !(function (t, e) {
+            if (!(t instanceof e))
+              throw new TypeError("Cannot call a class as a function");
+          })(this, t),
+            (this.gm = e),
+            (this.ws = null),
+            (this.reconnectAttempts = 0),
+            (this.maxBackoff = 5e3),
+            (this.intentionalClose = !1),
+            (this.lastConfig = null),
+            this.connect();
+        }),
+        (e = [
+          {
+            key: "_getWsUrl",
+            value: function () {
+              var t = window.location.hostname || "localhost";
+              return "ws://".concat(t, ":").concat(9090);
+            },
+          },
+          {
+            key: "connect",
+            value: function () {
+              var t = this;
+              if (
+                !this.ws ||
+                (this.ws.readyState !== WebSocket.OPEN &&
+                  this.ws.readyState !== WebSocket.CONNECTING)
+              ) {
+                this.intentionalClose = !1;
+                var e = this._getWsUrl();
+                try {
+                  this.ws = new WebSocket(e);
+                } catch (t) {
+                  return (
+                    console.warn(
+                      "[Realtime] WebSocket creation failed:",
+                      t.message,
+                    ),
+                    void this._scheduleReconnect()
+                  );
+                }
+                (this.ws.onopen = function () {
+                  console.log("[Realtime] Connected to " + e),
+                    (t.reconnectAttempts = 0);
+                }),
+                  (this.ws.onmessage = function (e) {
+                    try {
+                      var n = JSON.parse(e.data);
+                      t._dispatch(n);
+                    } catch (t) {
+                      console.warn("[Realtime] Invalid message:", t.message);
+                    }
+                  }),
+                  (this.ws.onclose = function (e) {
+                    console.log(
+                      "[Realtime] Disconnected (code=" + e.code + ")",
+                    ),
+                      t.intentionalClose || t._scheduleReconnect();
+                  }),
+                  (this.ws.onerror = function () {});
+              }
+            },
+          },
+          {
+            key: "_dispatch",
+            value: function (t) {
+              if (t && t.type)
+                switch (t.type) {
+                  case "configChanged":
+                    (this.lastConfig = t.config || {}),
+                      this.gm &&
+                        "function" == typeof this.gm.onConfigChanged &&
+                        this.gm.onConfigChanged(this.lastConfig);
+                    break;
+                  case "jackpotChanged":
+                    this.gm &&
+                      "function" == typeof this.gm.onJackpotChanged &&
+                      this.gm.onJackpotChanged(t.value);
+                    break;
+                  case "balanceChanged":
+                    this.gm &&
+                      "function" == typeof this.gm.onBalanceChanged &&
+                      this.gm.onBalanceChanged(t.player, t.balance);
+                    break;
+                  case "difficultyChanged":
+                    this.gm &&
+                      "function" == typeof this.gm.onDifficultyChanged &&
+                      this.gm.onDifficultyChanged(
+                        t.level,
+                        t.winRate,
+                        t.payoutMultiplier,
+                      );
+                    break;
+                  case "maintenanceMode":
+                    this.gm &&
+                      "function" == typeof this.gm.onMaintenanceMode &&
+                      this.gm.onMaintenanceMode(t.enabled);
+                    break;
+                  case "resetGame":
+                    this.gm &&
+                      "function" == typeof this.gm.onResetGame &&
+                      this.gm.onResetGame();
+                    break;
+                  default:
+                    console.log("[Realtime] Unknown event type:", t.type);
+                }
+            },
+          },
+          {
+            key: "_scheduleReconnect",
+            value: function () {
+              var t = this,
+                e = Math.min(
+                  1e3 * Math.pow(2, this.reconnectAttempts),
+                  this.maxBackoff,
+                );
+              this.reconnectAttempts++,
+                console.log(
+                  "[Realtime] Reconnecting in "
+                    .concat(e, "ms (attempt ")
+                    .concat(this.reconnectAttempts, ")"),
+                ),
+                setTimeout(function () {
+                  return t.connect();
+                }, e);
+            },
+          },
+          {
+            key: "disconnect",
+            value: function () {
+              if (((this.intentionalClose = !0), this.ws)) {
+                try {
+                  this.ws.close();
+                } catch (t) {}
+                this.ws = null;
+              }
+            },
+          },
+        ]),
+        e && U(t.prototype, e),
+        Object.defineProperty(t, "prototype", { writable: !1 }),
+        t
+      );
+      var t, e;
+    })();
+    function Y(t) {
+      return (
+        (Y =
+          "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
+            ? function (t) {
+                return typeof t;
+              }
+            : function (t) {
+                return t &&
+                  "function" == typeof Symbol &&
+                  t.constructor === Symbol &&
+                  t !== Symbol.prototype
+                  ? "symbol"
+                  : typeof t;
+              }),
+        Y(t)
+      );
+    }
+    function q() {
+      q = function () {
+        return e;
+      };
+      var t,
+        e = {},
+        n = Object.prototype,
+        r = n.hasOwnProperty,
+        i =
+          Object.defineProperty ||
+          function (t, e, n) {
+            t[e] = n.value;
+          },
+        o = "function" == typeof Symbol ? Symbol : {},
+        a = o.iterator || "@@iterator",
+        l = o.asyncIterator || "@@asyncIterator",
+        s = o.toStringTag || "@@toStringTag";
+      function c(t, e, n) {
+        return (
+          Object.defineProperty(t, e, {
+            value: n,
+            enumerable: !0,
+            configurable: !0,
+            writable: !0,
+          }),
+          t[e]
+        );
+      }
+      try {
+        c({}, "");
+      } catch (t) {
+        c = function (t, e, n) {
+          return (t[e] = n);
+        };
+      }
+      function u(t, e, n, r) {
+        var o = e && e.prototype instanceof v ? e : v,
+          a = Object.create(o.prototype),
+          l = new B(r || []);
+        return i(a, "_invoke", { value: L(t, n, l) }), a;
+      }
+      function f(t, e, n) {
+        try {
+          return { type: "normal", arg: t.call(e, n) };
+        } catch (t) {
+          return { type: "throw", arg: t };
+        }
+      }
+      e.wrap = u;
+      var h = "suspendedStart",
+        p = "suspendedYield",
+        y = "executing",
+        d = "completed",
+        m = {};
+      function v() {}
+      function g() {}
+      function b() {}
+      var w = {};
+      c(w, a, function () {
+        return this;
+      });
+      var S = Object.getPrototypeOf,
+        E = S && S(S(j([])));
+      E && E !== n && r.call(E, a) && (w = E);
+      var A = (b.prototype = v.prototype = Object.create(w));
+      function x(t) {
+        ["next", "throw", "return"].forEach(function (e) {
+          c(t, e, function (t) {
+            return this._invoke(e, t);
+          });
+        });
+      }
+      function k(t, e) {
+        function n(i, o, a, l) {
+          var s = f(t[i], t, o);
+          if ("throw" !== s.type) {
+            var c = s.arg,
+              u = c.value;
+            return u && "object" == Y(u) && r.call(u, "__await")
+              ? e.resolve(u.__await).then(
+                  function (t) {
+                    n("next", t, a, l);
+                  },
+                  function (t) {
+                    n("throw", t, a, l);
+                  },
+                )
+              : e.resolve(u).then(
+                  function (t) {
+                    (c.value = t), a(c);
+                  },
+                  function (t) {
+                    return n("throw", t, a, l);
+                  },
+                );
+          }
+          l(s.arg);
+        }
+        var o;
+        i(this, "_invoke", {
+          value: function (t, r) {
+            function i() {
+              return new e(function (e, i) {
+                n(t, r, e, i);
+              });
+            }
+            return (o = o ? o.then(i, i) : i());
+          },
+        });
+      }
+      function L(e, n, r) {
+        var i = h;
+        return function (o, a) {
+          if (i === y) throw Error("Generator is already running");
+          if (i === d) {
+            if ("throw" === o) throw a;
+            return { value: t, done: !0 };
+          }
+          for (r.method = o, r.arg = a; ; ) {
+            var l = r.delegate;
+            if (l) {
+              var s = M(l, r);
+              if (s) {
+                if (s === m) continue;
+                return s;
+              }
+            }
+            if ("next" === r.method) r.sent = r._sent = r.arg;
+            else if ("throw" === r.method) {
+              if (i === h) throw ((i = d), r.arg);
+              r.dispatchException(r.arg);
+            } else "return" === r.method && r.abrupt("return", r.arg);
+            i = y;
+            var c = f(e, n, r);
+            if ("normal" === c.type) {
+              if (((i = r.done ? d : p), c.arg === m)) continue;
+              return { value: c.arg, done: r.done };
+            }
+            "throw" === c.type &&
+              ((i = d), (r.method = "throw"), (r.arg = c.arg));
+          }
+        };
+      }
+      function M(e, n) {
+        var r = n.method,
+          i = e.iterator[r];
+        if (i === t)
+          return (
+            (n.delegate = null),
+            ("throw" === r &&
+              e.iterator.return &&
+              ((n.method = "return"),
+              (n.arg = t),
+              M(e, n),
+              "throw" === n.method)) ||
+              ("return" !== r &&
+                ((n.method = "throw"),
+                (n.arg = new TypeError(
+                  "The iterator does not provide a '" + r + "' method",
+                )))),
+            m
+          );
+        var o = f(i, e.iterator, n.arg);
+        if ("throw" === o.type)
+          return (n.method = "throw"), (n.arg = o.arg), (n.delegate = null), m;
+        var a = o.arg;
+        return a
+          ? a.done
+            ? ((n[e.resultName] = a.value),
+              (n.next = e.nextLoc),
+              "return" !== n.method && ((n.method = "next"), (n.arg = t)),
+              (n.delegate = null),
+              m)
+            : a
+          : ((n.method = "throw"),
+            (n.arg = new TypeError("iterator result is not an object")),
+            (n.delegate = null),
+            m);
+      }
+      function C(t) {
+        var e = { tryLoc: t[0] };
+        1 in t && (e.catchLoc = t[1]),
+          2 in t && ((e.finallyLoc = t[2]), (e.afterLoc = t[3])),
+          this.tryEntries.push(e);
+      }
+      function O(t) {
+        var e = t.completion || {};
+        (e.type = "normal"), delete e.arg, (t.completion = e);
+      }
+      function B(t) {
+        (this.tryEntries = [{ tryLoc: "root" }]),
+          t.forEach(C, this),
+          this.reset(!0);
+      }
+      function j(e) {
+        if (e || "" === e) {
+          var n = e[a];
+          if (n) return n.call(e);
+          if ("function" == typeof e.next) return e;
+          if (!isNaN(e.length)) {
+            var i = -1,
+              o = function n() {
+                for (; ++i < e.length; )
+                  if (r.call(e, i)) return (n.value = e[i]), (n.done = !1), n;
+                return (n.value = t), (n.done = !0), n;
+              };
+            return (o.next = o);
+          }
+        }
+        throw new TypeError(Y(e) + " is not iterable");
+      }
+      return (
+        (g.prototype = b),
+        i(A, "constructor", { value: b, configurable: !0 }),
+        i(b, "constructor", { value: g, configurable: !0 }),
+        (g.displayName = c(b, s, "GeneratorFunction")),
+        (e.isGeneratorFunction = function (t) {
+          var e = "function" == typeof t && t.constructor;
+          return (
+            !!e &&
+            (e === g || "GeneratorFunction" === (e.displayName || e.name))
+          );
+        }),
+        (e.mark = function (t) {
+          return (
+            Object.setPrototypeOf
+              ? Object.setPrototypeOf(t, b)
+              : ((t.__proto__ = b), c(t, s, "GeneratorFunction")),
+            (t.prototype = Object.create(A)),
+            t
+          );
+        }),
+        (e.awrap = function (t) {
+          return { __await: t };
+        }),
+        x(k.prototype),
+        c(k.prototype, l, function () {
+          return this;
+        }),
+        (e.AsyncIterator = k),
+        (e.async = function (t, n, r, i, o) {
+          void 0 === o && (o = Promise);
+          var a = new k(u(t, n, r, i), o);
+          return e.isGeneratorFunction(n)
+            ? a
+            : a.next().then(function (t) {
+                return t.done ? t.value : a.next();
+              });
+        }),
+        x(A),
+        c(A, s, "Generator"),
+        c(A, a, function () {
+          return this;
+        }),
+        c(A, "toString", function () {
+          return "[object Generator]";
+        }),
+        (e.keys = function (t) {
+          var e = Object(t),
+            n = [];
+          for (var r in e) n.push(r);
+          return (
+            n.reverse(),
+            function t() {
+              for (; n.length; ) {
+                var r = n.pop();
+                if (r in e) return (t.value = r), (t.done = !1), t;
+              }
+              return (t.done = !0), t;
+            }
+          );
+        }),
+        (e.values = j),
+        (B.prototype = {
+          constructor: B,
+          reset: function (e) {
+            if (
+              ((this.prev = 0),
+              (this.next = 0),
+              (this.sent = this._sent = t),
+              (this.done = !1),
+              (this.delegate = null),
+              (this.method = "next"),
+              (this.arg = t),
+              this.tryEntries.forEach(O),
+              !e)
+            )
+              for (var n in this)
+                "t" === n.charAt(0) &&
+                  r.call(this, n) &&
+                  !isNaN(+n.slice(1)) &&
+                  (this[n] = t);
+          },
+          stop: function () {
+            this.done = !0;
+            var t = this.tryEntries[0].completion;
+            if ("throw" === t.type) throw t.arg;
+            return this.rval;
+          },
+          dispatchException: function (e) {
+            if (this.done) throw e;
+            var n = this;
+            function i(r, i) {
+              return (
+                (l.type = "throw"),
+                (l.arg = e),
+                (n.next = r),
+                i && ((n.method = "next"), (n.arg = t)),
+                !!i
+              );
+            }
+            for (var o = this.tryEntries.length - 1; o >= 0; --o) {
+              var a = this.tryEntries[o],
+                l = a.completion;
+              if ("root" === a.tryLoc) return i("end");
+              if (a.tryLoc <= this.prev) {
+                var s = r.call(a, "catchLoc"),
+                  c = r.call(a, "finallyLoc");
+                if (s && c) {
+                  if (this.prev < a.catchLoc) return i(a.catchLoc, !0);
+                  if (this.prev < a.finallyLoc) return i(a.finallyLoc);
+                } else if (s) {
+                  if (this.prev < a.catchLoc) return i(a.catchLoc, !0);
+                } else {
+                  if (!c) throw Error("try statement without catch or finally");
+                  if (this.prev < a.finallyLoc) return i(a.finallyLoc);
+                }
+              }
+            }
+          },
+          abrupt: function (t, e) {
+            for (var n = this.tryEntries.length - 1; n >= 0; --n) {
+              var i = this.tryEntries[n];
+              if (
+                i.tryLoc <= this.prev &&
+                r.call(i, "finallyLoc") &&
+                this.prev < i.finallyLoc
+              ) {
+                var o = i;
+                break;
+              }
+            }
+            o &&
+              ("break" === t || "continue" === t) &&
+              o.tryLoc <= e &&
+              e <= o.finallyLoc &&
+              (o = null);
+            var a = o ? o.completion : {};
+            return (
+              (a.type = t),
+              (a.arg = e),
+              o
+                ? ((this.method = "next"), (this.next = o.finallyLoc), m)
+                : this.complete(a)
+            );
+          },
+          complete: function (t, e) {
+            if ("throw" === t.type) throw t.arg;
+            return (
+              "break" === t.type || "continue" === t.type
+                ? (this.next = t.arg)
+                : "return" === t.type
+                  ? ((this.rval = this.arg = t.arg),
+                    (this.method = "return"),
+                    (this.next = "end"))
+                  : "normal" === t.type && e && (this.next = e),
+              m
+            );
+          },
+          finish: function (t) {
+            for (var e = this.tryEntries.length - 1; e >= 0; --e) {
+              var n = this.tryEntries[e];
+              if (n.finallyLoc === t)
+                return this.complete(n.completion, n.afterLoc), O(n), m;
+            }
+          },
+          catch: function (t) {
+            for (var e = this.tryEntries.length - 1; e >= 0; --e) {
+              var n = this.tryEntries[e];
+              if (n.tryLoc === t) {
+                var r = n.completion;
+                if ("throw" === r.type) {
+                  var i = r.arg;
+                  O(n);
+                }
+                return i;
+              }
+            }
+            throw Error("illegal catch attempt");
+          },
+          delegateYield: function (e, n, r) {
+            return (
+              (this.delegate = { iterator: j(e), resultName: n, nextLoc: r }),
+              "next" === this.method && (this.arg = t),
+              m
+            );
+          },
+        }),
+        e
+      );
+    }
+    function J(t, e, n, r, i, o, a) {
+      try {
+        var l = t[o](a),
+          s = l.value;
+      } catch (t) {
+        return void n(t);
+      }
+      l.done ? e(s) : Promise.resolve(s).then(r, i);
+    }
+    function z(t) {
+      return function () {
+        var e = this,
+          n = arguments;
+        return new Promise(function (r, i) {
+          var o = t.apply(e, n);
+          function a(t) {
+            J(o, r, i, a, l, "next", t);
+          }
+          function l(t) {
+            J(o, r, i, a, l, "throw", t);
+          }
+          a(void 0);
+        });
+      };
+    }
+    function $(t, e) {
       var n =
         ("undefined" != typeof Symbol && t[Symbol.iterator]) || t["@@iterator"];
       if (!n) {
@@ -2203,7 +2392,7 @@
           Array.isArray(t) ||
           (n = (function (t, e) {
             if (t) {
-              if ("string" == typeof t) return q(t, e);
+              if ("string" == typeof t) return K(t, e);
               var n = {}.toString.call(t).slice(8, -1);
               return (
                 "Object" === n && t.constructor && (n = t.constructor.name),
@@ -2211,7 +2400,7 @@
                   ? Array.from(t)
                   : "Arguments" === n ||
                       /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
-                    ? q(t, e)
+                    ? K(t, e)
                     : void 0
               );
             }
@@ -2259,43 +2448,44 @@
         },
       };
     }
-    function q(t, e) {
+    function K(t, e) {
       (null == e || e > t.length) && (e = t.length);
       for (var n = 0, r = Array(e); n < e; n++) r[n] = t[n];
       return r;
     }
-    function z(t, e) {
+    function V(t, e) {
       for (var n = 0; n < e.length; n++) {
         var r = e[n];
         (r.enumerable = r.enumerable || !1),
           (r.configurable = !0),
           "value" in r && (r.writable = !0),
-          Object.defineProperty(t, $(r.key), r);
+          Object.defineProperty(t, Q(r.key), r);
       }
     }
-    function $(t) {
+    function Q(t) {
       var e = (function (t) {
-        if ("object" != G(t) || !t) return t;
+        if ("object" != Y(t) || !t) return t;
         var e = t[Symbol.toPrimitive];
         if (void 0 !== e) {
           var n = e.call(t, "string");
-          if ("object" != G(n)) return n;
+          if ("object" != Y(n)) return n;
           throw new TypeError("@@toPrimitive must return a primitive value.");
         }
         return String(t);
       })(t);
-      return "symbol" == G(e) ? e : e + "";
+      return "symbol" == Y(e) ? e : e + "";
     }
-    window.__SYMBOLS_DATA = v;
-    var J = (function () {
+    window.__SYMBOLS_DATA = m;
+    var X = (function () {
       return (
         (t = function t() {
           !(function (t, e) {
             if (!(t instanceof e))
               throw new TypeError("Cannot call a class as a function");
           })(this, t),
-            (this.anim = new k()),
+            (this.anim = new L()),
             (this.reels = []),
+            (this.realtime = null),
             (this.state = {
               balance: 1e4,
               bet: 100,
@@ -2306,7 +2496,7 @@
               turbo: !1,
               spinCount: 0,
               lossStreak: 0,
-              config: null,
+              config: {},
             }),
             (this.grid = [
               ["BAR", "BAR", "BAR"],
@@ -2320,13 +2510,17 @@
           {
             key: "init",
             value: function () {
+              var t = this;
               this.cacheDOM(),
                 this.initReels(),
                 this.loadConfig(),
                 this.bindEvents(),
                 this.showGrid(),
                 this.updateUI(),
-                this.showMsg("🎰 SPIN TO WIN");
+                this.showMsg("🎰 SPIN TO WIN"),
+                setTimeout(function () {
+                  t.realtime = new H(t);
+                }, 100);
             },
           },
           {
@@ -2363,7 +2557,7 @@
               var t = document.querySelectorAll(".reel");
               if (t) {
                 var e,
-                  n = Y(t);
+                  n = $(t);
                 try {
                   for (n.s(); !(e = n.n()).done; ) {
                     var r = e.value;
@@ -2391,26 +2585,24 @@
           {
             key: "loadConfig",
             value:
-              ((i = W(
-                H().mark(function t() {
+              ((i = z(
+                q().mark(function t() {
                   var e, n, r;
-                  return H().wrap(
+                  return q().wrap(
                     function (t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
                           case 0:
-                            return (t.prev = 0), (t.next = 3), N();
+                            return (t.prev = 0), (t.next = 3), _();
                           case 3:
-                            (n = t.sent),
-                              (this.state.config = n),
-                              null != n &&
-                                n.betAmount &&
-                                (this.state.bet = n.betAmount),
-                              (t.next = 10);
+                            (n = t.sent) &&
+                              ((this.state.config = n),
+                              n.betAmount && (this.state.bet = n.betAmount)),
+                              (t.next = 9);
                             break;
-                          case 8:
-                            (t.prev = 8), (t.t0 = t.catch(0));
-                          case 10:
+                          case 7:
+                            (t.prev = 7), (t.t0 = t.catch(0));
+                          case 9:
                             (r = localStorage.getItem("slot777_balance"))
                               ? (this.state.balance = parseInt(r, 10))
                               : null !== (e = this.state.config) &&
@@ -2418,16 +2610,16 @@
                                 e.startingMoney &&
                                 (this.state.balance =
                                   this.state.config.startingMoney),
-                              D(this.state.balance),
+                              P(this.state.balance),
                               this.updateUI();
-                          case 14:
+                          case 13:
                           case "end":
                             return t.stop();
                         }
                     },
                     t,
                     this,
-                    [[0, 8]],
+                    [[0, 7]],
                   );
                 }),
               )),
@@ -2492,7 +2684,7 @@
                 }),
                 window.addEventListener("resize", function () {
                   var t,
-                    e = Y(l.reels);
+                    e = $(l.reels);
                   try {
                     for (e.s(); !(t = e.n()).done; ) t.value.updateSize();
                   } catch (t) {
@@ -2521,17 +2713,18 @@
           {
             key: "resetBalance",
             value:
-              ((r = W(
-                H().mark(function t() {
+              ((r = z(
+                q().mark(function t() {
                   var e, n;
-                  return H().wrap(
+                  return q().wrap(
                     function (t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
                           case 0:
-                            return (t.prev = 0), (t.next = 3), N();
+                            return (t.prev = 0), (t.next = 3), _();
                           case 3:
-                            (n = t.sent), (this.state.config = n), (t.next = 9);
+                            (n = t.sent) && (this.state.config = n),
+                              (t.next = 9);
                             break;
                           case 7:
                             (t.prev = 7), (t.t0 = t.catch(0));
@@ -2545,7 +2738,7 @@
                                 "slot777_balance",
                                 this.state.balance,
                               ),
-                              D(this.state.balance),
+                              P(this.state.balance),
                               this.el.spinBtn &&
                                 (this.el.spinBtn.disabled = !1),
                               this.updateUI(),
@@ -2566,10 +2759,80 @@
               }),
           },
           {
+            key: "onConfigChanged",
+            value: function (t) {
+              t &&
+                ((this.state.config = t),
+                console.log("[Game] Config updated via WebSocket:", t),
+                this.showMsg("⚙️ CONFIG UPDATED", "#D5AD6D"));
+            },
+          },
+          {
+            key: "onJackpotChanged",
+            value: function (t) {
+              console.log("[Game] Jackpot updated:", t);
+              var e = document.getElementById("jackpotDisplay");
+              if (e) {
+                var n = (t || 0).toLocaleString("id-ID");
+                (e.textContent = n),
+                  e.classList.add("win-flash"),
+                  setTimeout(function () {
+                    return e.classList.remove("win-flash");
+                  }, 600);
+              }
+            },
+          },
+          {
+            key: "onBalanceChanged",
+            value: function (t, e) {
+              console.log("[Game] Balance update for", t, ":", e),
+                void 0 !== e &&
+                  e >= 0 &&
+                  ((this.state.balance = e),
+                  localStorage.setItem("slot777_balance", this.state.balance),
+                  this.updateUI(),
+                  this.showMsg("💰 BALANCE: ".concat(this.fmt(e)), "#4CAF50"));
+            },
+          },
+          {
+            key: "onDifficultyChanged",
+            value: function (t, e, n) {
+              console.log("[Game] Difficulty changed:", t, e, n),
+                this.state.config || (this.state.config = {}),
+                void 0 !== e && (this.state.config.winRate = e),
+                void 0 !== n && (this.state.config.payoutMultiplier = n),
+                this.showMsg(
+                  "🎯 DIFFICULTY: ".concat(t || "CUSTOM"),
+                  "#D5AD6D",
+                );
+            },
+          },
+          {
+            key: "onMaintenanceMode",
+            value: function (t) {
+              console.log("[Game] Maintenance mode:", t),
+                t
+                  ? (this.showMsg("🛠️ MAINTENANCE MODE", "#FF6B6B"),
+                    this.el.spinBtn && (this.el.spinBtn.disabled = !0))
+                  : (this.showMsg("✅ READY", "#4CAF50"),
+                    this.el.spinBtn &&
+                      !this.state.spinning &&
+                      (this.el.spinBtn.disabled = !1));
+            },
+          },
+          {
+            key: "onResetGame",
+            value: function () {
+              console.log("[Game] Reset command received"),
+                this.resetBalance(),
+                this.showMsg("🔄 GAME RESET", "#FFD700");
+            },
+          },
+          {
             key: "spin",
             value:
-              ((n = W(
-                H().mark(function t() {
+              ((n = z(
+                q().mark(function t() {
                   var e,
                     n,
                     r,
@@ -2577,28 +2840,28 @@
                     o,
                     a,
                     l,
-                    u,
                     s,
                     c,
+                    u,
                     f,
                     h,
                     p,
                     d,
-                    v,
                     m,
+                    v,
                     g,
                     b,
                     w,
                     S,
                     E,
-                    x,
                     A,
-                    L,
+                    x,
                     k,
+                    L,
                     M,
-                    O,
-                    j = this;
-                  return H().wrap(
+                    C,
+                    O = this;
+                  return q().wrap(
                     function (t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -2630,7 +2893,7 @@
                                   "slot777_balance",
                                   this.state.balance,
                                 ),
-                                D(this.state.balance),
+                                P(this.state.balance),
                                 i = this.state.config || {},
                                 o =
                                   null !== (e = i.winRate) && void 0 !== e
@@ -2648,22 +2911,22 @@
                                     : 0,
                                 this.state.lossStreak =
                                   this.state.lossStreak || 0,
-                                u = !1,
+                                s = !1,
                                 l > 0 &&
                                   this.state.lossStreak >= l &&
-                                  ((u = !0), (this.state.lossStreak = 0)),
-                                s = this.generateResult(u ? 1 : o, a),
-                                c = s.grid,
-                                f = s.wins,
-                                this.grid = c,
+                                  ((s = !0), (this.state.lossStreak = 0)),
+                                c = this.generateResult(s ? 1 : o, a),
+                                u = c.grid,
+                                f = c.wins,
+                                this.grid = u,
                                 h = y(f),
                                 p = this.state.turbo,
                                 this.showMsg("🎰 SPINNING!"),
                                 t.prev = 26,
-                                m = [
-                                  (v = p ? 800 : 1200),
-                                  v + (d = p ? 200 : 280),
-                                  v + 2 * d,
+                                v = [
+                                  (m = p ? 800 : 1200),
+                                  m + (d = p ? 200 : 280),
+                                  m + 2 * d,
                                 ],
                                 g = [],
                                 b = 0;
@@ -2671,7 +2934,7 @@
                               b++
                             )
                               (w = this.grid[b] || ["BAR", "BAR", "BAR"]),
-                                g.push(this.reels[b].spin(w, m[b]));
+                                g.push(this.reels[b].spin(w, v[b]));
                             return (t.next = 34), Promise.all(g);
                           case 34:
                             t.next = 43;
@@ -2696,17 +2959,17 @@
                               (this.state.balance += h),
                                 (this.state.lossStreak = 0),
                                 (S = []),
-                                (E = Y(f));
+                                (E = $(f));
                               try {
-                                for (E.s(); !(x = E.n()).done; ) {
-                                  (A = x.value), (L = Y(A.positions));
+                                for (E.s(); !(A = E.n()).done; ) {
+                                  (x = A.value), (k = $(x.positions));
                                   try {
-                                    for (L.s(); !(k = L.n()).done; )
-                                      (M = k.value), S.push(M);
+                                    for (k.s(); !(L = k.n()).done; )
+                                      (M = L.value), S.push(M);
                                   } catch (t) {
-                                    L.e(t);
+                                    k.e(t);
                                   } finally {
-                                    L.f();
+                                    k.f();
                                   }
                                 }
                               } catch (t) {
@@ -2726,15 +2989,15 @@
                                   ),
                                   this.anim.flashWin(this.el.totalWinDisplay)),
                                 this.el.spinBtn &&
-                                  ((O =
+                                  ((C =
                                     this.el.spinBtn.getBoundingClientRect()),
-                                  this.anim.burst(O.left + O.width / 2, O.top));
+                                  this.anim.burst(C.left + C.width / 2, C.top));
                             } else this.state.lossStreak++;
                             localStorage.setItem(
                               "slot777_balance",
                               this.state.balance,
                             ),
-                              D(this.state.balance),
+                              P(this.state.balance),
                               (this.state.spinning = !1),
                               this.el.spinBtn &&
                                 (this.el.spinBtn.disabled = !1),
@@ -2743,7 +3006,7 @@
                               this.state.balance >= this.state.bet
                                 ? setTimeout(
                                     function () {
-                                      return j.spin();
+                                      return O.spin();
                                     },
                                     p ? 100 : 400,
                                   )
@@ -2779,11 +3042,11 @@
                   o = p(i, this.state.bet);
                 if (e && 1 !== e) {
                   var a,
-                    l = Y(o);
+                    l = $(o);
                   try {
                     for (l.s(); !(a = l.n()).done; ) {
-                      var u = a.value;
-                      u.amount = Math.floor(u.amount * e);
+                      var s = a.value;
+                      s.amount = Math.floor(s.amount * e);
                     }
                   } catch (t) {
                     l.e(t);
@@ -2799,17 +3062,17 @@
                   (o = p(i, this.state.bet)),
                   e && 1 !== e)
                 ) {
-                  var s,
-                    c = Y(o);
+                  var c,
+                    u = $(o);
                   try {
-                    for (c.s(); !(s = c.n()).done; ) {
-                      var f = s.value;
+                    for (u.s(); !(c = u.n()).done; ) {
+                      var f = c.value;
                       f.amount = Math.floor(f.amount * e);
                     }
                   } catch (t) {
-                    c.e(t);
+                    u.e(t);
                   } finally {
-                    c.f();
+                    u.f();
                   }
                 }
                 return { grid: i, wins: o };
@@ -2854,7 +3117,7 @@
             },
           },
         ]),
-        e && z(t.prototype, e),
+        e && V(t.prototype, e),
         Object.defineProperty(t, "prototype", { writable: !1 }),
         t
       );
@@ -2862,8 +3125,8 @@
     })();
     "loading" === document.readyState
       ? document.addEventListener("DOMContentLoaded", function () {
-          return new J();
+          return new X();
         })
-      : new J();
+      : new X();
   })();
 })();

@@ -42,6 +42,7 @@ public class SlotServer extends NanoHTTPD {
                 case "/api/config":      return jsonResponse(handleConfig(method, session));
                 case "/api/jackpot":     return jsonResponse(handleJackpot(method, session));
                 case "/api/status":      return jsonResponse(handleStatus());
+                case "/api/wsurl":      return jsonResponse(handleWsUrl());
                 case "/api/money":       return jsonResponse(handleMoney(method, session));
                 default:                 return serveStaticFile(uri);
             }
@@ -100,6 +101,11 @@ public class SlotServer extends NanoHTTPD {
     }
 
     // ========== STATUS ==========
+
+    private String handleWsUrl() {
+        String ip = localIp != null ? localIp : "127.0.0.1";
+        return "{\"url\":\"ws://" + ip + ":9090\",\"port\":9090}";
+    }
 
     private String handleStatus() {
         return "{"

@@ -1,9 +1,8 @@
 /**
  * GameManager — 3-Reel Classic Slot Machine
  *
- * All 3 reels start spinning SIMULTANEOUSLY.
- * Each reel stops at a different time (staggered) with smooth deceleration.
- * RNG determines the result BEFORE any animation begins.
+ * Orchestrates real reel spinning, RNG, paylines, balance, UI.
+ * Receives real-time config updates via RealtimeManager.
  */
 
 import ReelEngine from "./ReelEngine.js";
@@ -11,16 +10,16 @@ import { evaluate, totalWin } from "./Paylines.js";
 import { weightedRandom, getRenderData, SYMBOLS } from "./Symbols.js";
 import AnimationManager from "./AnimationManager.js";
 import JackpotAPI from "./JackpotAPI.js";
+import RealtimeManager from "./RealtimeManager.js";
 
-// Make SYMBOLS accessible to Paylines
 window.__SYMBOLS_DATA = SYMBOLS;
 
 export default class GameManager {
   constructor() {
     this.anim = new AnimationManager();
     this.reels = [];
+    this.realtime = null;
 
-    // State
     this.state = {
       balance: 10000,
       bet: 100,
@@ -31,19 +30,16 @@ export default class GameManager {
       turbo: false,
       spinCount: 0,
       lossStreak: 0,
-      config: null,
+      config: {},
     };
 
-    // Grid: [reel][row] = symbol ID
     this.grid = [
       ["BAR", "BAR", "BAR"],
       ["BAR", "BAR", "BAR"],
       ["BAR", "BAR", "BAR"],
     ];
 
-    // DOM cache
     this.el = {};
-
     this.init();
   }
 
@@ -55,6 +51,11 @@ export default class GameManager {
     this.showGrid();
     this.updateUI();
     this.showMsg("🎰 SPIN TO WIN");
+
+    // Start real-time sync AFTER game is initialized
+    setTimeout(() => {
+      this.realtime = new RealtimeManager(this);
+    }, 100);
   }
 
   cacheDOM() {
@@ -84,7 +85,6 @@ export default class GameManager {
     }
   }
 
-  /** Show initial symbols on all reels */
   showGrid() {
     for (let r = 0; r < this.reels.length && r < this.grid.length; r++) {
       this.reels[r].loadStrip(this.grid[r]);
@@ -94,8 +94,10 @@ export default class GameManager {
   async loadConfig() {
     try {
       const cfg = await JackpotAPI.fetchConfig();
-      this.state.config = cfg;
-      if (cfg?.betAmount) this.state.bet = cfg.betAmount;
+      if (cfg) {
+        this.state.config = cfg;
+        if (cfg.betAmount) this.state.bet = cfg.betAmount;
+      }
     } catch (_) {}
 
     const saved = localStorage.getItem("slot777_balance");
@@ -158,7 +160,7 @@ export default class GameManager {
   async resetBalance() {
     try {
       const cfg = await JackpotAPI.fetchConfig();
-      this.state.config = cfg;
+      if (cfg) this.state.config = cfg;
     } catch (_) {}
     this.state.balance = this.state.config?.startingMoney || 10000;
     this.state.lossStreak = 0;
@@ -169,7 +171,91 @@ export default class GameManager {
     this.showMsg("💰 BALANCE RESET");
   }
 
-  // ===================== SPIN =====================
+  // =====================
+  // REAL-TIME EVENT HANDLERS
+  // Called by RealtimeManager when server pushes changes
+  // =====================
+
+  /**
+   * Config changed — update all game parameters immediately.
+   * These take effect on the NEXT spin (no need to reload).
+   */
+  onConfigChanged(config) {
+    if (!config) return;
+    this.state.config = config;
+    console.log("[Game] Config updated via WebSocket:", config);
+    this.showMsg("⚙️ CONFIG UPDATED", "#D5AD6D");
+    // Config is read on next spin — no reload needed
+  }
+
+  /**
+   * Jackpot changed — update jackpot display immediately.
+   */
+  onJackpotChanged(value) {
+    console.log("[Game] Jackpot updated:", value);
+    // Update jackpot display if we have one
+    const jpEl = document.getElementById("jackpotDisplay");
+    if (jpEl) {
+      const fmt = (value || 0).toLocaleString("id-ID");
+      jpEl.textContent = fmt;
+      jpEl.classList.add("win-flash");
+      setTimeout(() => jpEl.classList.remove("win-flash"), 600);
+    }
+  }
+
+  /**
+   * Balance changed — update from admin panel.
+   */
+  onBalanceChanged(player, balance) {
+    console.log("[Game] Balance update for", player, ":", balance);
+    // Update our local balance to match server
+    if (balance !== undefined && balance >= 0) {
+      this.state.balance = balance;
+      localStorage.setItem("slot777_balance", this.state.balance);
+      this.updateUI();
+      this.showMsg(`💰 BALANCE: ${this.fmt(balance)}`, "#4CAF50");
+    }
+  }
+
+  /**
+   * Difficulty changed — update winRate, payoutMultiplier immediately.
+   */
+  onDifficultyChanged(level, winRate, payoutMultiplier) {
+    console.log("[Game] Difficulty changed:", level, winRate, payoutMultiplier);
+    if (!this.state.config) this.state.config = {};
+    if (winRate !== undefined) this.state.config.winRate = winRate;
+    if (payoutMultiplier !== undefined)
+      this.state.config.payoutMultiplier = payoutMultiplier;
+    this.showMsg(`🎯 DIFFICULTY: ${level || "CUSTOM"}`, "#D5AD6D");
+  }
+
+  /**
+   * Maintenance mode — show/hide overlay.
+   */
+  onMaintenanceMode(enabled) {
+    console.log("[Game] Maintenance mode:", enabled);
+    if (enabled) {
+      this.showMsg("🛠️ MAINTENANCE MODE", "#FF6B6B");
+      if (this.el.spinBtn) this.el.spinBtn.disabled = true;
+    } else {
+      this.showMsg("✅ READY", "#4CAF50");
+      if (this.el.spinBtn && !this.state.spinning)
+        this.el.spinBtn.disabled = false;
+    }
+  }
+
+  /**
+   * Reset game — force reload state from server.
+   */
+  onResetGame() {
+    console.log("[Game] Reset command received");
+    this.resetBalance();
+    this.showMsg("🔄 GAME RESET", "#FFD700");
+  }
+
+  // =====================
+  // SPIN LOGIC
+  // =====================
 
   async spin() {
     if (this.state.spinning) return;
@@ -190,7 +276,7 @@ export default class GameManager {
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
 
-    // ---- RNG: determine result BEFORE animation ----
+    // ---- RNG with LIVE config ----
     const cfg = this.state.config || {};
     const wr = cfg.winRate ?? 0.15;
     const pm = cfg.payoutMultiplier ?? 3;
@@ -211,12 +297,7 @@ export default class GameManager {
     this.showMsg(total > 0 ? "🎰 SPINNING!" : "🎰 SPINNING!");
 
     try {
-      // All reels start SPINNING SIMULTANEOUSLY
-      // Each has a different duration so they stop at staggered times:
-      //   Left:    shortest duration (stops first)
-      //   Middle:  medium duration   (stops second)
-      //   Right:   longest duration  (stops last)
-      const stagger = turbo ? 200 : 280; // ms between reel stops
+      const stagger = turbo ? 200 : 280;
       const baseDuration = turbo ? 800 : 1200;
       const durations = [
         baseDuration,
@@ -229,8 +310,6 @@ export default class GameManager {
         const resultCol = this.grid[r] || ["BAR", "BAR", "BAR"];
         promises.push(this.reels[r].spin(resultCol, durations[r]));
       }
-
-      // Wait for all reels to finish (they finish in order: left, middle, right)
       await Promise.all(promises);
     } catch (e) {
       console.error("Spin error:", e);
@@ -253,7 +332,6 @@ export default class GameManager {
         for (const pos of w.positions) allPos.push(pos);
       }
       this.anim.highlightWins(allPos);
-
       this.showMsg(`🎉 WIN ${this.fmt(total)}!`, "#FF6B6B");
 
       if (this.el.totalWinDisplay) {
@@ -276,7 +354,6 @@ export default class GameManager {
     if (this.el.spinBtn) this.el.spinBtn.disabled = false;
     this.updateUI();
 
-    // Auto-spin
     if (this.state.autoplay && this.state.balance >= this.state.bet) {
       setTimeout(() => this.spin(), turbo ? 100 : 400);
     } else {
@@ -285,9 +362,6 @@ export default class GameManager {
     }
   }
 
-  /**
-   * Generate RNG result for 3 reels × 3 rows
-   */
   generateResult(winChance, pm) {
     const win = Math.random() < winChance;
 
