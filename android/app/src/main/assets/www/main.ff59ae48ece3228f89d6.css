@@ -1,0 +1,635 @@
+/* ============================================
+   777 SLOT — Premium Casino Theme
+   Real 3-reel spinning mechanism
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #050008;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    ellipse at 50% 20%,
+    #1a0035 0%,
+    #050008 60%,
+    #020005 100%
+  );
+}
+
+#gameScreen {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 50% 20%,
+    #1a0035 0%,
+    #050008 60%,
+    #020005 100%
+  );
+}
+
+/* ===== HEADER ===== */
+#topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 40px;
+  padding: 2px 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 0, 20, 0.98) 0%,
+    rgba(25, 5, 50, 0.9) 100%
+  );
+  border-bottom: 1px solid rgba(155, 48, 255, 0.2);
+  position: relative;
+  z-index: 10;
+}
+#topBar::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 0, 0.3),
+    transparent
+  );
+}
+.h-left,
+.h-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.h-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.h-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow:
+    0 0 20px rgba(255, 215, 0, 0.3),
+    0 0 40px rgba(255, 215, 0, 0.1);
+  letter-spacing: 5px;
+}
+.h-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+}
+.h-lbl {
+  font-size: 7px;
+  font-weight: 600;
+  color: rgba(180, 160, 220, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.h-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(155, 48, 255, 0.2);
+}
+.h-val.gold {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+}
+.h-reset {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(155, 48, 255, 0.25);
+  background: rgba(155, 48, 255, 0.08);
+  color: rgba(155, 48, 255, 0.5);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.h-reset:active {
+  transform: scale(0.85);
+  background: rgba(155, 48, 255, 0.2);
+}
+
+/* ===== WIN MESSAGE BAR ===== */
+#winMsg {
+  flex-shrink: 0;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(155, 48, 255, 0.06),
+    transparent
+  );
+}
+#winText {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(213, 173, 109, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.1);
+  transition: all 0.3s;
+}
+
+/* ===== REELS CONTAINER ===== */
+#reels {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  min-height: 0;
+  overflow: hidden;
+  align-items: stretch;
+  position: relative;
+}
+#reels::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 2px solid rgba(155, 48, 255, 0.12);
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Payline indicator (horizontal lines) */
+#reels::after {
+  content: "";
+  position: absolute;
+  top: calc(33.33% - 1px);
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: rgba(255, 215, 0, 0.06);
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: 0 calc(33.33% - 1px) 0 rgba(255, 215, 0, 0.06);
+  /* Only top line via pseudo; the middle line effect is done differently */
+}
+
+/* ===== SINGLE REEL ===== */
+.reel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 5, 35, 0.8),
+    rgba(8, 3, 20, 0.95)
+  );
+  border-radius: 8px;
+  border: 1px solid rgba(155, 48, 255, 0.12);
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.7),
+    0 0 8px rgba(155, 48, 255, 0.03);
+  z-index: 2;
+}
+
+/* Reel frame overlay with gradient edges to simulate depth */
+.reel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 0, 8, 0.85) 0%,
+    transparent 15%,
+    transparent 85%,
+    rgba(5, 0, 8, 0.85) 100%
+  );
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Payline glow overlay */
+.reel::after {
+  content: "";
+  position: absolute;
+  top: calc(33.33% - 1px);
+  left: 0;
+  right: 0;
+  height: calc(33.33% + 2px);
+  border-top: 1px solid rgba(255, 215, 0, 0.08);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.08);
+  pointer-events: none;
+  z-index: 4;
+  background: rgba(255, 215, 0, 0.02);
+}
+
+/* ===== REEL STRIP (scrollable) ===== */
+.reel-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  will-change: transform;
+  z-index: 2;
+}
+
+/* ===== SYMBOLS INSIDE STRIP ===== */
+.reel-strip .sym {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: clamp(18px, 4.5vw, 40px);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+
+/* Win highlight on symbols */
+.reel-strip .sym.highlight {
+  box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.4);
+  animation: symGlow 0.6s ease infinite alternate;
+  z-index: 5;
+  position: relative;
+}
+@keyframes symGlow {
+  0% {
+    box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+  100% {
+    box-shadow: inset 0 0 25px rgba(255, 215, 0, 0.6);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  }
+}
+
+/* ===== CONTROLS ===== */
+#controls {
+  flex-shrink: 0;
+  padding: 6px 10px calc(env(safe-area-inset-bottom, 0px) + 8px);
+  background: linear-gradient(
+    0deg,
+    rgba(10, 0, 20, 0.98) 0%,
+    rgba(20, 5, 40, 0.95) 100%
+  );
+  border-top: 1px solid rgba(155, 48, 255, 0.1);
+  z-index: 10;
+}
+
+.c-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.c-top {
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.c-bottom {
+  gap: 8px;
+}
+
+/* Bet group */
+.bet-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.bet-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(155, 48, 255, 0.2);
+  background: rgba(155, 48, 255, 0.08);
+  color: rgba(180, 160, 220, 0.6);
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.bet-btn:active {
+  background: rgba(155, 48, 255, 0.2);
+  transform: scale(0.9);
+}
+.bet-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  min-width: 60px;
+}
+.bet-lbl {
+  font-size: 7px;
+  font-weight: 600;
+  color: rgba(180, 160, 220, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.bet-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.15);
+}
+
+/* Win group */
+.win-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+.win-lbl {
+  font-size: 7px;
+  font-weight: 600;
+  color: rgba(180, 160, 220, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.win-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: #4caf50;
+  text-shadow: 0 0 8px rgba(76, 175, 80, 0.15);
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Toggle buttons */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: rgba(180, 160, 220, 0.45);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.toggle-label:active {
+  background: rgba(155, 48, 255, 0.1);
+}
+.toggle-label input {
+  display: none;
+}
+.toggle-label:has(input:checked) {
+  color: rgba(155, 48, 255, 0.9);
+  border-color: rgba(155, 48, 255, 0.2);
+  background: rgba(155, 48, 255, 0.06);
+}
+
+/* Ctrl buttons */
+.ctrl-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(155, 48, 255, 0.15);
+  background: rgba(155, 48, 255, 0.05);
+  color: rgba(180, 160, 220, 0.5);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+}
+.ctrl-btn:active {
+  background: rgba(155, 48, 255, 0.15);
+  transform: scale(0.95);
+}
+
+/* ===== SPIN BUTTON ===== */
+.spin-btn {
+  background: linear-gradient(180deg, #ffd700 0%, #e5b800 40%, #b8860b 100%);
+  border: none;
+  color: #1a0020;
+  font-size: 18px;
+  font-weight: 900;
+  padding: 10px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+  position: relative;
+  box-shadow:
+    0 3px 16px rgba(255, 215, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.15s;
+  min-width: 110px;
+  -webkit-tap-highlight-color: transparent;
+}
+.spin-btn:active {
+  transform: scale(0.93);
+  box-shadow: 0 1px 4px rgba(255, 215, 0, 0.1);
+}
+.spin-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Pulse animation */
+.spin-btn.btn-pulse {
+  animation: btnPulse 0.3s ease;
+}
+@keyframes btnPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Win flash */
+.win-flash {
+  animation: flashAnim 0.4s ease 2;
+}
+@keyframes flashAnim {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+    color: #ffd700;
+  }
+}
+
+/* Particles */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  border-radius: 50%;
+}
+
+/* ===== RESPONSIVE: LANDSCAPE ===== */
+@media (orientation: landscape) and (max-height: 500px) {
+  #topBar {
+    height: 28px;
+    padding: 1px 8px;
+  }
+  .h-title {
+    font-size: 16px;
+  }
+  .h-val {
+    font-size: 11px;
+  }
+  .h-lbl {
+    font-size: 6px;
+  }
+  #winMsg {
+    height: 16px;
+  }
+  #winText {
+    font-size: 8px;
+  }
+
+  #reels {
+    padding: 3px 6px;
+    gap: 2px;
+    max-width: 60%;
+    margin: 0 auto;
+  }
+  .spin-btn {
+    font-size: 12px;
+    padding: 5px 14px;
+    min-width: 70px;
+  }
+  .bet-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+  }
+  .bet-val {
+    font-size: 11px;
+  }
+  .win-val {
+    font-size: 11px;
+  }
+  .toggle-label {
+    font-size: 7px;
+    padding: 2px 4px;
+  }
+  .ctrl-btn {
+    font-size: 7px;
+    padding: 2px 6px;
+  }
+  #controls {
+    padding: 2px 6px;
+  }
+  .c-top {
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+  .c-bottom {
+    gap: 4px;
+  }
+  .h-reset {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+}
+
+/* ===== RESPONSIVE: TABLET+ ===== */
+@media (min-width: 600px) {
+  #reels {
+    padding: 10px 20px;
+    gap: 5px;
+    max-width: 450px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .reel {
+    border-radius: 10px;
+  }
+}
+
+/* ===== RESPONSIVE: TALL SCREENS ===== */
+@media (min-height: 800px) {
+  #topBar {
+    height: 44px;
+    padding: 4px 16px;
+  }
+  .h-title {
+    font-size: 28px;
+  }
+  .h-val {
+    font-size: 17px;
+  }
+  .h-lbl {
+    font-size: 8px;
+  }
+  .spin-btn {
+    font-size: 20px;
+    padding: 12px 36px;
+    min-width: 130px;
+  }
+  .bet-val {
+    font-size: 17px;
+  }
+  .win-val {
+    font-size: 17px;
+  }
+  .bet-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 19px;
+  }
+  #controls {
+    padding: 8px 14px calc(env(safe-area-inset-bottom, 0px) + 10px);
+  }
+}

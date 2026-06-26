@@ -1,65 +1,42 @@
-# 🎰 777 Slot — Premium Casino Game
+# 🎰 777 Slot - Premium Casino Game
 
-> Mesin slot klasik 3-reel dengan server embedded Android & web server.
+Aplikasi Android server embedded untuk mesin slot klasik 3-reel.
+Game diakses melalui browser di perangkat lain dalam jaringan lokal.
+Admin panel tersedia di dalam aplikasi untuk mengontrol pengaturan game.
 
-## 📱 Android APK
+## Fitur
 
-Aplikasi Android yang menjalankan server web embedded (NanoHTTPD) untuk menghosting game slot di jaringan lokal. Admin mengontrol pengaturan game (jackpot, win rate, payout) melalui native Android UI.
+- **Slot 3 Reel Klasik** dengan simbol BAR, 7, Cherry, Lemon, Bell, dll.
+- **Server Embedded** — hosting game di jaringan lokal via NanoHTTPD
+- **Admin Panel** — atur jackpot, tingkat kesulitan, win rate, payout multiplier
+- **Manajemen Akun** — buat/atur akun pemain langsung dari aplikasi
+- **Real-time Config** — perubahan pengaturan langsung teraplikasi ke game
+- **Landing Page** — tampilkan URL server dan QR code untuk akses mudah
 
-**Min SDK:** Android 6.0 (API 23)
+## Cara Pakai
 
-### Build APK
+1. Install APK di perangkat Android
+2. Buka aplikasi → server otomatis berjalan
+3. Lihat URL server (contoh: `http://192.168.1.5:8080`)
+4. Buka URL tersebut dari perangkat lain dalam jaringan yang sama
+5. Mainkan slot dari browser perangkat lain
+6. Atur jackpot, kesulitan, dan kelola akun dari admin panel di aplikasi
+
+## Build APK
 
 ```bash
-npm ci && npm run build        # Build web app
-cp dist/* android/app/src/main/assets/www/  # Copy ke Android assets
-cd android && ./gradlew assembleDebug       # Build APK
+npm ci
+npm run build
+cp dist/* android/app/src/main/assets/www/
+cd android
+./gradlew assembleDebug
 ```
 
-## 🌐 Web Version (Koyeb / Standalone)
+APK output: `android/app/build/outputs/apk/debug/app-debug.apk`
 
-Jalankan sebagai web server standalone tanpa Android:
+## Tech Stack
 
-```bash
-npm ci && npm run build   # Build frontend
-npm start                 # Start Express server di port 3000
-```
-
-## 🎮 Game Features
-
-- **3 Reel Klasik** — simbol BAR, 7, Cherry, Lemon, Bell, Orange, Plum, Grapes, Watermelon, Diamond
-- **Reel Berputar Nyata** — animasi scroll kontinu dengan requestAnimationFrame
-- **5 Paylines** — 3 horizontal + 2 diagonal, wild (DIAMOND)
-- **RNG Berdasarkan Konfigurasi** — win rate, difficulty, payout multiplier dari admin
-- **Auto Spin & Turbo Mode**
-- **Balance & Bet Management**
-
-## 🛠️ Tech Stack
-
-- **Frontend:** HTML5, CSS3, JavaScript ES6 + Webpack
-- **Backend (Android):** NanoHTTPD (embedded Java HTTP server)
-- **Backend (Web):** Node.js + Express
-- **Android:** Java, SharedPreferences, Material Design
-- **Storage:** SharedPreferences (Android) / JSON files (web)
-
-## 🚀 API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/config` | Game configuration |
-| POST | `/api/config` | Update configuration |
-| GET | `/api/jackpot` | Jackpot value |
-| POST | `/api/jackpot` | Update jackpot |
-| POST | `/api/login` | Login (admin/player) |
-| POST | `/api/register` | Register new player |
-| GET | `/api/user` | Current user info |
-| POST | `/api/spin` | Perform a spin |
-| GET | `/api/admin/users` | List users (admin) |
-
-## 🔧 GitHub Actions
-
-Push ke `main` → otomatis build APK dan upload sebagai artifact.
-
-## 📄 Lisensi
-
-MIT
+- **Frontend**: HTML5, CSS3, JavaScript (ES6) — Webpack
+- **Backend**: NanoHTTPD (embedded Java HTTP server)
+- **Android**: Java, SharedPreferences, CardView
+- **Min SDK**: Android 6.0 (API 23)
