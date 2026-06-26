@@ -1,16 +1,26 @@
 /**
  * GameManager — 3-Reel Classic Slot Machine
- * Orchestrates spinning, RNG, paylines, balance, UI
+ * Orchestrates real mechanical reel spinning, RNG, paylines, balance, UI
  */
 
+import ReelEngine from "./ReelEngine.js";
 import { evaluate, totalWin } from "./Paylines.js";
-import { weightedRandom, buildReelStrips } from "./Symbols.js";
+import {
+  weightedRandom,
+  buildReelStrips,
+  getRenderData,
+  SYMBOLS,
+} from "./Symbols.js";
 import AnimationManager from "./AnimationManager.js";
 import JackpotAPI from "./JackpotAPI.js";
+
+// Make SYMBOLS accessible to Paylines
+window.__SYMBOLS_DATA = SYMBOLS;
 
 export default class GameManager {
   constructor() {
     this.anim = new AnimationManager();
+    this.reels = [];
 
     // State
     this.state = {
@@ -26,10 +36,7 @@ export default class GameManager {
       config: null,
     };
 
-    // Reel strips (virtual)
-    this.strips = buildReelStrips();
-
-    // Grid: [reel][row] = symbol ID, 3x3
+    // Grid: [reel][row] = symbol ID
     this.grid = [
       ["BAR", "BAR", "BAR"],
       ["BAR", "BAR", "BAR"],
@@ -38,19 +45,18 @@ export default class GameManager {
 
     // DOM cache
     this.el = {};
-    this.reelEls = null;
 
     this.init();
   }
 
   init() {
     this.cacheDOM();
-    this.ensureSymbols();
+    this.initReels();
     this.loadConfig();
     this.bindEvents();
-    this.renderGrid();
+    this.renderInitial();
     this.updateUI();
-    this.showMsg("🎰 PULL TO WIN");
+    this.showMsg("🎰 SPIN TO WIN");
   }
 
   cacheDOM() {
@@ -72,25 +78,27 @@ export default class GameManager {
     for (const id of ids) {
       this.el[id] = document.getElementById(id);
     }
-    this.reelEls = document.querySelectorAll(".reel");
+  }
+
+  initReels() {
+    const reelEls = document.querySelectorAll(".reel");
+    if (!reelEls || reelEls.length === 0) return;
+
+    for (const reelEl of reelEls) {
+      const engine = new ReelEngine(reelEl, getRenderData, weightedRandom);
+      this.reels.push(engine);
+    }
   }
 
   /**
-   * Ensure each reel has 3 .sym children, creating them if missing
+   * Show initial symbols on all reels
    */
-  ensureSymbols() {
-    if (!this.reelEls) return;
-    for (const reel of this.reelEls) {
-      let items = reel.querySelectorAll(".sym");
-      if (items.length === 0) {
-        // Create 3 .sym elements
-        for (let i = 0; i < 3; i++) {
-          const sym = document.createElement("div");
-          sym.className = "sym";
-          reel.appendChild(sym);
-        }
-        items = reel.querySelectorAll(".sym");
-      }
+  renderInitial() {
+    for (let r = 0; r < this.reels.length && r < this.grid.length; r++) {
+      const col = this.grid[r];
+      // First spin will populate properly; for now build a strip
+      const strip = [...col]; // just the 3 result symbols
+      this.reels[r].loadStrip(strip);
     }
   }
 
@@ -99,11 +107,8 @@ export default class GameManager {
       const cfg = await JackpotAPI.fetchConfig();
       this.state.config = cfg;
       if (cfg && cfg.betAmount) this.state.bet = cfg.betAmount;
-    } catch (_) {
-      // No server - use defaults
-    }
+    } catch (_) {}
 
-    // Try to load saved balance
     const saved = localStorage.getItem("slot777_balance");
     if (saved) {
       this.state.balance = parseInt(saved, 10);
@@ -137,11 +142,17 @@ export default class GameManager {
       this.state.turbo = this.el.turboMode.checked;
     });
 
-    // Space bar to spin
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space" && !this.state.spinning) {
         e.preventDefault();
         this.spin();
+      }
+    });
+
+    // Handle resize
+    window.addEventListener("resize", () => {
+      for (const reel of this.reels) {
+        reel.updateSize();
       }
     });
   }
@@ -172,23 +183,7 @@ export default class GameManager {
     this.showMsg("💰 BALANCE RESET");
   }
 
-  renderGrid() {
-    const SYM_RENDER = this.getSymRender();
-    for (let r = 0; r < 3 && this.reelEls && r < this.reelEls.length; r++) {
-      const reel = this.reelEls[r];
-      const items = reel.querySelectorAll(".sym");
-      for (let i = 0; i < 3 && i < items.length; i++) {
-        const id = this.grid[r]?.[i] || "BAR";
-        const d = SYM_RENDER[id] || SYM_RENDER.BAR;
-        items[i].textContent = d.icon;
-        items[i].style.background = d.bg;
-        items[i].style.color = d.color;
-        items[i].className = "sym";
-      }
-    }
-  }
-
-  // ---- SPIN ----
+  // ---- SPIN LOGIC ----
 
   async spin() {
     if (this.state.spinning) return;
@@ -209,7 +204,7 @@ export default class GameManager {
     localStorage.setItem("slot777_balance", this.state.balance);
     JackpotAPI.saveMoney(this.state.balance);
 
-    // ---- RNG: determine result BEFORE animation ----
+    // RNG: determine result BEFORE animation
     const cfg = this.state.config || {};
     const wr = cfg.winRate ?? 0.15;
     const pm = cfg.payoutMultiplier ?? 3;
@@ -225,23 +220,34 @@ export default class GameManager {
     const { grid, wins } = this.generateResult(forceWin ? 1.0 : wr, pm);
     this.grid = grid;
 
-    // Re-render grid to DOM and animate
     const total = totalWin(wins);
-    const duration = this.state.turbo ? 300 : 700;
-    const stagger = this.state.turbo ? 80 : 150;
+    const turbo = this.state.turbo;
 
-    this.showMsg(total > 0 ? "🎰 WINNING..." : "🎰 SPINNING...");
+    // Spin parameters
+    const baseDuration = turbo ? 500 : 1000;
+    const stagger = turbo ? 120 : 250;
 
-    // Spin each reel sequentially: left → middle → right
-    const promises = [];
-    for (let r = 0; r < 3 && r < this.reelEls.length; r++) {
-      const reelEl = this.reelEls[r];
-      const resultCol = this.grid[r] || ["BAR", "BAR", "BAR"];
-      promises.push(
-        this.anim.spinReel(reelEl, resultCol, duration, r * stagger),
-      );
+    this.showMsg(total > 0 ? "🎰 SPINNING!" : "🎰 SPINNING!");
+
+    try {
+      // Ensure reels are ready
+      if (this.reels.length < 3) {
+        throw new Error("Reels not initialized");
+      }
+
+      // Spin each reel sequentially: left → middle → right
+      for (let r = 0; r < 3 && r < this.reels.length; r++) {
+        const resultCol = this.grid[r] || ["BAR", "BAR", "BAR"];
+        const duration = baseDuration + r * 200; // each subsequent reel spins slightly longer
+        await this.reels[r].spin(resultCol, duration, r === 0 ? 0 : stagger);
+      }
+    } catch (e) {
+      console.error("Spin error:", e);
+      this.state.spinning = false;
+      if (this.el.spinBtn) this.el.spinBtn.disabled = false;
+      this.showMsg("⚠️ ERROR");
+      return;
     }
-    await Promise.all(promises);
 
     // ---- WIN EVALUATION ----
     this.state.lastWin = total;
@@ -258,7 +264,6 @@ export default class GameManager {
       }
       this.anim.highlightWins(allPos);
 
-      // Show win
       this.showMsg(`🎉 WIN ${this.fmt(total)}!`, "#FF6B6B");
 
       if (this.el.totalWinDisplay) {
@@ -285,7 +290,7 @@ export default class GameManager {
 
     // Auto-spin
     if (this.state.autoplay && this.state.balance >= this.state.bet) {
-      setTimeout(() => this.spin(), this.state.turbo ? 100 : 400);
+      setTimeout(() => this.spin(), turbo ? 100 : 400);
     } else {
       if (this.el.autoplay) this.el.autoplay.checked = false;
       this.state.autoplay = false;
@@ -299,7 +304,7 @@ export default class GameManager {
     const win = Math.random() < winChance;
 
     if (win) {
-      // Generate a guaranteed winning grid
+      // Force at least one winning payline
       const winSym = weightedRandom();
       const grid = [
         [weightedRandom(), winSym, weightedRandom()],
@@ -326,7 +331,7 @@ export default class GameManager {
       return { grid, wins };
     }
 
-    // No win — generate a non-winning grid
+    // No win — generate non-winning grid
     let grid;
     let attempts = 0;
     do {
@@ -361,60 +366,5 @@ export default class GameManager {
       this.el.winText.textContent = text || "";
       this.el.winText.style.color = color || "#D5AD6D";
     }
-  }
-
-  getSymRender() {
-    return {
-      DIAMOND: {
-        icon: "💎",
-        bg: "linear-gradient(135deg,#003366,#0099FF,#003366)",
-        color: "#00FFFF",
-      },
-      SEVEN: {
-        icon: "7",
-        bg: "linear-gradient(135deg,#8B0000,#FF0000,#8B0000)",
-        color: "#FFD700",
-      },
-      BAR: {
-        icon: "BAR",
-        bg: "linear-gradient(135deg,#1a1a2e,#444466,#1a1a2e)",
-        color: "#FFFFFF",
-      },
-      BELL: {
-        icon: "🔔",
-        bg: "linear-gradient(135deg,#4a0030,#8b0060,#4a0030)",
-        color: "#FFD700",
-      },
-      CHERRY: {
-        icon: "🍒",
-        bg: "linear-gradient(135deg,#660000,#CC0033,#660000)",
-        color: "#FFCCCC",
-      },
-      LEMON: {
-        icon: "🍋",
-        bg: "linear-gradient(135deg,#3a5000,#8BB800,#3a5000)",
-        color: "#FFFFCC",
-      },
-      ORANGE: {
-        icon: "🍊",
-        bg: "linear-gradient(135deg,#803000,#FF6600,#803000)",
-        color: "#FFFFFF",
-      },
-      PLUM: {
-        icon: "🍑",
-        bg: "linear-gradient(135deg,#400060,#9900CC,#400060)",
-        color: "#FFDDFF",
-      },
-      WATERMELON: {
-        icon: "🍉",
-        bg: "linear-gradient(135deg,#004D00,#00AA00,#004D00)",
-        color: "#CCFFCC",
-      },
-      GRAPES: {
-        icon: "🍇",
-        bg: "linear-gradient(135deg,#1a003a,#6600AA,#1a003a)",
-        color: "#DDCCFF",
-      },
-    };
   }
 }
