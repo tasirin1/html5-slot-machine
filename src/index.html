@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width,initial-scale=1,user-scalable=no"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
     />
     <meta
       http-equiv="cache-control"
@@ -12,28 +12,50 @@
     />
     <meta http-equiv="pragma" content="no-cache" />
     <meta http-equiv="expires" content="0" />
-    <title>Slot 777</title>
+    <title>777 SLOT</title>
   </head>
   <body>
     <div id="gameScreen">
+      <!-- ===== TOP STATS ===== -->
       <div id="topBar">
-        <div class="left">
-          <span class="mlabel">💰</span>
-          <span id="playerMoney" class="mval">0</span>
-          <span class="mlabel betlabel">BET</span>
-          <span id="betDisplay" class="mval betval">100</span>
+        <div class="stat">
+          <span class="stat-label">BALANCE</span>
+          <span id="playerMoney" class="stat-value">0</span>
         </div>
-        <button id="resetBtn" class="reset-btn">↻</button>
+        <div class="stat">
+          <span class="stat-label">BET</span>
+          <span id="betDisplay" class="stat-value gold">100</span>
+        </div>
+        <div class="stat win-stat">
+          <span class="stat-label">WIN</span>
+          <span class="stat-value win-amount">—</span>
+        </div>
+        <button id="resetBtn" class="reset-btn" title="Reset">↻</button>
       </div>
-      <div id="winMsg"><span id="winText">🎰 Selamat Bermain!</span></div>
+
+      <!-- ===== WIN MESSAGE BAR ===== -->
+      <div id="winMsg"><span id="winText">🎰 SPIN TO WIN</span></div>
+
+      <!-- ===== REELS ===== -->
       <div id="reels">
         <div class="reel"></div>
         <div class="reel"></div>
         <div class="reel"></div>
       </div>
+
+      <!-- ===== BOTTOM CONTROLS ===== -->
       <div id="controls">
-        <button type="button" id="spinBtn">SPIN</button>
-        <label><input type="checkbox" id="autoplay" /> Auto</label>
+        <div class="ctrl-group">
+          <div class="bet-info">
+            <span class="ctrl-label">BET</span>
+            <span id="betDisplay2" class="ctrl-bet">100</span>
+          </div>
+          <button type="button" id="spinBtn">🎰 SPIN</button>
+          <label class="auto-label">
+            <input type="checkbox" id="autoplay" />
+            <span>AUTO</span>
+          </label>
+        </div>
       </div>
     </div>
   </body>

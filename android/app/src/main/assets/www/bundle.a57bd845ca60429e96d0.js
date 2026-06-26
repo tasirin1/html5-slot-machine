@@ -1,4 +1,4 @@
-/*! For license information please see bundle.352b35e96940d232bce9.js.LICENSE.txt */
+/*! For license information please see bundle.a57bd845ca60429e96d0.js.LICENSE.txt */
 (() => {
   "use strict";
   (() => {
@@ -208,7 +208,7 @@
         return this;
       });
       var L = Object.getPrototypeOf,
-        S = L && L(L(A([])));
+        S = L && L(L(F([])));
       S && S !== r && n.call(S, u) && (E = S);
       var k = (x.prototype = b.prototype = Object.create(E));
       function j(t) {
@@ -340,7 +340,7 @@
           t.forEach(T, this),
           this.reset(!0);
       }
-      function A(e) {
+      function F(e) {
         if (e || "" === e) {
           var r = e[u];
           if (r) return r.call(e);
@@ -418,7 +418,7 @@
             }
           );
         }),
-        (e.values = A),
+        (e.values = F),
         (N.prototype = {
           constructor: N,
           reset: function (e) {
@@ -538,7 +538,7 @@
           },
           delegateYield: function (e, r, n) {
             return (
-              (this.delegate = { iterator: A(e), resultName: r, nextLoc: n }),
+              (this.delegate = { iterator: F(e), resultName: r, nextLoc: n }),
               "next" === this.method && (this.arg = t),
               g
             );
@@ -906,7 +906,7 @@
         return this;
       });
       var L = Object.getPrototypeOf,
-        S = L && L(L(A([])));
+        S = L && L(L(F([])));
       S && S !== r && n.call(S, a) && (E = S);
       var k = (x.prototype = b.prototype = Object.create(E));
       function j(t) {
@@ -1038,7 +1038,7 @@
           t.forEach(T, this),
           this.reset(!0);
       }
-      function A(e) {
+      function F(e) {
         if (e || "" === e) {
           var r = e[a];
           if (r) return r.call(e);
@@ -1116,7 +1116,7 @@
             }
           );
         }),
-        (e.values = A),
+        (e.values = F),
         (N.prototype = {
           constructor: N,
           reset: function (e) {
@@ -1236,7 +1236,7 @@
           },
           delegateYield: function (e, r, n) {
             return (
-              (this.delegate = { iterator: A(e), resultName: r, nextLoc: n }),
+              (this.delegate = { iterator: F(e), resultName: r, nextLoc: n }),
               "next" === this.method && (this.arg = t),
               g
             );
@@ -1477,7 +1477,7 @@
         return this;
       });
       var x = Object.getPrototypeOf,
-        E = x && x(x(A([])));
+        E = x && x(x(F([])));
       E && E !== r && n.call(E, a) && (w = E);
       var L = (b.prototype = d.prototype = Object.create(w));
       function S(t) {
@@ -1609,7 +1609,7 @@
           t.forEach(T, this),
           this.reset(!0);
       }
-      function A(e) {
+      function F(e) {
         if (e || "" === e) {
           var r = e[a];
           if (r) return r.call(e);
@@ -1687,7 +1687,7 @@
             }
           );
         }),
-        (e.values = A),
+        (e.values = F),
         (N.prototype = {
           constructor: N,
           reset: function (e) {
@@ -1807,7 +1807,7 @@
           },
           delegateYield: function (e, r, n) {
             return (
-              (this.delegate = { iterator: A(e), resultName: r, nextLoc: n }),
+              (this.delegate = { iterator: F(e), resultName: r, nextLoc: n }),
               "next" === this.method && (this.arg = t),
               m
             );
@@ -1847,10 +1847,10 @@
         (n.enumerable = n.enumerable || !1),
           (n.configurable = !0),
           "value" in n && (n.writable = !0),
-          Object.defineProperty(t, A(n.key), n);
+          Object.defineProperty(t, F(n.key), n);
       }
     }
-    function A(t) {
+    function F(t) {
       var e = (function (t) {
         if ("object" != _(t) || !t) return t;
         var e = t[Symbol.toPrimitive];
@@ -1884,7 +1884,9 @@
                 "gameScreen",
                 "playerMoney",
                 "betDisplay",
+                "betDisplay2",
                 "winText",
+                "winBox",
                 "spinBtn",
                 "autoplay",
                 "resetBtn",
@@ -1951,8 +1953,9 @@
                                 return t.setSymbols(n[e]);
                               }),
                               this.updateUI(),
-                              this.showMsg("🎰 Selamat Bermain!", "#FFD700");
-                          case 12:
+                              this.showMsg("🎰 SPIN TO WIN", "#FFD700"),
+                              this.showWin(0);
+                          case 13:
                           case "end":
                             return t.stop();
                         }
@@ -1986,8 +1989,9 @@
                               localStorage.setItem("slot777_money", this.money),
                               j(this.money),
                               this.updateUI(),
-                              this.showMsg("💰 Uang direset!", "#4CAF50");
-                          case 10:
+                              this.showMsg("💰 BALANCE RESET", "#4CAF50"),
+                              this.showWin(0);
+                          case 11:
                           case "end":
                             return t.stop();
                         }
@@ -2007,7 +2011,9 @@
               this.el.playerMoney &&
                 (this.el.playerMoney.textContent = O(this.money)),
                 this.el.betDisplay &&
-                  (this.el.betDisplay.textContent = O(this.bet));
+                  (this.el.betDisplay.textContent = O(this.bet)),
+                this.el.betDisplay2 &&
+                  (this.el.betDisplay2.textContent = O(this.bet));
             },
           },
           {
@@ -2016,6 +2022,15 @@
               this.el.winText &&
                 ((this.el.winText.textContent = t),
                 (this.el.winText.style.color = e || "#FFD700"));
+            },
+          },
+          {
+            key: "showWin",
+            value: function (t) {
+              this.el.winBox &&
+                ((this.el.winBox.textContent = t > 0 ? O(t) : "—"),
+                (this.el.winBox.style.color =
+                  t > 0 ? "#FF6B6B" : "rgba(155,148,180,0.4)"));
             },
           },
           {
@@ -2148,11 +2163,12 @@
                           case 25:
                             this.updateUI(),
                               o
-                                ? this.showMsg(
-                                    "🎉 MENANG " + O(c) + "!",
+                                ? (this.showMsg(
+                                    "🎉 WIN " + O(c) + "!",
                                     "#FFD700",
-                                  )
-                                : this.showMsg("", "#888"),
+                                  ),
+                                  this.showWin(c))
+                                : (this.showMsg("", "#888"), this.showWin(0)),
                               localStorage.setItem("slot777_money", this.money),
                               j(this.money),
                               (this.spinning = !1),

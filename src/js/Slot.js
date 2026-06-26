@@ -17,7 +17,9 @@ export default class Slot {
       "gameScreen",
       "playerMoney",
       "betDisplay",
+      "betDisplay2",
       "winText",
+      "winBox",
       "spinBtn",
       "autoplay",
       "resetBtn",
@@ -71,7 +73,8 @@ export default class Slot {
     this.reels.forEach((reel, i) => reel.setSymbols(initSymbols[i]));
 
     this.updateUI();
-    this.showMsg("🎰 Selamat Bermain!", "#FFD700");
+    this.showMsg("🎰 SPIN TO WIN", "#FFD700");
+    this.showWin(0);
   }
 
   async resetMoney() {
@@ -82,7 +85,8 @@ export default class Slot {
     localStorage.setItem("slot777_money", this.money);
     JackpotAPI.saveMoney(this.money);
     this.updateUI();
-    this.showMsg("💰 Uang direset!", "#4CAF50");
+    this.showMsg("💰 BALANCE RESET", "#4CAF50");
+    this.showWin(0);
   }
 
   updateUI() {
@@ -90,12 +94,23 @@ export default class Slot {
       this.el.playerMoney.textContent = JackpotAPI.formatNumber(this.money);
     if (this.el.betDisplay)
       this.el.betDisplay.textContent = JackpotAPI.formatNumber(this.bet);
+    if (this.el.betDisplay2)
+      this.el.betDisplay2.textContent = JackpotAPI.formatNumber(this.bet);
   }
 
   showMsg(text, color) {
     if (this.el.winText) {
       this.el.winText.textContent = text;
       this.el.winText.style.color = color || "#FFD700";
+    }
+  }
+
+  showWin(amount) {
+    if (this.el.winBox) {
+      this.el.winBox.textContent =
+        amount > 0 ? JackpotAPI.formatNumber(amount) : "—";
+      this.el.winBox.style.color =
+        amount > 0 ? "#FF6B6B" : "rgba(155,148,180,0.4)";
     }
   }
 
@@ -173,11 +188,13 @@ export default class Slot {
     this.updateUI();
     if (win) {
       this.showMsg(
-        "🎉 MENANG " + JackpotAPI.formatNumber(winnings) + "!",
+        "🎉 WIN " + JackpotAPI.formatNumber(winnings) + "!",
         "#FFD700",
       );
+      this.showWin(winnings);
     } else {
       this.showMsg("", "#888");
+      this.showWin(0);
     }
 
     // Save money
